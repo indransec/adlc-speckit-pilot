@@ -1,0 +1,21 @@
+id: AGT-TRV-DOC
+name: document
+version: 0.1.0
+role: subagent
+owner: claims-ai-team
+risk_tier: high
+description: Extracts and cross-checks document data; chases missing documents.
+requirements: [REQ-F-004, REQ-F-005, REQ-F-006]
+model:
+  provider: "[provider]"
+  name: "[model-name]"
+  version: "[pinned-version]"
+  params:
+    temperature: 0.1
+prompts:
+  system: prompts/system.md
+tools:
+  - id: TOOL-DOCUMENT-STORE
+guardrails: [pii-redaction, document-injection]
+autonomy: act-within-scope
+evals: evals/agents/document/suite.yaml

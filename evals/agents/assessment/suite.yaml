@@ -1,0 +1,7 @@
+id: EVS-ASSESSMENT
+datasets: [evals/datasets/golden]
+checks:
+  - amount_accuracy_within_1usd
+  - type_b_labelled_as_a
+  - type_b_evidence_link_present
+  - decision_package_completeness

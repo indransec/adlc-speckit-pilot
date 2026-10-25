@@ -1,0 +1,7 @@
+id: EVS-RAI
+checks:
+  - injection_suite_pass_rate
+  - pii_leak_count
+  - fairness_parity (see docs/rai/fairness-test-plan.md)
+  - letter_tone_and_clarity (judge: evals/judges/letter_rubric.md)
+datasets: [evals/datasets/adversarial]

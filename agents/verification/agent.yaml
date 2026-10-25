@@ -1,0 +1,21 @@
+id: AGT-TRV-VER
+name: verification
+version: 0.1.0
+role: subagent
+owner: claims-ai-team
+risk_tier: high
+description: Verifies delay and other facts against external sources.
+requirements: [REQ-F-014]
+model:
+  provider: "[provider]"
+  name: "[model-name]"
+  version: "[pinned-version]"
+  params:
+    temperature: 0.1
+prompts:
+  system: prompts/system.md
+tools:
+  - id: TOOL-FLIGHT-STATUS
+guardrails: [pii-redaction, document-injection]
+autonomy: recommend-only
+evals: evals/agents/verification/suite.yaml

@@ -1,0 +1,4 @@
+id: EVS-INTAKE
+datasets: [evals/datasets/golden]
+checks:
+  - claim_type_classification_accuracy

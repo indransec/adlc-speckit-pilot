@@ -1,0 +1,23 @@
+# Non-functional requirements
+requirements:
+  - id: REQ-N-001
+    text: Time from complete submission to decision package p95 <= 10 minutes.
+    verification: [perf-test, slo:decision-latency]
+  - id: REQ-N-002
+    text: Service availability >= 99.5% in business hours.
+    verification: [slo:availability]
+  - id: REQ-N-003
+    text: Model and tool cost per claim <= USD [x].
+    verification: [slo:cost-per-claim]
+  - id: REQ-N-004
+    text: Sustain 3x expected peak claim volume without breaching REQ-N-001.
+    verification: [perf-test]
+  - id: REQ-N-005
+    text: All processing and storage within [region].
+    verification: [design-review]
+  - id: REQ-N-006
+    text: Full audit trail (inputs, recommendation, approvals, release ID) retained [N] years.
+    verification: [test:audit]
+  - id: REQ-N-007
+    text: Every trace span carries the system release ID and agent version.
+    verification: [test:telemetry]

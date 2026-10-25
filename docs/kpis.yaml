@@ -1,0 +1,32 @@
+# KPI baseline and targets (metric realisation)
+kpis:
+  - id: KPI-01
+    name: Average handling time, delay + baggage
+    baseline: "[measure from last 6 months]"
+    target: "-40%"
+    source: claims system timestamps
+  - id: KPI-02
+    name: Straight-through processing rate
+    baseline: 0%
+    target: 15-25% (conservative MVP routing)
+    source: routing decisions
+  - id: KPI-03
+    name: Adjuster minutes per claim
+    baseline: "[time study]"
+    target: "-30%"
+    source: workbench activity
+  - id: KPI-04
+    name: Payment accuracy (QA sample)
+    baseline: "[current QA error rate]"
+    target: ">= baseline"
+    source: weekly QA sample
+  - id: KPI-05
+    name: Human override rate of agent recommendation
+    baseline: n/a
+    target: "< 15%"
+    source: L1/L2 decisions
+  - id: KPI-06
+    name: Customer complaints per 1,000 claims
+    baseline: "[current]"
+    target: "<= baseline"
+    source: complaints log

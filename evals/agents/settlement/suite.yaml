@@ -1,0 +1,4 @@
+id: EVS-SETTLEMENT
+datasets: [evals/datasets/golden]
+checks:
+  - no_instruction_without_token

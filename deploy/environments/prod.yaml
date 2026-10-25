@@ -1,0 +1,11 @@
+environment: prod
+model_endpoint: "[prod-endpoint]"
+region: "[region]"
+mode: shadow            # shadow | assisted | full
+feature_flags:
+  straight_through_enabled: false
+  payments_enabled: false
+  kill_switch: false
+limits:
+  max_cost_per_claim_usd: "[x]"
+  max_agent_steps: 40

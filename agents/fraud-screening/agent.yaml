@@ -1,0 +1,21 @@
+id: AGT-TRV-FRAUD
+name: fraud-screening
+version: 0.1.0
+role: subagent
+owner: claims-ai-team
+risk_tier: high
+description: Obtains SIU fraud score and flags anomalies. Never rejects.
+requirements: [REQ-F-016, REQ-B-007]
+model:
+  provider: "[provider]"
+  name: "[model-name]"
+  version: "[pinned-version]"
+  params:
+    temperature: 0.1
+prompts:
+  system: prompts/system.md
+tools:
+  - id: TOOL-FRAUD-SCORE
+guardrails: [pii-redaction, document-injection]
+autonomy: flag-only
+evals: evals/agents/fraud-screening/suite.yaml

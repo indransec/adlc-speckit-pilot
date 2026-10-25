@@ -1,0 +1,31 @@
+# Which agent may use which tool, and how
+tools:
+  - id: TOOL-POLICY-ADMIN
+    agents: [coverage]
+    access: read
+    side_effects: none
+  - id: TOOL-CLAIMS-SYSTEM
+    agents: [intake, orchestrator]
+    access: create, update-status
+    side_effects: claim record changes (no payment fields)
+  - id: TOOL-FLIGHT-STATUS
+    agents: [verification]
+    access: read
+    side_effects: none
+  - id: TOOL-DOCUMENT-STORE
+    agents: [document]
+    access: read, write-extracted-fields
+    side_effects: stores extraction results
+  - id: TOOL-FRAUD-SCORE
+    agents: [fraud-screening]
+    access: read
+    side_effects: none
+  - id: TOOL-PAYMENTS
+    agents: [settlement]
+    access: create-instruction
+    side_effects: money movement
+    precondition: valid approval token (ADR-003)
+  - id: TOOL-NOTIFY
+    agents: [communication]
+    access: send-from-template
+    side_effects: customer communication

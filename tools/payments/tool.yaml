@@ -1,0 +1,10 @@
+id: TOOL-PAYMENTS
+description: Create payment instruction.
+owner: "[system owner]"
+auth_scope: create-instruction (requires approval token)
+side_effects: money movement
+rate_limit: "[n] calls/min"
+timeout_seconds: 10
+retries: 2
+input_schema: "[JSON schema]"
+output_schema: "[JSON schema]"

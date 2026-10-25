@@ -1,0 +1,4 @@
+id: document-injection
+applies_to: [document-text]
+detect: [instruction-like text, role-play prompts, system-prompt requests]
+action_on_detection: wrap-as-quoted-data, raise-fraud-signal, log-event

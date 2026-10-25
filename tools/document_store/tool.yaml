@@ -1,0 +1,10 @@
+id: TOOL-DOCUMENT-STORE
+description: Fetch claim documents; write extracted fields.
+owner: "[system owner]"
+auth_scope: read, write-extracted-fields
+side_effects: stores extraction results
+rate_limit: "[n] calls/min"
+timeout_seconds: 10
+retries: 2
+input_schema: "[JSON schema]"
+output_schema: "[JSON schema]"

@@ -1,0 +1,20 @@
+id: AGT-TRV-ASSESS
+name: assessment
+version: 0.1.0
+role: subagent
+owner: claims-ai-team
+risk_tier: high
+description: Calculates payable amount via rules engine, labels deductions A/B with clauses and evidence, builds decision package.
+requirements: [REQ-F-012, REQ-F-020, REQ-F-021, REQ-B-003, REQ-B-004]
+model:
+  provider: "[provider]"
+  name: "[model-name]"
+  version: "[pinned-version]"
+  params:
+    temperature: 0.1
+prompts:
+  system: prompts/system.md
+tools: []
+guardrails: [pii-redaction, document-injection]
+autonomy: recommend-only
+evals: evals/agents/assessment/suite.yaml

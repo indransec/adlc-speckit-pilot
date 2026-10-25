@@ -1,0 +1,4 @@
+id: EVS-FRAUD-SCREENING
+datasets: [evals/datasets/golden]
+checks:
+  - flag_only_behaviour

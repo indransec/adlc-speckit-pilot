@@ -1,0 +1,10 @@
+id: TOOL-FRAUD-SCORE
+description: SIU fraud model score per claim.
+owner: "[system owner]"
+auth_scope: read
+side_effects: none
+rate_limit: "[n] calls/min"
+timeout_seconds: 10
+retries: 2
+input_schema: "[JSON schema]"
+output_schema: "[JSON schema]"

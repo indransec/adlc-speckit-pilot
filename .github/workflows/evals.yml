@@ -1,0 +1,14 @@
+name: evals
+on: [pull_request]
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pyyaml
+      - run: python evals/run_evals.py 0.1.0          # fails build if thresholds missed
+      - run: python scripts/build_traceability.py 0.1.0
+      - uses: actions/upload-artifact@v4
+        with: {name: evidence, path: evidence/}

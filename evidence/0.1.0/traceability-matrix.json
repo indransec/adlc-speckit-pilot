@@ -1,0 +1,359 @@
+{
+  "release": "0.1.0",
+  "requirements": 35,
+  "without_verification": [],
+  "with_eval_cases": 13,
+  "matrix": [
+    {
+      "requirement": "REQ-B-001",
+      "verification": [
+        "test:routing",
+        "eval:routing"
+      ],
+      "eval_cases": [
+        "EVC-001"
+      ],
+      "case_results": {
+        "EVC-001": true
+      }
+    },
+    {
+      "requirement": "REQ-B-002",
+      "verification": [
+        "test:routing",
+        "eval:routing"
+      ],
+      "eval_cases": [
+        "EVC-005"
+      ],
+      "case_results": {
+        "EVC-005": true
+      }
+    },
+    {
+      "requirement": "REQ-B-003",
+      "verification": [
+        "test:routing",
+        "eval:deduction-classification"
+      ],
+      "eval_cases": [
+        "EVC-004"
+      ],
+      "case_results": {
+        "EVC-004": true
+      }
+    },
+    {
+      "requirement": "REQ-B-004",
+      "verification": [
+        "test:routing",
+        "eval:evidence-linking"
+      ],
+      "eval_cases": [
+        "EVC-006"
+      ],
+      "case_results": {
+        "EVC-006": true
+      }
+    },
+    {
+      "requirement": "REQ-B-005",
+      "verification": [
+        "test:settlement",
+        "rai:red-team"
+      ],
+      "eval_cases": [
+        "ADV-003"
+      ],
+      "case_results": {
+        "ADV-003": null
+      }
+    },
+    {
+      "requirement": "REQ-B-006",
+      "verification": [
+        "test:hitl"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-B-007",
+      "verification": [
+        "test:routing"
+      ],
+      "eval_cases": [
+        "EVC-007"
+      ],
+      "case_results": {
+        "EVC-007": true
+      }
+    },
+    {
+      "requirement": "REQ-B-008",
+      "verification": [
+        "eval:letters"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-B-009",
+      "verification": [
+        "rai:pii-suite"
+      ],
+      "eval_cases": [
+        "ADV-004"
+      ],
+      "case_results": {
+        "ADV-004": null
+      }
+    },
+    {
+      "requirement": "REQ-B-010",
+      "verification": [
+        "rai:injection-suite"
+      ],
+      "eval_cases": [
+        "ADV-001"
+      ],
+      "case_results": {
+        "ADV-001": null
+      }
+    },
+    {
+      "requirement": "REQ-B-011",
+      "verification": [
+        "eval:routing"
+      ],
+      "eval_cases": [
+        "EVC-006"
+      ],
+      "case_results": {
+        "EVC-006": true
+      }
+    },
+    {
+      "requirement": "REQ-F-001",
+      "verification": [
+        "eval:intake-classification",
+        "test:intake"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-F-002",
+      "verification": [
+        "test:communication-templates"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-F-004",
+      "verification": [
+        "eval:document-extraction"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-F-005",
+      "verification": [
+        "eval:document-completeness"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-F-006",
+      "verification": [
+        "test:document-chasing"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-F-010",
+      "verification": [
+        "eval:coverage"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-F-011",
+      "verification": [
+        "eval:coverage"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-F-012",
+      "verification": [
+        "test:calculation",
+        "eval:amount-accuracy"
+      ],
+      "eval_cases": [
+        "EVC-002"
+      ],
+      "case_results": {
+        "EVC-002": true
+      }
+    },
+    {
+      "requirement": "REQ-F-013",
+      "verification": [
+        "eval:edge-cases"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-F-014",
+      "verification": [
+        "eval:verification"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-F-015",
+      "verification": [
+        "test:routing",
+        "eval:edge-cases"
+      ],
+      "eval_cases": [
+        "ADV-002",
+        "EVC-008"
+      ],
+      "case_results": {
+        "ADV-002": null,
+        "EVC-008": true
+      }
+    },
+    {
+      "requirement": "REQ-F-016",
+      "verification": [
+        "test:fraud-integration"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-F-020",
+      "verification": [
+        "eval:deduction-classification"
+      ],
+      "eval_cases": [
+        "EVC-002",
+        "EVC-004"
+      ],
+      "case_results": {
+        "EVC-002": true,
+        "EVC-004": true
+      }
+    },
+    {
+      "requirement": "REQ-F-021",
+      "verification": [
+        "eval:decision-package"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-F-025",
+      "verification": [
+        "test:routing",
+        "eval:routing"
+      ],
+      "eval_cases": [
+        "EVC-001",
+        "EVC-002",
+        "EVC-003"
+      ],
+      "case_results": {
+        "EVC-001": true,
+        "EVC-002": true,
+        "EVC-003": true
+      }
+    },
+    {
+      "requirement": "REQ-F-030",
+      "verification": [
+        "test:settlement"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-F-031",
+      "verification": [
+        "eval:letters",
+        "rai:letter-review"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-N-001",
+      "verification": [
+        "perf-test",
+        "slo:decision-latency"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-N-002",
+      "verification": [
+        "slo:availability"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-N-003",
+      "verification": [
+        "slo:cost-per-claim"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-N-004",
+      "verification": [
+        "perf-test"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-N-005",
+      "verification": [
+        "design-review"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-N-006",
+      "verification": [
+        "test:audit"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    },
+    {
+      "requirement": "REQ-N-007",
+      "verification": [
+        "test:telemetry"
+      ],
+      "eval_cases": [],
+      "case_results": {}
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+id: AGT-TRV-SETTLE
+name: settlement
+version: 0.1.0
+role: subagent
+owner: claims-ai-team
+risk_tier: high
+description: Creates payment instruction only with a valid approval token.
+requirements: [REQ-F-030, REQ-B-005]
+model:
+  provider: "[provider]"
+  name: "[model-name]"
+  version: "[pinned-version]"
+  params:
+    temperature: 0.1
+prompts:
+  system: prompts/system.md
+tools:
+  - id: TOOL-PAYMENTS
+guardrails: [pii-redaction, document-injection]
+autonomy: act-with-approval-token
+evals: evals/agents/settlement/suite.yaml

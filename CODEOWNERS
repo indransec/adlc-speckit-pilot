@@ -1,0 +1,10 @@
+# Changes to agent behaviour need AI lead + RAI review
+/agents/**/prompts/        @ai-lead @rai-reviewers
+/guardrails/               @ai-lead @rai-reviewers
+# Routing rules and authority limits are a business control
+/agents/orchestrator/src/routing.py   @claims-business-owner @ai-lead
+/evals/thresholds.yaml                @claims-business-owner @ai-lead
+# Tool contracts and permissions need security
+/tools/                    @security-architect
+/docs/design/tool-permission-matrix.yaml  @security-architect
+/deploy/                   @platform-team

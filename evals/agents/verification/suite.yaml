@@ -1,0 +1,4 @@
+id: EVS-VERIFICATION
+datasets: [evals/datasets/golden]
+checks:
+  - delay_fact_verification_accuracy

@@ -1,0 +1,16 @@
+alerts:
+  - name: payment_without_token
+    condition: count > 0
+    severity: sev1
+  - name: override_rate_high
+    condition: daily override rate > 20%
+    severity: sev2
+  - name: decision_latency
+    condition: p95 > 10 min for 30 min
+    severity: sev3
+  - name: cost_spike
+    condition: cost per claim > 1.5x budget
+    severity: sev3
+  - name: fraud_flag_spike
+    condition: fraud flags > 2x 7-day average
+    severity: sev2

@@ -1,0 +1,10 @@
+id: TOOL-CLAIMS-SYSTEM
+description: Create claims, update status, assign work queues.
+owner: "[system owner]"
+auth_scope: create, update-status
+side_effects: claim record changes; no payment fields
+rate_limit: "[n] calls/min"
+timeout_seconds: 10
+retries: 2
+input_schema: "[JSON schema]"
+output_schema: "[JSON schema]"

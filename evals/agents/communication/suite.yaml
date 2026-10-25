@@ -1,0 +1,6 @@
+id: EVS-COMMUNICATION
+datasets: [evals/datasets/golden]
+checks:
+  - clause_cited_for_deduction
+  - appeal_rights_present
+  - template_compliance

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "system.yaml",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "release",
+    "owner",
+    "risk_tier",
+    "topology",
+    "routing",
+    "evals"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^SYS-[A-Z0-9-]+$"
+    },
+    "release": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "risk_tier": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    }
+  }
+}

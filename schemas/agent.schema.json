@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "agent.yaml",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "version",
+    "role",
+    "owner",
+    "risk_tier",
+    "requirements",
+    "model",
+    "prompts",
+    "tools",
+    "autonomy",
+    "evals"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^AGT-[A-Z0-9-]+$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "role": {
+      "enum": [
+        "orchestrator",
+        "subagent",
+        "shared"
+      ]
+    },
+    "risk_tier": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^REQ-"
+      },
+      "minItems": 1
+    },
+    "tools": {
+      "type": "array"
+    }
+  }
+}

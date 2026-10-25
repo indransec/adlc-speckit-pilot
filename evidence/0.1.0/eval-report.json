@@ -1,0 +1,87 @@
+{
+  "release": "0.1.0",
+  "generated_at": "2026-10-25T08:01:53.800544+00:00",
+  "suite": "routing",
+  "routing_correctness": 1.0,
+  "threshold": 0.99,
+  "passed": true,
+  "cases": [
+    {
+      "case_id": "EVC-001",
+      "requirements": [
+        "REQ-B-001",
+        "REQ-F-025"
+      ],
+      "expected": "row1_straight_through",
+      "got": "row1_straight_through",
+      "pass": true
+    },
+    {
+      "case_id": "EVC-002",
+      "requirements": [
+        "REQ-F-012",
+        "REQ-F-020",
+        "REQ-F-025"
+      ],
+      "expected": "row2_l1_policy_norm",
+      "got": "row2_l1_policy_norm",
+      "pass": true
+    },
+    {
+      "case_id": "EVC-003",
+      "requirements": [
+        "REQ-F-025"
+      ],
+      "expected": "row3_l1_authority",
+      "got": "row3_l1_authority",
+      "pass": true
+    },
+    {
+      "case_id": "EVC-004",
+      "requirements": [
+        "REQ-B-003",
+        "REQ-F-020"
+      ],
+      "expected": "row4_l1_l2_significant",
+      "got": "row4_l1_l2_significant",
+      "pass": true
+    },
+    {
+      "case_id": "EVC-005",
+      "requirements": [
+        "REQ-B-002"
+      ],
+      "expected": "row5_l1_l2_rejection",
+      "got": "row5_l1_l2_rejection",
+      "pass": true
+    },
+    {
+      "case_id": "EVC-006",
+      "requirements": [
+        "REQ-B-004",
+        "REQ-B-011"
+      ],
+      "expected": "row6_investigation",
+      "got": "row6_investigation",
+      "pass": true
+    },
+    {
+      "case_id": "EVC-007",
+      "requirements": [
+        "REQ-B-007"
+      ],
+      "expected": "row7_siu",
+      "got": "row7_siu",
+      "pass": true
+    },
+    {
+      "case_id": "EVC-008",
+      "requirements": [
+        "REQ-F-015"
+      ],
+      "expected": "row3_l1_authority",
+      "got": "row3_l1_authority",
+      "pass": true
+    }
+  ]
+}

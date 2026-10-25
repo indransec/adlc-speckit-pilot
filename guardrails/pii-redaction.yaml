@@ -1,0 +1,5 @@
+id: pii-redaction
+applies_to: [model-input, logs]
+redact: [passport_number, bank_account, card_number, phone, email, address]
+never_send_to_model: [bank_account, card_number]
+action_on_detection: redact-and-log-event

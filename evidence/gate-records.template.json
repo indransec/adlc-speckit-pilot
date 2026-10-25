@@ -1,0 +1,62 @@
+{
+  "system": "SYS-TRV-CLM",
+  "release": "0.1.0",
+  "gates": [
+    {
+      "gate": "G0",
+      "status": "pending",
+      "approvers": [],
+      "decided_at": null,
+      "evidence": []
+    },
+    {
+      "gate": "G1",
+      "status": "pending",
+      "approvers": [],
+      "decided_at": null,
+      "evidence": []
+    },
+    {
+      "gate": "G2",
+      "status": "pending",
+      "approvers": [],
+      "decided_at": null,
+      "evidence": []
+    },
+    {
+      "gate": "G3",
+      "status": "pending",
+      "approvers": [],
+      "decided_at": null,
+      "evidence": []
+    },
+    {
+      "gate": "G4",
+      "status": "pending",
+      "approvers": [],
+      "decided_at": null,
+      "evidence": []
+    },
+    {
+      "gate": "G5",
+      "status": "pending",
+      "approvers": [],
+      "decided_at": null,
+      "evidence": []
+    },
+    {
+      "gate": "G6",
+      "status": "pending",
+      "approvers": [],
+      "decided_at": null,
+      "evidence": []
+    },
+    {
+      "gate": "G7",
+      "status": "pending",
+      "approvers": [],
+      "decided_at": null,
+      "evidence": []
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+id: AGT-TRV-COV
+name: coverage
+version: 0.1.0
+role: subagent
+owner: claims-ai-team
+risk_tier: high
+description: Checks policy validity, benefits, limits and exclusions.
+requirements: [REQ-F-010, REQ-F-011, REQ-F-013]
+model:
+  provider: "[provider]"
+  name: "[model-name]"
+  version: "[pinned-version]"
+  params:
+    temperature: 0.1
+prompts:
+  system: prompts/system.md
+tools:
+  - id: TOOL-POLICY-ADMIN
+guardrails: [pii-redaction, document-injection]
+autonomy: recommend-only
+evals: evals/agents/coverage/suite.yaml

@@ -1,0 +1,7 @@
+id: output-policy
+applies_to: [customer-messages]
+rules:
+  - templates-only
+  - must-cite-clause-for-deduction
+  - must-include-appeal-rights-on-deduction-or-rejection
+  - no-internal-scores-or-fraud-flags-in-customer-text

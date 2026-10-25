@@ -1,0 +1,53 @@
+# Functional requirements - what the system must do
+requirements:
+  - id: REQ-F-001
+    text: Register each submitted claim, assign a claim ID and classify it as delay, baggage or both within 5 minutes.
+    verification: [eval:intake-classification, test:intake]
+  - id: REQ-F-002
+    text: Send an acknowledgement with claim ID and next steps to the customer.
+    verification: [test:communication-templates]
+  - id: REQ-F-004
+    text: Extract name, policy number, travel dates, flight number, amounts and currency from all attached documents and cross-check them for consistency.
+    verification: [eval:document-extraction]
+  - id: REQ-F-005
+    text: Check document completeness against the checklist for each claim type.
+    verification: [eval:document-completeness]
+  - id: REQ-F-006
+    text: Request missing documents, send reminders on day 3 and day 7, and close the claim as incomplete on day [30].
+    verification: [test:document-chasing]
+  - id: REQ-F-010
+    text: Confirm the policy was active on the travel dates and the claimant is an insured person.
+    verification: [eval:coverage]
+  - id: REQ-F-011
+    text: Map the claim to benefit sections and identify applicable exclusions.
+    verification: [eval:coverage]
+  - id: REQ-F-012
+    text: Apply excess, sub-limits, benefit caps, currency conversion at the policy rule date, and offsets for compensation already received.
+    verification: [test:calculation, eval:amount-accuracy]
+  - id: REQ-F-013
+    text: Detect duplicate claims for the same event.
+    verification: [eval:edge-cases]
+  - id: REQ-F-014
+    text: Verify flight delay facts against the licensed flight status source.
+    verification: [eval:verification]
+  - id: REQ-F-015
+    text: Aggregate approved amounts across the claim and any claims linked to the same trip or event.
+    verification: [test:routing, eval:edge-cases]
+  - id: REQ-F-016
+    text: Obtain a fraud risk level (low, medium, high) for each claim.
+    verification: [test:fraud-integration]
+  - id: REQ-F-020
+    text: Label every deduction line as type A (policy-norm) or type B (judgement) with the policy clause and evidence reference.
+    verification: [eval:deduction-classification]
+  - id: REQ-F-021
+    text: Produce a decision package with recommended outcome, amount, line-by-line deductions, clauses, evidence and confidence.
+    verification: [eval:decision-package]
+  - id: REQ-F-025
+    text: Route each claim according to the routing matrix rows 1-7.
+    verification: [test:routing, eval:routing]
+  - id: REQ-F-030
+    text: Create a payment instruction only after the final required approval, and verify the account holder matches the claimant.
+    verification: [test:settlement]
+  - id: REQ-F-031
+    text: Send the decision letter with breakdown, clause citations for any deduction, and appeal rights.
+    verification: [eval:letters, rai:letter-review]

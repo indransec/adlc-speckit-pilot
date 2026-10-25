@@ -1,0 +1,5 @@
+id: EVS-COVERAGE
+datasets: [evals/datasets/golden]
+checks:
+  - coverage_agreement_with_adjuster
+  - exclusion_identification

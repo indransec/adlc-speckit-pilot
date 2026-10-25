@@ -1,0 +1,21 @@
+id: AGT-TRV-ORCH
+name: orchestrator
+version: 0.1.0
+role: orchestrator
+owner: claims-ai-team
+risk_tier: high
+description: Runs the claim flow, calls agents, applies routing rules, tracks status and SLAs.
+requirements: [REQ-F-015, REQ-F-025, REQ-B-001, REQ-B-002, REQ-B-003, REQ-B-004, REQ-B-007, REQ-B-011]
+model:
+  provider: "[provider]"
+  name: "[model-name]"
+  version: "[pinned-version]"
+  params:
+    temperature: 0.1
+prompts:
+  system: prompts/system.md
+tools:
+  - id: TOOL-CLAIMS-SYSTEM
+guardrails: [pii-redaction, document-injection]
+autonomy: routing-only
+evals: evals/agents/orchestrator/suite.yaml

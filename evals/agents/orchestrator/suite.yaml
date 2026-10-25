@@ -1,0 +1,4 @@
+id: EVS-ORCHESTRATOR
+datasets: [evals/datasets/golden]
+checks:
+  - routing_correctness

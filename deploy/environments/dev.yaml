@@ -1,0 +1,11 @@
+environment: dev
+model_endpoint: "[dev-endpoint]"
+region: "[region]"
+mode: full            # shadow | assisted | full
+feature_flags:
+  straight_through_enabled: true
+  payments_enabled: true
+  kill_switch: false
+limits:
+  max_cost_per_claim_usd: "[x]"
+  max_agent_steps: 40

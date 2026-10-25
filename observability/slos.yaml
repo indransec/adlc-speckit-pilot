@@ -1,0 +1,11 @@
+slos:
+  - id: slo:decision-latency
+    target: p95 <= 10 min (submission complete -> decision package)
+  - id: slo:availability
+    target: 99.5% business hours
+  - id: slo:cost-per-claim
+    target: "<= USD [x]"
+  - id: slo:l1-turnaround
+    target: 1 business day
+  - id: slo:l2-turnaround
+    target: 1 business day after L1

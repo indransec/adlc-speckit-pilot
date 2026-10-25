@@ -1,0 +1,6 @@
+id: EVS-DOCUMENT
+datasets: [evals/datasets/golden]
+checks:
+  - extraction_key_fields_accuracy
+  - completeness_check_accuracy
+  - cross_document_mismatch_detection

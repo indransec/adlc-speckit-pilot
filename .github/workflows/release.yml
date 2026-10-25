@@ -1,0 +1,16 @@
+name: release
+on:
+  push:
+    tags: ["v*"]
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: production        # requires CAB approver in GitHub environment rules
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bundle hash
+        run: tar -cf bundle.tar system.yaml agents tools guardrails && sha256sum bundle.tar | tee bundle.sha256
+      - name: Gate G5 check
+        run: python scripts/gate_check.py --gate G5
+      - name: Deploy
+        run: echo "deploy via deploy/infra"

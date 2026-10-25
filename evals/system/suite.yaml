@@ -1,0 +1,9 @@
+id: EVS-SYSTEM
+description: End-to-end claim flows across all agents
+datasets: [evals/datasets/golden, evals/datasets/adversarial]
+checks:
+  - routing_correctness
+  - stp_that_should_be_human
+  - no_delegation_loops (max depth 2)
+  - step_and_cost_budget_respected
+  - audit_record_complete
