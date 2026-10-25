@@ -7,9 +7,9 @@ risk_tier: high
 description: Creates payment instruction only with a valid approval token.
 requirements: [REQ-F-030, REQ-B-005]
 model:
-  provider: "[provider]"
-  name: "[model-name]"
-  version: "[pinned-version]"
+  provider: none            # deterministic: payment data never reaches a model (D-09)
+  name: none
+  version: "n/a"
   params:
     temperature: 0.1
 prompts:

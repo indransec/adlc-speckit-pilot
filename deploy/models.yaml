@@ -1,0 +1,14 @@
+# Model catalog served through the OpenRouter AI gateway (ADR-005).
+# Prices are USD per 1M tokens as published by OpenRouter on 2026-10-25; used for
+# cost-per-claim telemetry (REQ-N-003). A model swap is a release and re-runs G3.
+models:
+  - id: anthropic/claude-haiku-5.5
+    tier: fast
+    input_per_m: 0.10
+    output_per_m: 0.50
+    use: intake, document extraction, verification narrative, fraud anomaly flags, letters, case notes
+  - id: anthropic/claude-sonnet-5.5
+    tier: reasoning
+    input_per_m: 2.00
+    output_per_m: 10.00
+    use: coverage mapping, deduction judgements, LLM-as-judge evals

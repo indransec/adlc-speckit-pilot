@@ -1,0 +1,9 @@
+Dear {{ claimant_name }},
+
+To continue with claim {{ claim_id }} we need the following document(s):
+{% for d in missing %}
+- {{ d }}
+{% endfor %}
+
+Please upload them through your claim page. We will send reminders after 3 and 7 days, and if we do not receive the documents within 30 days we will close the claim as incomplete. You can re-open it by sending the documents later.
+{% include "_footer.j2" %}

@@ -4,10 +4,12 @@ tools:
     agents: [coverage]
     access: read
     side_effects: none
+    note: includes per-policy claims history for duplicate detection REQ-F-013
   - id: TOOL-CLAIMS-SYSTEM
     agents: [intake, orchestrator]
-    access: create, update-status
+    access: create, update-status, read
     side_effects: claim record changes (no payment fields)
+    note: read added for linked-claim aggregation REQ-F-015 (decision D-07)
   - id: TOOL-FLIGHT-STATUS
     agents: [verification]
     access: read

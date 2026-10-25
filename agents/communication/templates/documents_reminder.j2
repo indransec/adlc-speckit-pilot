@@ -1,0 +1,7 @@
+Dear {{ claimant_name }},
+
+This is a reminder (day {{ day }}) that we still need the following document(s) for claim {{ claim_id }}:
+{% for d in missing %}
+- {{ d }}
+{% endfor %}
+{% include "_footer.j2" %}

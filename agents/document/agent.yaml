@@ -7,9 +7,9 @@ risk_tier: high
 description: Extracts and cross-checks document data; chases missing documents.
 requirements: [REQ-F-004, REQ-F-005, REQ-F-006]
 model:
-  provider: "[provider]"
-  name: "[model-name]"
-  version: "[pinned-version]"
+  provider: openrouter
+  name: anthropic/claude-haiku-5.5   # fast tier (deploy/models.yaml)
+  version: "5.5"
   params:
     temperature: 0.1
 prompts:

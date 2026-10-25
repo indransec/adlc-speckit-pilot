@@ -1,0 +1,16 @@
+Dear {{ claimant_name }},
+
+{{ opening }}
+
+Claim {{ claim_id }}: approved in part.
+Amount claimed: USD {{ "%.2f"|format(claimed_usd) }}
+Amount approved: USD {{ "%.2f"|format(approved_usd) }}
+
+How we calculated this amount:
+{% for d in deductions %}
+- USD {{ "%.2f"|format(d.amount_usd) }} deducted under clause {{ d.clause }} ({{ d.clause_title }}): {{ d.explanation }}
+{% endfor %}
+
+{{ payment_note }}
+{% include "_appeal.j2" %}
+{% include "_footer.j2" %}

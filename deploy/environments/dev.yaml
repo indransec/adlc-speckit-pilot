@@ -1,11 +1,12 @@
 environment: dev
-model_endpoint: "[dev-endpoint]"
-region: "[region]"
+model_endpoint: https://openrouter.ai/api/v1   # AI gateway (OpenRouter)
+region: local-sim
 mode: full            # shadow | assisted | full
 feature_flags:
   straight_through_enabled: true
   payments_enabled: true
   kill_switch: false
 limits:
-  max_cost_per_claim_usd: "[x]"
+  max_cost_per_claim_usd: 0.25
   max_agent_steps: 40
+llm_mode: auto          # auto (live if OPENROUTER_API_KEY set, else mock) | live | mock

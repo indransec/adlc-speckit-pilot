@@ -1,0 +1,10 @@
+Dear {{ claimant_name }},
+
+{{ opening }}
+
+Claim {{ claim_id }}: approved in full.
+Amount claimed: USD {{ "%.2f"|format(claimed_usd) }}
+Amount approved: USD {{ "%.2f"|format(approved_usd) }}
+
+{{ payment_note }}
+{% include "_footer.j2" %}

@@ -7,9 +7,9 @@ risk_tier: high
 description: Registers and classifies claims; sends acknowledgement.
 requirements: [REQ-F-001, REQ-F-002]
 model:
-  provider: "[provider]"
-  name: "[model-name]"
-  version: "[pinned-version]"
+  provider: openrouter
+  name: anthropic/claude-haiku-5.5   # fast tier (deploy/models.yaml)
+  version: "5.5"
   params:
     temperature: 0.1
 prompts:

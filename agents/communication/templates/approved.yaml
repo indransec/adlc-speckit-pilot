@@ -1,0 +1,17 @@
+# Customer message templates. Only templates with status "approved" can be sent (TOOL-NOTIFY).
+# Approval is a G4 item ("Customer letters approved by Compliance").
+templates:
+  - {id: acknowledgement, file: acknowledgement.j2, version: "1.0", status: approved, decision: false,
+     subject: "We have received your claim {claim_id}", approved_by: "[Compliance]", approved_on: 2026-10-25}
+  - {id: documents_request, file: documents_request.j2, version: "1.0", status: approved, decision: false,
+     subject: "Documents needed for claim {claim_id}", approved_by: "[Compliance]", approved_on: 2026-10-25}
+  - {id: documents_reminder, file: documents_reminder.j2, version: "1.0", status: approved, decision: false,
+     subject: "Reminder: documents needed for claim {claim_id}", approved_by: "[Compliance]", approved_on: 2026-10-25}
+  - {id: closed_incomplete, file: closed_incomplete.j2, version: "1.0", status: approved, decision: false,
+     subject: "Claim {claim_id} closed - documents not received", approved_by: "[Compliance]", approved_on: 2026-10-25}
+  - {id: decision_approved, file: decision_approved.j2, version: "1.0", status: approved, decision: true,
+     subject: "Decision on your claim {claim_id}", approved_by: "[Compliance]", approved_on: 2026-10-25}
+  - {id: decision_partial, file: decision_partial.j2, version: "1.0", status: approved, decision: true,
+     subject: "Decision on your claim {claim_id}", approved_by: "[Compliance]", approved_on: 2026-10-25}
+  - {id: decision_rejected, file: decision_rejected.j2, version: "1.0", status: approved, decision: true,
+     subject: "Decision on your claim {claim_id}", approved_by: "[Compliance]", approved_on: 2026-10-25}

@@ -1,0 +1,13 @@
+Dear {{ claimant_name }},
+
+{{ opening }}
+
+Claim {{ claim_id }}: we are unable to pay this claim.
+Amount claimed: USD {{ "%.2f"|format(claimed_usd) }}
+
+Reason(s):
+{% for r in reasons %}
+- Clause {{ r.clause }} ({{ r.clause_title }}): {{ r.explanation }}
+{% endfor %}
+{% include "_appeal.j2" %}
+{% include "_footer.j2" %}
