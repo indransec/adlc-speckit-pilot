@@ -1,6 +1,6 @@
 id: AGT-TRV-FRAUD
 name: fraud-screening
-version: 0.1.0
+version: 0.2.0
 role: subagent
 owner: claims-ai-team
 risk_tier: high
@@ -16,6 +16,7 @@ prompts:
   system: prompts/system.md
 tools:
   - id: TOOL-FRAUD-SCORE
+    attach: [score]   # read ops the model may call (create_react_agent)
 guardrails: [pii-redaction, document-injection]
 autonomy: flag-only
 evals: evals/agents/fraud-screening/suite.yaml

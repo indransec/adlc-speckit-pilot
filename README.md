@@ -19,13 +19,16 @@ make dev                        # Phoenix :6006 + FastAPI :8000 + Streamlit :850
 
 Or run them separately: `make phoenix`, `make api`, `make ui`. Then open http://localhost:8501.
 
-Without `OPENROUTER_API_KEY`, every agent uses its deterministic fallback (**mock mode**), so
-the whole system, tests and evals run offline and reproducibly. With the key, the same code
-calls Claude Haiku 5.5 (fast tier) and Claude Sonnet 5.5 (reasoning tier) through OpenRouter.
-You can switch modes at runtime on the ADLC Lifecycle page.
+Without `OPENROUTER_API_KEY`, a scripted mock model stands in (**mock mode**): it makes the same
+kind of tool calls and returns each agent's deterministic fallback, so the system, tests and evals
+run offline and reproducibly. With the key, the same code calls Claude Haiku 5.5 (fast tier) and
+Claude Sonnet 5.5 (reasoning tier) through OpenRouter (about USD 0.09 and 85 s per claim, measured
+on one live claim). You can switch modes at runtime on the ADLC Lifecycle page. Tests always run
+in mock mode; `make evals` and `make simulate` use the key when it is set, so run them as
+`OPENROUTER_API_KEY= make simulate` to stay offline.
 
 ```bash
-make test        # 69 unit/routing/HITL/telemetry tests -> evidence/0.1.0/test-report.json
+make test        # 78 unit/routing/HITL/agent-runtime/telemetry tests -> evidence/<release>/test-report.json
 make evals       # G3 + G4 eval suites -> eval-report.json, rai-report.json
 make simulate    # walk G0 -> G7: run every stage's actions, check each gate, sign with simulated approvers
 make status      # gate overview
@@ -36,13 +39,14 @@ make status      # gate overview
 | Concern | Choice | Where |
 |---|---|---|
 | Orchestration | LangGraph state graph (fan-out, HITL `interrupt()`, SQLite checkpointer) | `agents/orchestrator/src/claim_graph.py` |
-| AI gateway | OpenRouter via `langchain-openai`, structured output, tiered models | `shared/llm.py`, `deploy/models.yaml` |
+| Agents + tools | LangGraph prebuilt `create_react_agent` per LLM task; read tools attached from `agent.yaml` | `shared/agent_runtime.py` |
+| AI gateway | OpenRouter via `langchain-openai`, structured output method per model, tiered models | `shared/llm.py`, `deploy/models.yaml` |
 | Vector DB | FAISS + fastembed (`bge-small-en-v1.5`, ONNX) over policy-wording clauses | `shared/rag.py` |
 | Relational DB | SQLite (claims, audit, approvals, payments, telemetry) | `shared/db.py` |
 | Object store | Local disk (claim PDFs, policy wording) | `shared/object_store.py` |
 | Backend | FastAPI (OpenAPI at `/docs`) | `backend/app.py`, `backend/service.py` |
 | Front end | Streamlit (process claim, workbench, status, observability, lifecycle) | `frontend/` |
-| Observability | OpenTelemetry + OpenInference, **Arize Phoenix**; KPIs/SLOs/alerts in-app | `shared/telemetry.py`, `shared/metrics.py` |
+| Observability | OpenTelemetry + OpenInference, **Arize Phoenix** (tokens, latency, cost tracking, tool spans); KPIs/SLOs/alerts in-app | `shared/telemetry.py`, `shared/metrics.py` |
 | Guardrails | **Microsoft Presidio** PII redaction, injection heuristics, output policy | `shared/guardrails/`, `guardrails/*.yaml` |
 | Documents | reportlab (synthetic PDFs), pypdf (text extraction) | `synthetic/pdfs.py` |
 | HITL control | Signed approval token (PyJWT, HS256) checked by the payments tool | `shared/hitl/` |
@@ -65,6 +69,15 @@ Streamlit ──HTTP──> FastAPI ──> ClaimsService ──> LangGraph orch
 - **Manifest-driven.** The orchestrator loads each sub-agent pinned in `system.yaml`
   (`id@version`), with its `agent.yaml`, `prompts/system.md` and `src/agent.py`. Delegation is
   checked against the topology and max depth.
+- **Agents are `create_react_agent` graphs** (decision D-12). Each LLM task builds
+  `create_react_agent(model, tools, prompt=<system.md>, response_format=<schema>)`. The tools are the
+  read operations listed under `attach:` in `agent.yaml`, described by the tool contract. Claim-scoped
+  arguments (claim id, policy number) are bound by the platform, so the model cannot query another
+  claim. Tool results are PII-redacted and documents are wrapped as untrusted data. Writes (register a
+  claim, store extraction, pay, send) stay in agent code. Settlement has no model (D-09).
+- **Usage comes from telemetry** (D-13). Tokens and latency are read from the OpenInference LLM spans;
+  Phoenix prices them with the `deploy/models.yaml` prices it is given at startup. A local span sink
+  keeps the same rows in SQLite (`llm_calls`, `tool_calls`) for budgets, the dashboards and CI.
 - **Tool permissions are enforced.** Every tool call goes through `shared/tool_gateway.py`, which
   applies `docs/design/tool-permission-matrix.yaml`. Denials are logged as control events.
 - **Human-in-the-loop with LangGraph `interrupt()`.** L1, investigation, L2 and SIU decisions

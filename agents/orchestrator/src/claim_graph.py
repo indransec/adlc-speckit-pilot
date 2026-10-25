@@ -207,7 +207,8 @@ def route(s: ClaimState) -> dict:
     note, note_cost = None, 0.0
     if overlay == "normal" and routing["approvals_required"] > 0:
         ctx = registry.AgentContext(registry.manifest(ORCH), s["claim_id"], s["run_no"])
-        with agent_span(ORCH, ctx.manifest["version"], s["claim_id"], "agent orchestrator.case_note"):
+        last_id = db.scalar("SELECT COALESCE(MAX(id), 0) FROM llm_calls")
+        with agent_span(ORCH, ctx.manifest["version"], s["claim_id"], "agent orchestrator.case_note", run_no=s["run_no"]):
             a = s["assessment"]
             fb = CaseNote(summary=(f"{s['intake']['claim_type'].replace('_', ' ').title()} claim for USD {a['claimed_usd']:.2f}; "
                                    f"recommended {a['recommendation']} at USD {a['recommended_usd']:.2f}. "
@@ -218,8 +219,8 @@ def route(s: ClaimState) -> dict:
                       f"Verification: {s['verification'].get('summary')}\nDocument issues: {s['document']['mismatches']}\n"
                       f"Fraud signals: {s['fraud']['reasons'] + [f['description'] for f in s['fraud']['ai_flags']]}\n"
                       "Write the adjuster handover note.")
-            n, meta = ctx.llm("case_note", CaseNote, prompt, fallback=lambda: fb)
-            note, note_cost = n.model_dump(), meta.cost_usd
+            note = ctx.agent("case_note", CaseNote, prompt, fallback=lambda: fb).model_dump()
+        note_cost = registry.llm_usage_since(s["claim_id"], s["run_no"], ORCH, last_id)["cost_usd"]
 
     started = _claims("get_claim", s["claim_id"]).get("processing_started_at")
     latency = (datetime.fromisoformat(db.now()) - datetime.fromisoformat(started)).total_seconds() if started else None

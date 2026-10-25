@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import importlib
 import inspect
-import time
 from functools import lru_cache
 from pathlib import Path
 
@@ -16,7 +15,7 @@ import yaml
 
 from shared.audit import audit, control_event
 from shared.config import ROOT, load_yaml
-from shared.telemetry import tracer
+from shared.telemetry import hash_claim_id, tracer
 
 
 class ToolPermissionError(PermissionError):
@@ -41,7 +40,10 @@ def tool_modules() -> dict:
     return mods
 
 
-def call_tool(agent_name: str, tool_id: str, op: str, *, claim_id: str | None = None, **kwargs):
+def call_tool(agent_name: str, tool_id: str, op: str, *, claim_id: str | None = None, invoked_by: str = "code",
+              **kwargs):
+    """invoked_by: 'model' when the LLM chose the call (create_react_agent tool), 'code' otherwise.
+    Latency and outcome are recorded from this span by the telemetry sink."""
     rule = permission_matrix().get(tool_id)
     mod = tool_modules().get(tool_id)
     if rule is None or mod is None:
@@ -49,18 +51,25 @@ def call_tool(agent_name: str, tool_id: str, op: str, *, claim_id: str | None = 
     access = mod.OPERATIONS.get(op)
     if access is None:
         raise ToolPermissionError(f"{tool_id} has no operation {op}")
-    if agent_name not in rule["agents"] or access not in rule["access"]:
-        control_event(claim_id, "tool_permission", "denied", f"{agent_name} -> {tool_id}.{op} ({access})")
-        raise ToolPermissionError(f"agent '{agent_name}' may not call {tool_id}.{op} (access '{access}')")
-    t0 = time.perf_counter()
     with tracer().start_as_current_span(f"tool {tool_id}.{op}") as span:
-        span.set_attribute("tool.id", tool_id)
-        span.set_attribute("tool.operation", op)
-        span.set_attribute("tool.access", access)
+        for k, v in {"tool.id": tool_id, "tool.operation": op, "tool.access": access, "tool.caller": agent_name,
+                     "tool.invoked_by": invoked_by}.items():
+            span.set_attribute(k, v)
+        if claim_id:
+            span.set_attribute("claim.id", hash_claim_id(claim_id))
+        if agent_name not in rule["agents"] or access not in rule["access"]:
+            span.set_attribute("tool.status", "denied")
+            control_event(claim_id, "tool_permission", "denied", f"{agent_name} -> {tool_id}.{op} ({access})")
+            raise ToolPermissionError(f"agent '{agent_name}' may not call {tool_id}.{op} (access '{access}')")
         fn = getattr(mod, op)
         if "claim_id" in inspect.signature(fn).parameters:
             kwargs["claim_id"] = claim_id
-        result = fn(**kwargs)
-    audit(claim_id, "tool_call", {"tool": tool_id, "op": op, "access": access},
-          actor=agent_name, duration_ms=round((time.perf_counter() - t0) * 1000, 1))
+        try:
+            result = fn(**kwargs)
+        except Exception:
+            span.set_attribute("tool.status", "error")
+            raise
+        span.set_attribute("tool.status", "ok")
+    audit(claim_id, "tool_call", {"tool": tool_id, "op": op, "access": access, "invoked_by": invoked_by},
+          actor=agent_name)
     return result

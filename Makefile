@@ -1,7 +1,7 @@
 # Travel Claims Assistant - ADLC simulation
 export PYTHONPATH := $(CURDIR):$(CURDIR)/agents/orchestrator/src
 UV ?= uv
-RELEASE ?= 0.1.0
+RELEASE ?= $(shell sed -n 's/^release: *//p' system.yaml)
 PORT ?= 8000
 
 .PHONY: help setup data datasets api ui phoenix dev test evals evals-quick perf traceability validate lifecycle simulate status clean

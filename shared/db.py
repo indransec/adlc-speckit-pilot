@@ -71,10 +71,16 @@ CREATE TABLE IF NOT EXISTS audit_log(
   id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT, claim_id TEXT, run_no INTEGER, actor TEXT,
   agent_id TEXT, agent_version TEXT, release TEXT, event TEXT, payload TEXT, duration_ms REAL);
 
+-- llm_calls and tool_calls are written by the telemetry sink from OpenInference / gateway spans
 CREATE TABLE IF NOT EXISTS llm_calls(
   id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT, claim_id TEXT, agent_id TEXT, task TEXT, model TEXT,
   tier TEXT, mode TEXT, prompt_tokens INTEGER, completion_tokens INTEGER, cost_usd REAL,
-  latency_ms REAL, status TEXT, degraded INTEGER, input_excerpt TEXT);
+  latency_ms REAL, status TEXT, degraded INTEGER, input_excerpt TEXT, run_no INTEGER,
+  agent_version TEXT, trace_id TEXT, span_id TEXT);
+
+CREATE TABLE IF NOT EXISTS tool_calls(
+  id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT, claim_id TEXT, run_no INTEGER, agent_id TEXT, caller TEXT,
+  tool_id TEXT, operation TEXT, access TEXT, invoked_by TEXT, status TEXT, latency_ms REAL, trace_id TEXT);
 
 CREATE TABLE IF NOT EXISTS guardrail_events(
   id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT, claim_id TEXT, agent_id TEXT, guardrail TEXT,
@@ -93,6 +99,7 @@ CREATE INDEX IF NOT EXISTS ix_claims_status ON claims(status);
 CREATE INDEX IF NOT EXISTS ix_claims_trip ON claims(trip_id);
 CREATE INDEX IF NOT EXISTS ix_audit_claim ON audit_log(claim_id);
 CREATE INDEX IF NOT EXISTS ix_llm_claim ON llm_calls(claim_id);
+CREATE INDEX IF NOT EXISTS ix_tool_claim ON tool_calls(claim_id);
 """
 
 
@@ -120,8 +127,16 @@ def tx():
         conn.close()
 
 
+MIGRATIONS = {"llm_calls": {"run_no": "INTEGER", "agent_version": "TEXT", "trace_id": "TEXT", "span_id": "TEXT"}}
+
+
 def init_db() -> None:
     with tx() as c:
+        for table, cols in MIGRATIONS.items():  # add columns to data dirs created by an earlier release
+            have = {r[1] for r in c.execute(f"PRAGMA table_info({table})").fetchall()}
+            for col, typ in cols.items():
+                if have and col not in have:
+                    c.execute(f"ALTER TABLE {table} ADD COLUMN {col} {typ}")
         c.executescript(SCHEMA)
 
 

@@ -8,6 +8,6 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with: {python-version: "3.12"}
       - run: uv sync --frozen
-      - run: uv run python scripts/run_tests.py 0.1.0      # pytest; writes evidence/0.1.0/test-report.json
+      - run: uv run python scripts/run_tests.py            # pytest; writes evidence/<release>/test-report.json
       - uses: actions/upload-artifact@v4
-        with: {name: test-report, path: evidence/0.1.0/test-report.json}
+        with: {name: test-report, path: evidence/*/test-report.json}

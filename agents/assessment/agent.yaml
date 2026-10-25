@@ -1,6 +1,6 @@
 id: AGT-TRV-ASSESS
 name: assessment
-version: 0.1.0
+version: 0.2.0
 role: subagent
 owner: claims-ai-team
 risk_tier: high
@@ -14,7 +14,9 @@ model:
     temperature: 0.1
 prompts:
   system: prompts/system.md
-tools: []
+tools:
+  - id: TOOL-POLICY-WORDING
+    attach: [search, get_clause]   # read ops the model may call (create_react_agent)
 guardrails: [pii-redaction, document-injection]
 autonomy: recommend-only
 evals: evals/agents/assessment/suite.yaml

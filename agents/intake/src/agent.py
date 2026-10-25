@@ -32,10 +32,12 @@ def run(ctx, *, submission: dict) -> dict:
                "items": [{"description": l["description"], "category": l["category"]}
                          for l in json.loads(submission.get("lines_json") or "[]")],
                "description": submission.get("description")}
+    ctx.known_pii = {k: submission.get(k) for k in ("claimant_email", "claimant_phone", "claimant_address")}
     text = redact_for_model(json.dumps(payload, indent=1), claim_id=ctx.claim_id, agent_id=ctx.agent_id)
-    value, _ = ctx.llm("classify", IntakeClassification,
-                       "Classify this travel claim.\n" + wrap_as_data(text, ctx.claim_id, "claim_submission"),
-                       fallback=lambda: _heuristic(submission))
+    value = ctx.agent("classify", IntakeClassification,
+                      "Classify this travel claim. The full claim record is available through your claims tool.\n"
+                      + wrap_as_data(text, ctx.claim_id, "claim_submission"),
+                      fallback=lambda: _heuristic(submission), mock_plan=[("claims_system_get_claim", {})])
     category = CATEGORY[value.claim_type]
     ctx.tool("TOOL-CLAIMS-SYSTEM", "register", claim_id=ctx.claim_id, claim_type=value.claim_type, category=category)
     return {"claim_type": value.claim_type, "category": category, "rationale": value.rationale,

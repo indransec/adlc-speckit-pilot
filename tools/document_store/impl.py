@@ -12,10 +12,12 @@ def list_documents(claim_id: str) -> list[dict]:
                     "ORDER BY doc_id", [claim_id])
 
 
-def read_text(doc_id: str) -> str:
-    d = db.one("SELECT object_key FROM documents WHERE doc_id = ?", [doc_id])
+def read_text(doc_id: str, claim_id: str | None = None) -> str:
+    d = db.one("SELECT object_key, claim_id FROM documents WHERE doc_id = ?", [doc_id])
     if not d:
         raise KeyError(doc_id)
+    if claim_id and d["claim_id"] != claim_id:  # a model-chosen doc_id must belong to the claim in hand
+        raise PermissionError(f"document {doc_id} does not belong to claim {claim_id}")
     return pdf_text(object_store.get(d["object_key"]))
 
 

@@ -1,14 +1,18 @@
 # Model catalog served through the OpenRouter AI gateway (ADR-005).
 # Prices are USD per 1M tokens as published by OpenRouter on 2026-10-25; used for
-# cost-per-claim telemetry (REQ-N-003). A model swap is a release and re-runs G3.
+# cost-per-claim telemetry (REQ-N-003) and registered in Phoenix for its cost tracking.
+# structured_output: how the agent runtime asks the model for its schema-shaped answer
+# (verified live against OpenRouter on 2026-10-26). A model swap is a release and re-runs G3.
 models:
   - id: anthropic/claude-haiku-5.5
     tier: fast
     input_per_m: 0.10
     output_per_m: 0.50
+    structured_output: function_calling   # its JSON-schema mode allows at most 16 nullable fields (DocExtraction has 17)
     use: intake, document extraction, verification narrative, fraud anomaly flags, letters, case notes
   - id: anthropic/claude-sonnet-5.5
     tier: reasoning
     input_per_m: 2.00
     output_per_m: 10.00
+    structured_output: json_schema        # rejects the forced tool_choice that tool-calling output needs
     use: coverage mapping, deduction judgements, LLM-as-judge evals

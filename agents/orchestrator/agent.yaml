@@ -1,6 +1,6 @@
 id: AGT-TRV-ORCH
 name: orchestrator
-version: 0.1.0
+version: 0.2.0
 role: orchestrator
 owner: claims-ai-team
 risk_tier: high
@@ -16,6 +16,7 @@ prompts:
   system: prompts/system.md
 tools:
   - id: TOOL-CLAIMS-SYSTEM
+    attach: [get_claim]   # read ops the model may call (create_react_agent)
 guardrails: [pii-redaction, document-injection]
 autonomy: routing-only
 evals: evals/agents/orchestrator/suite.yaml

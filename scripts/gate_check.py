@@ -21,7 +21,7 @@ REQUIRED = {
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--gate", required=True, choices=sorted(REQUIRED))
-    ap.add_argument("--release", default="0.1.0")
+    ap.add_argument("--release", default=re.search(r"^release:\s*(\S+)", open(os.path.join(ROOT, "system.yaml")).read(), re.M).group(1))
     a = ap.parse_args()
     missing = [p for p in (x.format(release=a.release) for x in REQUIRED[a.gate])
                if not os.path.exists(os.path.join(ROOT, p))]

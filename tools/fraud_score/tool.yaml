@@ -12,6 +12,7 @@ implementation: tools/fraud_score/impl.py (mock; enforced via shared/tool_gatewa
 operations:
   score:
     access: read
+    description: "Return the SIU fraud model score, level and reasons for this claim. It never decides the claim."
     input:
       claim_id: string
       signals: object {injection_detected, doc_mismatch, ai_flags}

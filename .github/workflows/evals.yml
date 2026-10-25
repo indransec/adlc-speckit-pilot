@@ -11,9 +11,9 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with: {python-version: "3.12"}
       - run: uv sync --frozen
-      - run: uv run python scripts/run_tests.py 0.1.0
-      - run: uv run python evals/run_evals.py 0.1.0          # fails build if thresholds missed
-      - run: uv run python evals/perf_test.py 0.1.0
-      - run: uv run python scripts/build_traceability.py 0.1.0
+      - run: uv run python scripts/run_tests.py
+      - run: uv run python evals/run_evals.py          # fails build if thresholds missed
+      - run: uv run python evals/perf_test.py
+      - run: uv run python scripts/build_traceability.py
       - uses: actions/upload-artifact@v4
         with: {name: evidence, path: evidence/}

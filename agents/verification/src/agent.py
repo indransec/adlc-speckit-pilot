@@ -53,8 +53,10 @@ def run(ctx, *, claim_type: str, facts: dict) -> dict:
 
     prompt = (f"Claim type: {claim_type}\nClaim facts: flight {facts.get('flight_no')} on {facts.get('flight_date')}, "
               f"claimed delay {facts.get('delay_hours_claimed')}h, booking date {facts.get('booking_date')}, "
-              f"bag delay {facts.get('bag_delay_hours')}h\nFlight-status record: {f}\nChecks: {out}\n"
-              "Summarise the verified facts for the adjuster and list discrepancies.")
-    summary, _ = ctx.llm("summarise_verification", VerificationSummary, prompt, fallback=fallback)
+              f"bag delay {facts.get('bag_delay_hours')}h\nThreshold checks done in code: {out}\n"
+              "Look up the flight with your flight-status tool, then summarise the verified facts for the "
+              "adjuster and list discrepancies.")
+    summary = ctx.agent("summarise_verification", VerificationSummary, prompt, fallback=fallback, mock_plan=[
+        ("flight_status_lookup", {"flight_no": facts.get("flight_no") or "", "flight_date": facts.get("flight_date") or ""})])
     out["summary"] = summary.summary
     return out

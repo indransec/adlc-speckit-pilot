@@ -28,16 +28,16 @@ Communication agent (approved templates)
 ## Routing matrix
 See `routing-matrix.md` (source of truth for `agents/orchestrator/src/routing.py`).
 
-## Implementation (release 0.1.0, decision D-08)
+## Implementation (release 0.2.0, decisions D-08, D-12, D-13)
 | Component | Technology | Code |
 |---|---|---|
 | Orchestrator flow + HITL | LangGraph `StateGraph`, `interrupt()`, SQLite checkpointer | `agents/orchestrator/src/claim_graph.py` |
 | Routing rules | Python (deterministic) | `agents/orchestrator/src/routing.py` |
 | Confidence (ADR-002) | Python, combined signals | `agents/orchestrator/src/confidence.py` |
-| Sub-agents | Manifest-loaded modules, Pydantic structured outputs | `agents/*/src/agent.py`, `shared/registry.py` |
-| Model gateway (ADR-005) | OpenRouter (Claude Haiku 5.5 / Sonnet 5.5), mock fallback | `shared/llm.py`, `deploy/models.yaml` |
-| Clause retrieval | FAISS + fastembed | `shared/rag.py` |
+| Sub-agents | Manifest-loaded modules; each LLM task is a LangGraph `create_react_agent` (tools from `attach:`, Pydantic `response_format`) | `agents/*/src/agent.py`, `shared/registry.py`, `shared/agent_runtime.py` |
+| Model gateway (ADR-005) | OpenRouter (Claude Haiku 5.5 / Sonnet 5.5) via `ChatOpenAI`; scripted mock model offline | `shared/llm.py`, `deploy/models.yaml` |
+| Clause retrieval | FAISS + fastembed, exposed to models as TOOL-POLICY-WORDING | `shared/rag.py`, `tools/policy_wording/` |
 | Tool contracts + permissions | Mock systems behind a permission gateway | `tools/*/impl.py`, `shared/tool_gateway.py` |
 | Approval token (ADR-003) | Signed JWT, single use | `shared/hitl/approval_token.py` |
 | Workbench (ADR-004 stand-in) | Streamlit + FastAPI | `frontend/`, `backend/` |
-| Telemetry | OpenTelemetry/OpenInference -> Arize Phoenix | `shared/telemetry.py` |
+| Telemetry | OpenTelemetry/OpenInference -> Arize Phoenix (cost tracking with catalog prices); local span sink -> `llm_calls`, `tool_calls` | `shared/telemetry.py` |

@@ -118,9 +118,13 @@ def run(ctx, *, claim_type: str, document: dict, coverage: dict, verification: d
           f"Policy wording:\n{clause_ctx}\n\n"
           "Judge each line: eligible, ineligible (cite 3.5, 6.1 or 6.3) or depreciate (cite 5.4 with percent). "
           "Do NOT apply limits, excess, currency conversion or compensation offsets: the rules engine does that. "
-          "Every ineligible/depreciate decision must cite evidence_refs. Then give your overall recommendation."
+          "Every ineligible/depreciate decision must cite evidence_refs. Use your policy wording tools to check a "
+          "clause before citing it. Then give your overall recommendation."
     )
     loss_date = facts.get("flight_date")
+    to_check = sorted({j.clause for j in heuristic_judgements(claim_type, lines, loss_date, form_doc) if j.clause})
+    plan = [[("policy_wording_get_clause", {"clause_id": c}) for c in to_check]] if to_check else \
+        [("policy_wording_search", {"query": f"{claim_type.replace('_', ' ')} eligible expenses", "k": 3})]
 
     def fallback():
         js = heuristic_judgements(claim_type, lines, loss_date, form_doc)
@@ -128,7 +132,7 @@ def run(ctx, *, claim_type: str, document: dict, coverage: dict, verification: d
         return AssessmentJudgement(line_judgements=js, recommendation=rec,
                                    rationale="Rule-based assessment (offline mode).")
 
-    judged, _ = ctx.llm("judge_lines", AssessmentJudgement, prompt, fallback=fallback)
+    judged = ctx.agent("judge_lines", AssessmentJudgement, prompt, fallback=fallback, mock_plan=plan)
 
     judgements, relabelled = {}, []
     valid_lines = {l["line_id"] for l in lines}

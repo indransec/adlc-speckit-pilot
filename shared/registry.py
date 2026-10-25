@@ -10,7 +10,6 @@ from __future__ import annotations
 import importlib
 import importlib.util
 import sys
-import time
 import types
 from dataclasses import dataclass, field
 from functools import lru_cache
@@ -89,7 +88,11 @@ class AgentContext:
     manifest: dict
     claim_id: str
     run_no: int
-    llm_meta: list = field(default_factory=list)
+    runs: list = field(default_factory=list)          # one AgentRun per create_react_agent task
+    bindings: dict = field(default_factory=dict)      # claim-scoped tool arguments set by the agent
+    known_pii: dict = field(default_factory=dict)     # claimant contact data to redact from tool results
+    documents: dict = field(default_factory=dict)     # guarded document text, by doc_id
+    doc_types: dict = field(default_factory=dict)
 
     @property
     def name(self) -> str:
@@ -99,26 +102,33 @@ class AgentContext:
     def agent_id(self) -> str:
         return self.manifest["id"]
 
-    def tool(self, tool_id: str, op: str, **kwargs):
+    def tool(self, tool_id: str, op: str, invoked_by: str = "code", **kwargs):
         from shared.tool_gateway import call_tool
         claim_id = kwargs.pop("claim_id", self.claim_id)
-        return call_tool(self.name, tool_id, op, claim_id=claim_id, **kwargs)
+        return call_tool(self.name, tool_id, op, claim_id=claim_id, invoked_by=invoked_by, **kwargs)
 
-    def llm(self, task: str, schema, user_content: str, fallback, model_override: str | None = None):
-        from shared.llm import structured_call
-        value, meta = structured_call(manifest=self.manifest, claim_id=self.claim_id, task=task, schema=schema,
-                                      system_prompt=system_prompt(self.agent_id), user_content=user_content,
-                                      fallback=fallback, model_override=model_override)
-        self.llm_meta.append(meta)
-        return value, meta
+    def agent(self, task: str, schema, user_content: str, fallback, *, mock_plan: list | None = None,
+              bindings: dict | None = None, model_override: str | None = None):
+        """Run a task as a create_react_agent with this agent's attached tools (shared/agent_runtime.py)."""
+        from shared.agent_runtime import run_agent
+        return run_agent(self, task=task, schema=schema, user_content=user_content, fallback=fallback,
+                         mock_plan=mock_plan, bindings=bindings, model_override=model_override)
 
     @property
     def degraded(self) -> bool:
-        return any(m.degraded for m in self.llm_meta)
+        return any(r.degraded for r in self.runs)
 
     def audit(self, event: str, payload: dict | None = None):
         audit(self.claim_id, event, payload, actor=self.name, agent_id=self.agent_id,
               agent_version=self.manifest["version"], run_no=self.run_no)
+
+
+def llm_usage_since(claim_id: str, run_no: int, agent_id: str, after_id: int) -> dict:
+    """Tokens and cost recorded by the telemetry sink for one agent invocation."""
+    return db.one("SELECT COUNT(*) calls, COALESCE(SUM(prompt_tokens), 0) prompt_tokens, "
+                  "COALESCE(SUM(completion_tokens), 0) completion_tokens, ROUND(COALESCE(SUM(cost_usd), 0), 6) cost_usd "
+                  "FROM llm_calls WHERE id > ? AND claim_id = ? AND run_no = ? AND agent_id = ?",
+                  [after_id, claim_id, run_no, agent_id])
 
 
 def check_delegation(caller: str, target: str, depth: int) -> None:
@@ -134,20 +144,25 @@ def check_delegation(caller: str, target: str, depth: int) -> None:
 
 def invoke(agent_id: str, entry: str = "run", *, claim_id: str, run_no: int, caller: str = "AGT-TRV-ORCH",
            depth: int = 1, **inputs) -> dict:
+    from shared.agent_runtime import tool_call_summary
     from shared.telemetry import agent_span
     check_delegation(caller, agent_id, depth)
     m = manifest(agent_id)
     ctx = AgentContext(m, claim_id, run_no)
-    t0 = time.perf_counter()
-    with agent_span(agent_id, m["version"], claim_id, f"agent {m['name']}.{entry}",
-                    **{"adlc.agent.autonomy": m.get("autonomy")}):
+    last_id = db.scalar("SELECT COALESCE(MAX(id), 0) FROM llm_calls")
+    with agent_span(agent_id, m["version"], claim_id, f"agent {m['name']}.{entry}", run_no=run_no,
+                    **{"adlc.agent.autonomy": m.get("autonomy")}) as span:
         out = getattr(agent_module(agent_id), entry)(ctx, **inputs)
+    usage = llm_usage_since(claim_id, run_no, agent_id, last_id)
     out = dict(out or {})
     out["_meta"] = {"agent_id": agent_id, "agent_version": m["version"], "entry": entry,
-                    "llm_mode": ctx.llm_meta[0].mode if ctx.llm_meta else "none",
-                    "models": sorted({x.model for x in ctx.llm_meta}), "degraded": ctx.degraded,
-                    "cost_usd": round(sum(x.cost_usd for x in ctx.llm_meta), 6),
-                    "duration_ms": round((time.perf_counter() - t0) * 1000, 1)}
+                    "framework": "langgraph.prebuilt.create_react_agent" if ctx.runs else "deterministic",
+                    "llm_mode": ctx.runs[0].mode if ctx.runs else "none",
+                    "models": sorted({r.model for r in ctx.runs}), "degraded": ctx.degraded,
+                    "errors": [f"{r.task}: {r.error}" for r in ctx.runs if r.error],
+                    "llm_calls": usage["calls"], "tokens": usage["prompt_tokens"] + usage["completion_tokens"],
+                    "cost_usd": usage["cost_usd"], "tool_calls": tool_call_summary(ctx.runs),
+                    "duration_ms": round((span.end_time - span.start_time) / 1e6, 1)}
     key = agent_id if entry == "run" else f"{agent_id}:{entry}"
     db.upsert("agent_outputs", {"claim_id": claim_id, "run_no": run_no, "agent_id": key,
                                 "agent_version": m["version"], "output": db.jdump(out), "created_at": db.now()})

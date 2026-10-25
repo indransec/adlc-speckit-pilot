@@ -1,0 +1,3 @@
+agent creation to be framework used - create_react_agetnt, tools with @tool these are not followed in the repo
+
+cost , latencies t be captured using the observability/monitoring franmeworks instead o fmanual cost

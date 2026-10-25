@@ -111,8 +111,25 @@ def llm_usage() -> dict:
                         "FROM llm_calls GROUP BY agent_id, model, mode ORDER BY agent_id")
     processed = db.scalar("SELECT COUNT(DISTINCT claim_id) FROM llm_calls WHERE claim_id IS NOT NULL") or 0
     total = db.scalar("SELECT COALESCE(SUM(cost_usd),0) FROM llm_calls") or 0
-    return {"by_agent": by_agent, "total_cost_usd": round(total, 5), "claims": processed,
-            "cost_per_claim_usd": round(total / processed, 5) if processed else None}
+    tokens = db.one("SELECT COALESCE(SUM(prompt_tokens), 0) prompt, COALESCE(SUM(completion_tokens), 0) completion, "
+                    "COUNT(*) calls FROM llm_calls")
+    by_task = db.query("SELECT agent_id, task, COUNT(*) calls, ROUND(AVG(latency_ms), 1) avg_latency_ms, "
+                       "ROUND(SUM(cost_usd), 5) cost_usd FROM llm_calls GROUP BY agent_id, task ORDER BY cost_usd DESC")
+    return {"by_agent": by_agent, "by_task": by_task, "total_cost_usd": round(total, 5), "claims": processed,
+            "tokens": tokens, "cost_per_claim_usd": round(total / processed, 5) if processed else None}
+
+
+def tool_usage() -> dict:
+    """Tool calls by agent, operation and who chose the call (model vs agent code), from gateway spans."""
+    rows = db.query("SELECT caller agent, tool_id, operation, access, invoked_by, COUNT(*) calls, "
+                    "SUM(CASE WHEN status='denied' THEN 1 ELSE 0 END) denied, "
+                    "SUM(CASE WHEN status='error' THEN 1 ELSE 0 END) errors, ROUND(AVG(latency_ms), 2) avg_latency_ms "
+                    "FROM tool_calls GROUP BY caller, tool_id, operation, access, invoked_by ORDER BY caller, tool_id")
+    by_source = {r["invoked_by"]: r["n"] for r in
+                 db.query("SELECT invoked_by, COUNT(*) n FROM tool_calls GROUP BY invoked_by")}
+    claims = db.scalar("SELECT COUNT(DISTINCT claim_id) FROM tool_calls WHERE invoked_by = 'model'") or 0
+    return {"by_operation": rows, "by_source": by_source,
+            "model_calls_per_claim": round(by_source.get("model", 0) / claims, 1) if claims else None}
 
 
 def slos() -> list[dict]:
@@ -235,5 +252,5 @@ def override_reasons(limit: int = 5) -> list[dict]:
 
 def dashboard() -> dict:
     return {"overview": overview(), "routing_mix": routing_mix(), "kpis": kpis(), "slos": slos(), "alerts": alerts(),
-            "llm": llm_usage(), "guardrails": guardrails(), "controls": controls(), "fairness": fairness(),
+            "llm": llm_usage(), "tools": tool_usage(), "guardrails": guardrails(), "controls": controls(), "fairness": fairness(),
             "calibration": calibration(), "shadow": shadow_agreement(), "queues": queues_summary()}

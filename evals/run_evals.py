@@ -326,7 +326,9 @@ def compare(metrics, thresholds):
     return out, ok
 
 
-def main(release="0.1.0", quick=False):
+def main(release=None, quick=False):
+    from shared.config import release as current_release
+    release = release or current_release()
     import yaml
     tmp = tempfile.mkdtemp(prefix="adlc-evals-")
     os.environ["DATA_DIR"] = tmp

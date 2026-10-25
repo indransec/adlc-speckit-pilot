@@ -59,12 +59,15 @@ def decision_letter(ctx, *, claimant_name: str, outcome: str, claimed_usd: float
                     deductions: list[dict], reasons: list[dict], payment: dict | None) -> dict:
     items = reasons if outcome == "reject" else deductions
     prompt = ("Write the customer-facing slots for a travel insurance decision letter. The template already states "
-              "the amounts, clause numbers and appeal rights. Do not mention internal processes, scores or reviews.\n"
+              "the amounts, clause numbers and appeal rights. Do not mention internal processes, scores or reviews. "
+              "Read a clause with your policy wording tool if you need its exact meaning.\n"
               f"Outcome: {outcome}\nItems to explain:\n"
               + "\n".join(f"- clause {i['clause']} ({i.get('clause_title', '')}): {i['reason']}" for i in items))
     fallback = LetterSlots(opening="Thank you for your patience while we reviewed your claim.",
                            explanations=[Explanation(clause=i["clause"], text=_fallback_text(i)) for i in items])
-    slots, _ = ctx.llm("letter_slots", LetterSlots, prompt, fallback=lambda: fallback)
+    clauses = sorted({i["clause"] for i in items})
+    slots = ctx.agent("letter_slots", LetterSlots, prompt, fallback=lambda: fallback,
+                      mock_plan=[[("policy_wording_get_clause", {"clause_id": c}) for c in clauses]] if clauses else [])
     problems = check_slot_text(slots.opening) + [p for e in slots.explanations for p in check_slot_text(e.text)]
     if problems:
         guardrail_event(ctx.claim_id, "output-policy", "slot-text-replaced", "; ".join(problems), ctx.agent_id)

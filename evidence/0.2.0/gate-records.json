@@ -1,0 +1,416 @@
+{
+  "system": "SYS-TRV-CLM",
+  "release": "0.2.0",
+  "gates": [
+    {
+      "gate": "G0",
+      "status": "approved",
+      "approvers": [
+        {
+          "role": "Sponsor (Head of Claims)",
+          "name": "sim.head-of-claims",
+          "at": "2026-10-25T20:28:20.544543+00:00"
+        },
+        {
+          "role": "Risk",
+          "name": "sim.risk-officer",
+          "at": "2026-10-25T20:28:20.544954+00:00"
+        },
+        {
+          "role": "Data owner",
+          "name": "sim.data-owner",
+          "at": "2026-10-25T20:28:20.544958+00:00"
+        }
+      ],
+      "decided_at": "2026-10-25T20:28:20.545366+00:00",
+      "evidence": [
+        "all present",
+        "risk-assessment.md tier HIGH = system.yaml risk_tier",
+        "classification table present",
+        "verdict 'Go with conditions' with owned conditions"
+      ],
+      "notes": "simulated sign-off",
+      "checks": [
+        {
+          "check": "Use-case card, feasibility, risk assessment, RACI",
+          "ok": true,
+          "detail": "all present"
+        },
+        {
+          "check": "Risk tier assessed",
+          "ok": true,
+          "detail": "risk-assessment.md tier HIGH = system.yaml risk_tier"
+        },
+        {
+          "check": "Data classification agreed",
+          "ok": true,
+          "detail": "classification table present"
+        },
+        {
+          "check": "Feasibility verdict with owned conditions",
+          "ok": true,
+          "detail": "verdict 'Go with conditions' with owned conditions"
+        }
+      ]
+    },
+    {
+      "gate": "G1",
+      "status": "approved",
+      "approvers": [
+        {
+          "role": "Business owner (Head of Claims)",
+          "name": "sim.head-of-claims",
+          "at": "2026-10-25T20:28:20.553855+00:00"
+        },
+        {
+          "role": "AI lead",
+          "name": "sim.ai-lead",
+          "at": "2026-10-25T20:28:20.553859+00:00"
+        }
+      ],
+      "decided_at": "2026-10-25T20:28:20.559480+00:00",
+      "evidence": [
+        "35 requirements, all with verification methods",
+        "routing.py constants match system.yaml; HITL points defined",
+        "6 KPIs with targets (baselines '[...]' are placeholders to confirm)",
+        "23 thresholds incl. zero-tolerance controls"
+      ],
+      "notes": "simulated sign-off",
+      "checks": [
+        {
+          "check": "Requirements with IDs and verification methods",
+          "ok": true,
+          "detail": "35 requirements, all with verification methods"
+        },
+        {
+          "check": "Autonomy level and HITL points (routing matrix)",
+          "ok": true,
+          "detail": "routing.py constants match system.yaml; HITL points defined"
+        },
+        {
+          "check": "KPI baseline and targets",
+          "ok": true,
+          "detail": "6 KPIs with targets (baselines '[...]' are placeholders to confirm)"
+        },
+        {
+          "check": "Eval thresholds agreed",
+          "ok": true,
+          "detail": "23 thresholds incl. zero-tolerance controls"
+        }
+      ]
+    },
+    {
+      "gate": "G2",
+      "status": "approved",
+      "approvers": [
+        {
+          "role": "Architecture",
+          "name": "sim.architect",
+          "at": "2026-10-25T20:28:20.917131+00:00"
+        },
+        {
+          "role": "Security",
+          "name": "sim.security-architect",
+          "at": "2026-10-25T20:28:20.917150+00:00"
+        }
+      ],
+      "decided_at": "2026-10-25T20:28:20.967389+00:00",
+      "evidence": [
+        "9 agents, 8 tools, 35 requirements checked; 0 errors",
+        "5 ADRs",
+        "every tool and agent covered; model-attached operations are read-only",
+        "T1-T9 incl. document injection",
+        "redaction points documented",
+        "prompts, guardrails and routing rules need named reviewers"
+      ],
+      "notes": "simulated sign-off",
+      "checks": [
+        {
+          "check": "Architecture documented; manifests validate",
+          "ok": true,
+          "detail": "9 agents, 8 tools, 35 requirements checked; 0 errors"
+        },
+        {
+          "check": "ADRs recorded",
+          "ok": true,
+          "detail": "5 ADRs"
+        },
+        {
+          "check": "Tool permission matrix covers every tool and agent",
+          "ok": true,
+          "detail": "every tool and agent covered; model-attached operations are read-only"
+        },
+        {
+          "check": "Threat model: OWASP Agentic + document injection",
+          "ok": true,
+          "detail": "T1-T9 incl. document injection"
+        },
+        {
+          "check": "Data flows and redaction points",
+          "ok": true,
+          "detail": "redaction points documented"
+        },
+        {
+          "check": "Change control on prompts / routing",
+          "ok": true,
+          "detail": "prompts, guardrails and routing rules need named reviewers"
+        }
+      ]
+    },
+    {
+      "gate": "G3",
+      "status": "approved",
+      "approvers": [
+        {
+          "role": "AI lead",
+          "name": "sim.ai-lead",
+          "at": "2026-10-25T20:29:31.517171+00:00"
+        },
+        {
+          "role": "Product owner",
+          "name": "sim.product-owner",
+          "at": "2026-10-25T20:29:31.517176+00:00"
+        }
+      ],
+      "decided_at": "2026-10-25T20:29:31.517584+00:00",
+      "evidence": [
+        "78 tests, 0 failed",
+        "routing_cases.jsonl@02cb5da1bfc0, claims_cases.jsonl@9ced64163f7c, cases.jsonl@be3c2bac55d9, e2e_cases.jsonl@a2e316c166f3",
+        "23 metrics, llm=mock, failed=[]",
+        "type_b_labelled_as_a = 0",
+        "status {'verified': 33, 'partially_verified': 0, 'failed': 0, 'not_run': 2}",
+        "p95 14.0s at 10 concurrent, 0 errors"
+      ],
+      "notes": "simulated sign-off",
+      "checks": [
+        {
+          "check": "Unit and routing tests pass (CI)",
+          "ok": true,
+          "detail": "78 tests, 0 failed"
+        },
+        {
+          "check": "Datasets versioned",
+          "ok": true,
+          "detail": "routing_cases.jsonl@02cb5da1bfc0, claims_cases.jsonl@9ced64163f7c, cases.jsonl@be3c2bac55d9, e2e_cases.jsonl@a2e316c166f3"
+        },
+        {
+          "check": "Component + system evals pass all thresholds",
+          "ok": true,
+          "detail": "23 metrics, llm=mock, failed=[]"
+        },
+        {
+          "check": "Zero type B -> A mislabels",
+          "ok": true,
+          "detail": "type_b_labelled_as_a = 0"
+        },
+        {
+          "check": "Traceability: requirements linked to verification",
+          "ok": true,
+          "detail": "status {'verified': 33, 'partially_verified': 0, 'failed': 0, 'not_run': 2}"
+        },
+        {
+          "check": "Performance test at 3x peak",
+          "ok": true,
+          "detail": "p95 14.0s at 10 concurrent, 0 errors"
+        }
+      ]
+    },
+    {
+      "gate": "G4",
+      "status": "approved",
+      "approvers": [
+        {
+          "role": "RAI/Risk",
+          "name": "sim.rai-officer",
+          "at": "2026-10-25T20:29:31.520779+00:00"
+        },
+        {
+          "role": "Compliance",
+          "name": "sim.compliance",
+          "at": "2026-10-25T20:29:31.520780+00:00"
+        }
+      ],
+      "decided_at": "2026-10-25T20:29:31.522552+00:00",
+      "evidence": [
+        "counterfactual parity 1.0",
+        "pii_leak_count=0, injection_pass_rate=1.0",
+        "14 automated attacks, allowed: none",
+        "all present",
+        "7 templates approved; letter compliance 1.0"
+      ],
+      "notes": "simulated sign-off",
+      "checks": [
+        {
+          "check": "Fairness test (counterfactual parity)",
+          "ok": true,
+          "detail": "counterfactual parity 1.0"
+        },
+        {
+          "check": "PII and injection suites pass",
+          "ok": true,
+          "detail": "pii_leak_count=0, injection_pass_rate=1.0"
+        },
+        {
+          "check": "Red-team findings fixed (automated battery)",
+          "ok": true,
+          "detail": "14 automated attacks, allowed: none"
+        },
+        {
+          "check": "RAI card and transparency notice",
+          "ok": true,
+          "detail": "all present"
+        },
+        {
+          "check": "Customer letters approved",
+          "ok": true,
+          "detail": "7 templates approved; letter compliance 1.0"
+        }
+      ]
+    },
+    {
+      "gate": "G5",
+      "status": "approved",
+      "approvers": [
+        {
+          "role": "CAB",
+          "name": "sim.cab-chair",
+          "at": "2026-10-25T20:29:39.995884+00:00"
+        },
+        {
+          "role": "Head of Claims",
+          "name": "sim.head-of-claims",
+          "at": "2026-10-25T20:29:39.995886+00:00"
+        }
+      ],
+      "decided_at": "2026-10-25T20:29:40.001342+00:00",
+      "evidence": [
+        "sha256 82a659881a975239",
+        "eval + RAI evidence passed",
+        "route agreement 1.0, amount agreement 1.0 on 20 claims",
+        "tabletop: 4 runbook steps walked; kill switch verified; redeploy target bundle 82a659881a97",
+        "new claim -> manual_queue; payment attempt blocked"
+      ],
+      "notes": "simulated sign-off",
+      "checks": [
+        {
+          "check": "Release record with bundle hash",
+          "ok": true,
+          "detail": "sha256 82a659881a975239"
+        },
+        {
+          "check": "G3 and G4 evidence for this release",
+          "ok": true,
+          "detail": "eval + RAI evidence passed"
+        },
+        {
+          "check": "Shadow-mode results meet thresholds",
+          "ok": true,
+          "detail": "route agreement 1.0, amount agreement 1.0 on 20 claims"
+        },
+        {
+          "check": "Rollback plan and runbook tested",
+          "ok": true,
+          "detail": "tabletop: 4 runbook steps walked; kill switch verified; redeploy target bundle 82a659881a97"
+        },
+        {
+          "check": "Kill switch exercised",
+          "ok": true,
+          "detail": "new claim -> manual_queue; payment attempt blocked"
+        }
+      ]
+    },
+    {
+      "gate": "G6",
+      "status": "approved",
+      "approvers": [
+        {
+          "role": "Head of Claims",
+          "name": "sim.head-of-claims",
+          "at": "2026-10-25T20:29:57.202918+00:00"
+        }
+      ],
+      "decided_at": "2026-10-25T20:29:57.203201+00:00",
+      "evidence": [
+        "40 claims in full mode over a simulated 30 days",
+        "all SLOs met",
+        "payments without valid token = 0; blocked attempts logged",
+        "no Sev1/Sev2 firing",
+        "payment accuracy 1.0 vs baseline 0.95",
+        "5 value KPIs live"
+      ],
+      "notes": "simulated sign-off",
+      "checks": [
+        {
+          "check": "Hypercare traffic in full mode",
+          "ok": true,
+          "detail": "40 claims in full mode over a simulated 30 days"
+        },
+        {
+          "check": "SLOs met",
+          "ok": true,
+          "detail": "all SLOs met"
+        },
+        {
+          "check": "No control breaches",
+          "ok": true,
+          "detail": "payments without valid token = 0; blocked attempts logged"
+        },
+        {
+          "check": "No Sev1/Sev2 alerts",
+          "ok": true,
+          "detail": "no Sev1/Sev2 firing"
+        },
+        {
+          "check": "QA error rate within threshold",
+          "ok": true,
+          "detail": "payment accuracy 1.0 vs baseline 0.95"
+        },
+        {
+          "check": "Dashboard live with value KPIs",
+          "ok": true,
+          "detail": "5 value KPIs live"
+        }
+      ]
+    },
+    {
+      "gate": "G7",
+      "status": "approved",
+      "approvers": [
+        {
+          "role": "Head of Claims",
+          "name": "sim.head-of-claims",
+          "at": "2026-10-25T20:29:57.212275+00:00"
+        },
+        {
+          "role": "AI lead",
+          "name": "sim.ai-lead",
+          "at": "2026-10-25T20:29:57.212276+00:00"
+        }
+      ],
+      "decided_at": "2026-10-25T20:29:57.212505+00:00",
+      "evidence": [
+        "docs/reviews/G7-review-0.2.0.md contains 'Override reasons'",
+        "docs/reviews/G7-review-0.2.0.md contains 'Confidence calibration'",
+        "docs/reviews/G7-review-0.2.0.md contains 'Value realised'"
+      ],
+      "notes": "simulated sign-off",
+      "checks": [
+        {
+          "check": "Override reasons reviewed",
+          "ok": true,
+          "detail": "docs/reviews/G7-review-0.2.0.md contains 'Override reasons'"
+        },
+        {
+          "check": "Drift and calibration checked",
+          "ok": true,
+          "detail": "docs/reviews/G7-review-0.2.0.md contains 'Confidence calibration'"
+        },
+        {
+          "check": "Value realised vs hypothesis",
+          "ok": true,
+          "detail": "docs/reviews/G7-review-0.2.0.md contains 'Value realised'"
+        }
+      ]
+    }
+  ]
+}

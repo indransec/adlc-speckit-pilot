@@ -52,7 +52,8 @@ def _load(path):
     return json.load(open(path)) if os.path.exists(path) else None
 
 
-def main(release="0.1.0"):
+def main(release=None):
+    release = release or yaml.safe_load(open(os.path.join(ROOT, "system.yaml")))["release"]
     ev = os.path.join(ROOT, "evidence", release)
     reqs = []
     for p in sorted(glob.glob(os.path.join(ROOT, "docs", "requirements", "*.yaml"))):

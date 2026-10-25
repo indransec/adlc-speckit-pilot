@@ -177,7 +177,13 @@ def document_text(claim_id: str, doc_id: str):
 @app.get("/claims/{claim_id}/llm-calls")
 def llm_calls(claim_id: str):
     return db.query("SELECT ts, agent_id, task, model, mode, prompt_tokens, completion_tokens, cost_usd, latency_ms, "
-                    "status, degraded FROM llm_calls WHERE claim_id = ? ORDER BY id", [claim_id])
+                    "status, trace_id FROM llm_calls WHERE claim_id = ? ORDER BY id", [claim_id])
+
+
+@app.get("/claims/{claim_id}/tool-calls")
+def tool_calls(claim_id: str):
+    return db.query("SELECT ts, caller, tool_id, operation, access, invoked_by, status, latency_ms FROM tool_calls "
+                    "WHERE claim_id = ? ORDER BY id", [claim_id])
 
 
 # ------------------------------------------------------------------------------------------- workbench
@@ -212,7 +218,14 @@ def dashboard():
 @app.get("/metrics/llm-calls")
 def recent_llm_calls(limit: int = 100):
     return db.query("SELECT ts, claim_id, agent_id, task, model, mode, prompt_tokens, completion_tokens, cost_usd, "
-                    "latency_ms, status, degraded FROM llm_calls ORDER BY id DESC LIMIT ?", [limit])
+                    "latency_ms, status, trace_id FROM llm_calls ORDER BY id DESC LIMIT ?", [limit])
+
+
+@app.get("/metrics/phoenix-cost")
+def phoenix_cost():
+    """Token and cost totals as computed by Phoenix from the exported spans (null if Phoenix is down)."""
+    from shared.telemetry import phoenix_cost_summary
+    return phoenix_cost_summary()
 
 
 @app.get("/audit")

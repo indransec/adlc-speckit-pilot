@@ -12,12 +12,14 @@ implementation: tools/policy_admin/impl.py (mock; enforced via shared/tool_gatew
 operations:
   get_policy:
     access: read
+    description: "Return the claimant's policy: plan, period of cover, limits and FX table."
     input:
       policy_no: string
     output:
       policy: object {plan, insured_persons, start_date, end_date, limits, fx_rates} | null
   claims_history:
     access: read
+    description: "Return earlier claims on the same policy (for duplicate and pattern checks)."
     input:
       policy_no: string
       exclude_claim_id: string

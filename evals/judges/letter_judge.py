@@ -10,11 +10,13 @@ import re
 
 from pydantic import BaseModel, Field
 
+from shared.agent_runtime import run_agent
 from shared.config import ROOT
-from shared.llm import structured_call
+from shared.registry import AgentContext
 
 RUBRIC = (ROOT / "evals" / "judges" / "letter_rubric.md").read_text()
-JUDGE_MANIFEST = {"id": "EVAL-JUDGE", "version": "1", "model": {"name": "anthropic/claude-sonnet-5.5", "params": {"temperature": 0}}}
+JUDGE_MANIFEST = {"id": "EVAL-JUDGE", "name": "letter-judge", "version": "1", "tools": [],
+                  "model": {"name": "anthropic/claude-sonnet-5.5", "params": {"temperature": 0}}}
 
 
 class LetterScores(BaseModel):
@@ -39,10 +41,9 @@ def rubric_heuristic(body: str, outcome: str, clauses: list[str]) -> LetterScore
 def judge(body: str, outcome: str, clauses: list[str], claim_id: str | None = None) -> LetterScores:
     prompt = (f"Rubric:\n{RUBRIC}\n\nExpected outcome: {outcome}. Clauses that must be cited: {clauses}.\n"
               f"Letter:\n<letter>\n{body}\n</letter>\nScore each rubric item 1-5.")
-    scores, _ = structured_call(manifest=JUDGE_MANIFEST, claim_id=claim_id, task="judge_letter", schema=LetterScores,
-                                system_prompt="You are a strict compliance reviewer of insurance customer letters.",
-                                user_content=prompt, fallback=lambda: rubric_heuristic(body, outcome, clauses))
-    return scores
+    return run_agent(AgentContext(JUDGE_MANIFEST, claim_id, 0), task="judge_letter", schema=LetterScores,
+                     prompt="You are a strict compliance reviewer of insurance customer letters.",
+                     user_content=prompt, fallback=lambda: rubric_heuristic(body, outcome, clauses))
 
 
 def passed(s: LetterScores) -> bool:

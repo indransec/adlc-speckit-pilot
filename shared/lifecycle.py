@@ -133,6 +133,7 @@ def c_adrs():
 
 
 def c_tool_matrix():
+    from shared.agent_runtime import check_attachments
     matrix = {t["id"]: t for t in load_yaml("docs/design/tool-permission-matrix.yaml")["tools"]}
     tools = {yaml.safe_load(p.read_text())["id"] for p in (ROOT / "tools").glob("*/tool.yaml")}
     problems = [f"tool {t} not in matrix" for t in tools - set(matrix)]
@@ -141,7 +142,9 @@ def c_tool_matrix():
         for t in m.get("tools") or []:
             if m["name"] not in matrix.get(t["id"], {}).get("agents", []):
                 problems.append(f"{m['name']} uses {t['id']} without a matrix entry")
-    return not problems, "every tool and agent covered" if not problems else "; ".join(problems)
+        problems += check_attachments({**m, "name": m["name"]})
+    return not problems, ("every tool and agent covered; model-attached operations are read-only"
+                          if not problems else "; ".join(problems))
 
 
 def c_threat_model():

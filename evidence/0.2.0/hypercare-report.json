@@ -1,0 +1,190 @@
+{
+  "mode": "full",
+  "claims": 40,
+  "errors": 0,
+  "human_decisions": 44,
+  "simulated_days": 30,
+  "slos": [
+    {
+      "id": "slo:decision-latency",
+      "target": "p95 <= 10 min",
+      "value": "1.0s",
+      "met": true
+    },
+    {
+      "id": "slo:availability",
+      "target": "99.5%",
+      "value": "100.00%",
+      "met": true
+    },
+    {
+      "id": "slo:cost-per-claim",
+      "target": "<= USD 0.25",
+      "value": 0.02431,
+      "met": true
+    },
+    {
+      "id": "slo:l1-turnaround",
+      "target": "1 business day",
+      "value": "0.002h",
+      "met": true
+    },
+    {
+      "id": "slo:l2-turnaround",
+      "target": "1 business day after L1",
+      "value": "0.0h",
+      "met": true
+    }
+  ],
+  "alerts": [
+    {
+      "name": "payment_without_token",
+      "condition": "count > 0",
+      "severity": "sev1",
+      "value": 0,
+      "firing": false
+    },
+    {
+      "name": "override_rate_high",
+      "condition": "daily override rate > 20%",
+      "severity": "sev2",
+      "value": 0.023809523809523808,
+      "firing": false
+    },
+    {
+      "name": "decision_latency",
+      "condition": "p95 > 10 min for 30 min",
+      "severity": "sev3",
+      "value": 1.0,
+      "firing": false
+    },
+    {
+      "name": "cost_spike",
+      "condition": "cost per claim > 1.5x budget",
+      "severity": "sev3",
+      "value": 0.02431,
+      "firing": false
+    },
+    {
+      "name": "fraud_flag_spike",
+      "condition": "fraud flags > 2x 7-day average",
+      "severity": "sev2",
+      "value": 2,
+      "firing": false
+    }
+  ],
+  "controls": {
+    "payments_total": 30,
+    "payments_without_valid_token": 0,
+    "events": [
+      {
+        "control": "payment_requires_token",
+        "outcome": "blocked",
+        "n": 1
+      },
+      {
+        "control": "payment_requires_token",
+        "outcome": "passed",
+        "n": 30
+      }
+    ],
+    "type_b_mislabelled_as_a": 0,
+    "type_b_mislabel_note": "structurally prevented: type A only from rules engine"
+  },
+  "kpis": [
+    {
+      "id": "KPI-01",
+      "name": "Average handling time (days, simulated)",
+      "baseline": 5.5,
+      "value": 0.54,
+      "target": "-40%",
+      "met": true
+    },
+    {
+      "id": "KPI-02",
+      "name": "Straight-through processing rate",
+      "baseline": 0.0,
+      "value": 0.237,
+      "target": "15-25%",
+      "met": true
+    },
+    {
+      "id": "KPI-03",
+      "name": "Adjuster minutes per claim (simulated)",
+      "baseline": 45,
+      "value": 17.8,
+      "target": "-30%",
+      "met": true
+    },
+    {
+      "id": "KPI-04",
+      "name": "Payment accuracy (QA vs ground truth)",
+      "baseline": 0.95,
+      "value": 1.0,
+      "target": ">= baseline",
+      "met": true
+    },
+    {
+      "id": "KPI-05",
+      "name": "Human override rate",
+      "baseline": null,
+      "value": 0.024,
+      "target": "< 15%",
+      "met": true
+    },
+    {
+      "id": "KPI-06",
+      "name": "Complaints per 1,000 claims",
+      "baseline": null,
+      "value": null,
+      "target": "<= baseline",
+      "met": null,
+      "note": "not simulated"
+    }
+  ],
+  "routing_mix": [
+    {
+      "row": 1,
+      "label": "1 STP",
+      "claims": 16,
+      "pct": 27.1
+    },
+    {
+      "row": 2,
+      "label": "2 L1 type A",
+      "claims": 10,
+      "pct": 16.9
+    },
+    {
+      "row": 3,
+      "label": "3 L1 authority",
+      "claims": 5,
+      "pct": 8.5
+    },
+    {
+      "row": 4,
+      "label": "4 L1+L2 significant",
+      "claims": 11,
+      "pct": 18.6
+    },
+    {
+      "row": 5,
+      "label": "5 L1+L2 rejection",
+      "claims": 10,
+      "pct": 16.9
+    },
+    {
+      "row": 6,
+      "label": "6 investigation",
+      "claims": 5,
+      "pct": 8.5
+    },
+    {
+      "row": 7,
+      "label": "7 SIU",
+      "claims": 2,
+      "pct": 3.4
+    }
+  ],
+  "generated_at": "2026-10-25T20:29:57.201987+00:00"
+}

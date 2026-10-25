@@ -25,7 +25,8 @@ def test_audit_trail_complete_and_redacted(platform, make_claim):
 def test_every_span_carries_release_and_agent_version(platform, make_claim):
     init_telemetry(extra_processors=[SimpleSpanProcessor(EXPORTER)])
     EXPORTER.clear()
-    platform.process(make_claim("valuables"))
+    cid = make_claim("valuables")
+    platform.process(cid)
     spans = EXPORTER.get_finished_spans()
     assert len(spans) > 20
     for sp in spans:
@@ -35,4 +36,18 @@ def test_every_span_carries_release_and_agent_version(platform, make_claim):
         assert a.get("claim.id", "c_").startswith("c_")              # hashed, never the raw claim id
     names = {sp.name for sp in spans}
     assert {"claim.process", "agent assessment.run", "tool TOOL-POLICY-ADMIN.get_policy"} <= names
-    assert any(n.startswith("gen_ai.chat") for n in names)
+    # LLM spans come from OpenInference instrumentation of the create_react_agent graphs
+    llm = [sp for sp in spans if sp.attributes.get("openinference.span.kind") == "LLM"]
+    assert llm and all(sp.attributes.get("llm.model_name") and sp.attributes.get("llm.token_count.prompt") for sp in llm)
+    assert all(sp.attributes.get("adlc.task") for sp in llm)
+    assert any(sp.attributes.get("tool.invoked_by") == "model" for sp in spans)
+
+    # the telemetry sink recorded every LLM span of this claim, priced from the spans' token counts
+    from shared import db
+    from shared.telemetry import price_usd
+    rows = db.query("SELECT * FROM llm_calls WHERE claim_id = ?", [cid])
+    assert len(rows) == len(llm)
+    for r in rows:
+        assert r["cost_usd"] == price_usd(r["model"], r["prompt_tokens"], r["completion_tokens"])
+        assert r["trace_id"] and r["span_id"] and r["latency_ms"] is not None
+    assert db.scalar("SELECT COUNT(*) FROM tool_calls WHERE claim_id = ? AND invoked_by = 'model'", [cid]) > 0

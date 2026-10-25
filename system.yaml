@@ -1,6 +1,6 @@
 id: SYS-TRV-CLM
 name: travel-claims-assistant
-release: 0.1.0
+release: 0.2.0
 owner: claims-travel-product
 business_owner: head-of-claims-travel
 risk_tier: high
@@ -11,15 +11,15 @@ requirements_dir: docs/requirements
 topology:
   entry: AGT-TRV-ORCH
   agents:
-    - ref: AGT-TRV-ORCH@0.1.0
-    - ref: AGT-TRV-INTAKE@0.1.0
-    - ref: AGT-TRV-DOC@0.1.0
-    - ref: AGT-TRV-COV@0.1.0
-    - ref: AGT-TRV-VER@0.1.0
-    - ref: AGT-TRV-FRAUD@0.1.0
-    - ref: AGT-TRV-ASSESS@0.1.0
+    - ref: AGT-TRV-ORCH@0.2.0
+    - ref: AGT-TRV-INTAKE@0.2.0
+    - ref: AGT-TRV-DOC@0.2.0
+    - ref: AGT-TRV-COV@0.2.0
+    - ref: AGT-TRV-VER@0.2.0
+    - ref: AGT-TRV-FRAUD@0.2.0
+    - ref: AGT-TRV-ASSESS@0.2.0
     - ref: AGT-TRV-SETTLE@0.1.0
-    - ref: AGT-TRV-COMMS@0.1.0
+    - ref: AGT-TRV-COMMS@0.2.0
   delegation:
     - from: AGT-TRV-ORCH
       to: [AGT-TRV-INTAKE, AGT-TRV-DOC, AGT-TRV-COV, AGT-TRV-VER, AGT-TRV-FRAUD, AGT-TRV-ASSESS, AGT-TRV-SETTLE, AGT-TRV-COMMS]

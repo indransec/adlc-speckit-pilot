@@ -1,5 +1,6 @@
 """Run unit tests and write evidence/<release>/test-report.json (per test module pass/fail)."""
 import json
+import re
 import os
 import subprocess
 import sys
@@ -10,7 +11,8 @@ from datetime import datetime, timezone
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-def main(release="0.1.0"):
+def main(release=None):
+    release = release or re.search(r"^release:\s*(\S+)", open(os.path.join(ROOT, "system.yaml")).read(), re.M).group(1)
     xml = os.path.join(tempfile.mkdtemp(), "junit.xml")
     proc = subprocess.run([sys.executable, "-m", "pytest", f"--junitxml={xml}", "-o", "junit_family=xunit1", "-q"],
                           cwd=ROOT, capture_output=True, text=True)

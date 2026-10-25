@@ -25,17 +25,19 @@ SLO_SECONDS = 600
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("release", nargs="?", default="0.1.0")
+    ap.add_argument("release", nargs="?", default=None)
     ap.add_argument("--claims", type=int, default=3 * EXPECTED_PEAK_CONCURRENT)
     ap.add_argument("--workers", type=int, default=EXPECTED_PEAK_CONCURRENT)
     ap.add_argument("--latency-ms", type=int, default=400)
     ap.add_argument("--live", action="store_true")
     a = ap.parse_args()
+    from shared.config import release
+    a.release = a.release or release()
     os.environ["DATA_DIR"] = tempfile.mkdtemp(prefix="adlc-perf-")
     os.environ["MOCK_LLM_LATENCY_MS"] = str(a.latency_ms)
     os.environ.setdefault("TELEMETRY_ENABLED", "false")
     if not a.live:
-        os.environ.pop("OPENROUTER_API_KEY", None)
+        os.environ["OPENROUTER_API_KEY"] = ""  # empty, so load_dotenv cannot re-add a key from .env
     from backend import service
     from shared import db
     from shared.runtime import effective_llm_mode

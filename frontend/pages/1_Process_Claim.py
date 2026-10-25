@@ -119,7 +119,7 @@ if s.get("pending"):
 
 # ------------------------------------------------------------------ details
 tabs = st.tabs(["📄 Documents", "🧾 Extraction", "📘 Coverage", "✈️ Verification & fraud", "🧮 Assessment",
-                "🚦 Routing & confidence", "✉️ Letters & payment", "🧾 Audit trail", "🤖 LLM calls"])
+                "🚦 Routing & confidence", "✉️ Letters & payment", "🧾 Audit trail", "🤖 Agents, models & tools"])
 with tabs[0]:
     for d in s["documents"]:
         with st.expander(f"{d['doc_id']} · {d['doc_type']} · certainty {d['extraction_certainty']}"):
@@ -212,7 +212,18 @@ with tabs[7]:
         st.markdown("**Guardrail events**")
         st.dataframe(pd.DataFrame(s["guardrails"]), hide_index=True, width="stretch")
 with tabs[8]:
-    calls = get(f"/claims/{claim_id}/llm-calls")
-    st.caption(f"{s['llm']['calls']} calls · {s['llm']['prompt_tokens']} in / {s['llm']['completion_tokens']} out tokens · "
-               f"cost USD {s['llm']['cost_usd']:.5f} (mock-mode figures are estimates)")
-    st.dataframe(pd.DataFrame(calls), hide_index=True, width="stretch")
+    st.caption(f"{s['llm']['calls']} model calls · {s['llm']['prompt_tokens']} in / {s['llm']['completion_tokens']} out "
+               f"tokens · cost USD {s['llm']['cost_usd']:.5f}. Tokens and latency come from the OpenInference spans; "
+               "cost = tokens × deploy/models.yaml price, as in Phoenix. Mock-mode tokens are estimates.")
+    agents = [{"agent": o["_meta"]["agent_id"] + ("" if o["_meta"]["entry"] == "run" else f".{o['_meta']['entry']}"),
+               "framework": o["_meta"].get("framework", "–"), "model": ", ".join(o["_meta"]["models"]) or "–",
+               "model calls": o["_meta"].get("llm_calls", 0), "tokens": o["_meta"].get("tokens", 0),
+               "cost_usd": o["_meta"]["cost_usd"], "degraded": o["_meta"]["degraded"],
+               "tools chosen by the model": " → ".join(t["tool"] for t in o["_meta"].get("tool_calls", [])) or "–"}
+              for o in outs.values() if "_meta" in o]
+    st.markdown("**Agents** (each LLM task is a LangGraph `create_react_agent`)")
+    st.dataframe(pd.DataFrame(agents), hide_index=True, width="stretch")
+    st.markdown("**Tool calls** (through the permission gateway; `model` = chosen by the agent's LLM)")
+    st.dataframe(pd.DataFrame(get(f"/claims/{claim_id}/tool-calls")), hide_index=True, width="stretch")
+    st.markdown("**Model calls** (one row per LLM span; search Phoenix by trace_id)")
+    st.dataframe(pd.DataFrame(get(f"/claims/{claim_id}/llm-calls")), hide_index=True, width="stretch")

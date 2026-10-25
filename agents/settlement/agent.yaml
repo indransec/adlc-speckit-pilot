@@ -16,6 +16,7 @@ prompts:
   system: prompts/system.md
 tools:
   - id: TOOL-PAYMENTS
+    # deterministic agent, no model (decision D-09)
 guardrails: [pii-redaction, document-injection]
 autonomy: act-with-approval-token
 evals: evals/agents/settlement/suite.yaml

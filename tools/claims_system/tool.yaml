@@ -28,6 +28,7 @@ operations:
     output: {}
   get_claim:
     access: read
+    description: "Return the current claim record (submission, items, status) for the claim being processed."
     input:
       claim_id: string
     output:

@@ -1,4 +1,7 @@
 # Which agent may use which tool, and how
+# Only operations with access 'read' may be attached to a model (create_react_agent tools,
+# `attach:` in agent.yaml). Side-effecting operations are called by agent code after
+# validation, never chosen by the model (decision D-12).
 tools:
   - id: TOOL-POLICY-ADMIN
     agents: [coverage]
@@ -10,6 +13,11 @@ tools:
     access: create, update-status, read
     side_effects: claim record changes (no payment fields)
     note: read added for linked-claim aggregation REQ-F-015 (decision D-07)
+  - id: TOOL-POLICY-WORDING
+    agents: [coverage, assessment, communication]
+    access: read
+    side_effects: none
+    note: FAISS search over policy wording, attached to the model as a read tool (decision D-12)
   - id: TOOL-FLIGHT-STATUS
     agents: [verification]
     access: read

@@ -26,13 +26,15 @@ def _heuristic(doc: dict) -> AnomalyReview:
 
 
 def run(ctx, *, document: dict) -> dict:
+    base = {"injection_detected": document.get("injection_detected", False), "doc_mismatch": bool(document.get("mismatches"))}
+    ctx.bindings = {"signals": base}   # the model sees the SIU score before its own flags are added
     prompt = ("Review these extracted claim facts for anomalies a fraud investigator should see. "
-              "Do not decide the claim.\n"
+              "You can check the SIU model score with your fraud-score tool. Do not decide the claim.\n"
               f"Facts: {document.get('facts')}\nLines: {[(l['description'], l['claimed_usd'], bool(l['receipt_doc_id'])) for l in document.get('lines', [])]}\n"
               f"Cross-document mismatches: {document.get('mismatches')}")
-    review, _ = ctx.llm("anomaly_flags", AnomalyReview, prompt, fallback=lambda: _heuristic(document))
-    signals = {"injection_detected": document.get("injection_detected", False),
-               "doc_mismatch": bool(document.get("mismatches")), "ai_flags": len(review.flags)}
-    siu = ctx.tool("TOOL-FRAUD-SCORE", "score", claim_id=ctx.claim_id, signals=signals)
+    review = ctx.agent("anomaly_flags", AnomalyReview, prompt, fallback=lambda: _heuristic(document),
+                       mock_plan=[("fraud_score_score", {})])
+    signals = {**base, "ai_flags": len(review.flags)}
+    siu = ctx.tool("TOOL-FRAUD-SCORE", "score", signals=signals)
     return {"risk_level": siu["level"], "score": siu["score"], "reasons": siu["reasons"], "model": siu["model"],
             "ai_flags": [f.model_dump() for f in review.flags], "signals": signals}

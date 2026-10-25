@@ -6,7 +6,7 @@ import tempfile
 
 os.environ["DATA_DIR"] = tempfile.mkdtemp(prefix="adlc-tests-")
 os.environ["TELEMETRY_ENABLED"] = "false"
-os.environ.pop("OPENROUTER_API_KEY", None)
+os.environ["OPENROUTER_API_KEY"] = ""  # empty, so load_dotenv cannot re-add a key from .env
 
 import pytest  # noqa: E402
 

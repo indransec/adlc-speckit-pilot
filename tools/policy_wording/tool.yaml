@@ -1,0 +1,27 @@
+id: TOOL-POLICY-WORDING
+description: Semantic search over the policy wording (FAISS index of TRV-2026 clauses).
+owner: claims-platform (product wording, approved by Compliance)
+auth_scope: read
+side_effects: none
+rate_limit: 300 calls/min
+timeout_seconds: 5
+retries: 1
+input_schema: see operations.*.input
+output_schema: see operations.*.output
+implementation: tools/policy_wording/impl.py (FAISS + fastembed; enforced via shared/tool_gateway.py)
+operations:
+  search:
+    access: read
+    description: "Search the policy wording and return the most relevant clauses with their ids and text."
+    input:
+      query: string (what to look for, e.g. "lost baggage depreciation")
+      k: integer 1-8 (number of clauses)
+    output:
+      clauses: array[{clause_id, title, text, score}]
+  get_clause:
+    access: read
+    description: "Return the full text of one policy clause by id (e.g. 5.4)."
+    input:
+      clause_id: string
+    output:
+      clause: object {clause_id, title, text} | null
