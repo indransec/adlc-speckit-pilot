@@ -1,10 +1,23 @@
 id: TOOL-NOTIFY
 description: Send email/SMS from approved templates.
-owner: "[system owner]"
+owner: claims-platform (simulated system of record)
 auth_scope: send-from-template
 side_effects: customer communication
-rate_limit: "[n] calls/min"
+rate_limit: 60 calls/min
 timeout_seconds: 10
 retries: 2
-input_schema: "[JSON schema]"
-output_schema: "[JSON schema]"
+input_schema: see operations.*.input
+output_schema: see operations.*.output
+implementation: tools/notify/impl.py (mock; enforced via shared/tool_gateway.py)
+operations:
+  send:
+    access: send-from-template
+    input:
+      claim_id: string
+      template: approved template id
+      context: object (template variables)
+    output:
+      sent: boolean
+      violations: array[string]
+      subject: string
+      body: string

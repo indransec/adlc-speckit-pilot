@@ -8,9 +8,12 @@ jobs:
     environment: production        # requires CAB approver in GitHub environment rules
     steps:
       - uses: actions/checkout@v4
-      - name: Bundle hash
-        run: tar -cf bundle.tar system.yaml agents tools guardrails && sha256sum bundle.tar | tee bundle.sha256
+      - uses: astral-sh/setup-uv@v5
+        with: {python-version: "3.12"}
+      - run: uv sync --frozen
+      - name: Bundle hash (deterministic, same as the G5 check)
+        run: uv run python -c "from shared.lifecycle import bundle_hash; print(bundle_hash())" | tee bundle.sha256
       - name: Gate G5 check
-        run: python scripts/gate_check.py --gate G5
+        run: uv run python scripts/adlc.py check G5
       - name: Deploy
         run: echo "deploy via deploy/infra"

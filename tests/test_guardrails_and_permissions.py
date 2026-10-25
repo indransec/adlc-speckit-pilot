@@ -48,3 +48,12 @@ def test_injected_claim_routes_normally(platform, make_claim):
     s = platform.process(make_claim("injection"))
     assert s["claim"]["route"] == "row4_l1_l2_significant"
     assert any(g["guardrail"] == "document-injection" for g in s["guardrails"])
+
+
+def test_tool_contracts_match_implementations():
+    import yaml
+    from shared.config import ROOT
+    for p in (ROOT / "tools").glob("*/tool.yaml"):
+        spec = yaml.safe_load(p.read_text())
+        impl = tool_modules()[spec["id"]]
+        assert {k: v["access"] for k, v in spec["operations"].items()} == impl.OPERATIONS, spec["id"]

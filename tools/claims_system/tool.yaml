@@ -1,10 +1,41 @@
 id: TOOL-CLAIMS-SYSTEM
 description: Create claims, update status, assign work queues.
-owner: "[system owner]"
+owner: claims-platform (simulated system of record)
 auth_scope: create, update-status
 side_effects: claim record changes; no payment fields
-rate_limit: "[n] calls/min"
+rate_limit: 120 calls/min
 timeout_seconds: 10
 retries: 2
-input_schema: "[JSON schema]"
-output_schema: "[JSON schema]"
+input_schema: see operations.*.input
+output_schema: see operations.*.output
+implementation: tools/claims_system/impl.py (mock; enforced via shared/tool_gateway.py)
+operations:
+  register:
+    access: create
+    input:
+      claim_id: string
+      claim_type: enum[delay,baggage_delay,baggage_loss]
+      category: enum[delay,baggage]
+    output:
+      claim_id: string
+      status: string
+  update_status:
+    access: update-status
+    input:
+      claim_id: string
+      fields: object (status, queue, route, route_row, recommendation, recommended_usd, approved_usd, confidence,
+        fraud_risk, ...; NO payment fields)
+    output: {}
+  get_claim:
+    access: read
+    input:
+      claim_id: string
+    output:
+      claim: object (no bank, passport or ground-truth fields)
+  linked_approved_total:
+    access: read
+    input:
+      trip_id: string
+      exclude_claim_id: string
+    output:
+      total_usd: number

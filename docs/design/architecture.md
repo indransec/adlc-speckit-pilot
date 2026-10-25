@@ -27,3 +27,17 @@ Communication agent (approved templates)
 
 ## Routing matrix
 See `routing-matrix.md` (source of truth for `agents/orchestrator/src/routing.py`).
+
+## Implementation (release 0.1.0, decision D-08)
+| Component | Technology | Code |
+|---|---|---|
+| Orchestrator flow + HITL | LangGraph `StateGraph`, `interrupt()`, SQLite checkpointer | `agents/orchestrator/src/claim_graph.py` |
+| Routing rules | Python (deterministic) | `agents/orchestrator/src/routing.py` |
+| Confidence (ADR-002) | Python, combined signals | `agents/orchestrator/src/confidence.py` |
+| Sub-agents | Manifest-loaded modules, Pydantic structured outputs | `agents/*/src/agent.py`, `shared/registry.py` |
+| Model gateway (ADR-005) | OpenRouter (Claude Haiku 5.5 / Sonnet 5.5), mock fallback | `shared/llm.py`, `deploy/models.yaml` |
+| Clause retrieval | FAISS + fastembed | `shared/rag.py` |
+| Tool contracts + permissions | Mock systems behind a permission gateway | `tools/*/impl.py`, `shared/tool_gateway.py` |
+| Approval token (ADR-003) | Signed JWT, single use | `shared/hitl/approval_token.py` |
+| Workbench (ADR-004 stand-in) | Streamlit + FastAPI | `frontend/`, `backend/` |
+| Telemetry | OpenTelemetry/OpenInference -> Arize Phoenix | `shared/telemetry.py` |

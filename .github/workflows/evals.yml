@@ -3,12 +3,17 @@ on: [pull_request]
 jobs:
   evals:
     runs-on: ubuntu-latest
+    env:
+      # Set the secret to run live model evals through OpenRouter; without it evals run in mock mode.
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: "3.11"}
-      - run: pip install pyyaml
-      - run: python evals/run_evals.py 0.1.0          # fails build if thresholds missed
-      - run: python scripts/build_traceability.py 0.1.0
+      - uses: astral-sh/setup-uv@v5
+        with: {python-version: "3.12"}
+      - run: uv sync --frozen
+      - run: uv run python scripts/run_tests.py 0.1.0
+      - run: uv run python evals/run_evals.py 0.1.0          # fails build if thresholds missed
+      - run: uv run python evals/perf_test.py 0.1.0
+      - run: uv run python scripts/build_traceability.py 0.1.0
       - uses: actions/upload-artifact@v4
         with: {name: evidence, path: evidence/}

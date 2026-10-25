@@ -1,10 +1,25 @@
 id: TOOL-POLICY-ADMIN
 description: Read policy, insured persons, benefits, limits, exclusions.
-owner: "[system owner]"
+owner: claims-platform (simulated system of record)
 auth_scope: read
 side_effects: none
-rate_limit: "[n] calls/min"
+rate_limit: 120 calls/min
 timeout_seconds: 10
 retries: 2
-input_schema: "[JSON schema]"
-output_schema: "[JSON schema]"
+input_schema: see operations.*.input
+output_schema: see operations.*.output
+implementation: tools/policy_admin/impl.py (mock; enforced via shared/tool_gateway.py)
+operations:
+  get_policy:
+    access: read
+    input:
+      policy_no: string
+    output:
+      policy: object {plan, insured_persons, start_date, end_date, limits, fx_rates} | null
+  claims_history:
+    access: read
+    input:
+      policy_no: string
+      exclude_claim_id: string
+    output:
+      claims: array[{claim_id, claim_type, flight_no, flight_date, status, items}]

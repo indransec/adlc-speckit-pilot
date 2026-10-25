@@ -37,6 +37,18 @@ class ServiceError(ValueError):
 def bootstrap() -> None:
     db.init_db()
     init_telemetry()
+    warm_up()
+
+
+def warm_up() -> None:
+    """Load NLP / embedding models once, before worker threads race to build them."""
+    from shared import rag
+    from shared.guardrails.pii import redact
+    redact("warm up a@b.com", purpose="model")
+    try:
+        rag.search("travel delay", k=1)
+    except Exception:  # index not built yet (fresh data dir)
+        pass
 
 
 def graph():

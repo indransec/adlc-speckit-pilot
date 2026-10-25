@@ -1,10 +1,21 @@
 id: TOOL-FRAUD-SCORE
 description: SIU fraud model score per claim.
-owner: "[system owner]"
+owner: claims-platform (simulated system of record)
 auth_scope: read
 side_effects: none
-rate_limit: "[n] calls/min"
+rate_limit: 60 calls/min
 timeout_seconds: 10
 retries: 2
-input_schema: "[JSON schema]"
-output_schema: "[JSON schema]"
+input_schema: see operations.*.input
+output_schema: see operations.*.output
+implementation: tools/fraud_score/impl.py (mock; enforced via shared/tool_gateway.py)
+operations:
+  score:
+    access: read
+    input:
+      claim_id: string
+      signals: object {injection_detected, doc_mismatch, ai_flags}
+    output:
+      score: number 0-1
+      level: enum[low,medium,high]
+      reasons: array[string]

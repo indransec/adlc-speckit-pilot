@@ -1,0 +1,18 @@
+{
+  "kill_switch": {
+    "passed": true,
+    "at": "2026-10-25T17:46:04.690770+00:00",
+    "summary": "new claim -> manual_queue; payment attempt blocked"
+  },
+  "rollback": {
+    "passed": true,
+    "at": "2026-10-25T17:46:04.692702+00:00",
+    "steps": [
+      "1. Set `kill_switch: true` (stops straight-through and payment instructions immediately).",
+      "2. Route all new claims to the manual queue.",
+      "3. Redeploy previous release by bundle hash.",
+      "4. In-flight claims: hold at current step; adjusters complete manually."
+    ],
+    "summary": "tabletop: 4 runbook steps walked; kill switch verified; redeploy target bundle 969c40556ef7"
+  }
+}

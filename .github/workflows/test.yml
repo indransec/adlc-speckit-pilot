@@ -1,10 +1,13 @@
 name: test
-on: [pull_request]
+on: [pull_request, push]
 jobs:
   unit-and-routing:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: "3.11"}
-      - run: python -m unittest discover -s agents/orchestrator/tests -v
+      - uses: astral-sh/setup-uv@v5
+        with: {python-version: "3.12"}
+      - run: uv sync --frozen
+      - run: uv run python scripts/run_tests.py 0.1.0      # pytest; writes evidence/0.1.0/test-report.json
+      - uses: actions/upload-artifact@v4
+        with: {name: test-report, path: evidence/0.1.0/test-report.json}

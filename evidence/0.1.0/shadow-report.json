@@ -1,0 +1,14 @@
+{
+  "claims": 20,
+  "submitted": 20,
+  "errors": 0,
+  "route_agreement": 1.0,
+  "amount_agreement": 1.0,
+  "payments_created": 0,
+  "thresholds": {
+    "route": 0.99,
+    "amount": 0.95
+  },
+  "generated_at": "2026-10-25T17:46:04.542316+00:00",
+  "passed": true
+}

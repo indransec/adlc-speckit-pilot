@@ -1,10 +1,30 @@
 id: TOOL-PAYMENTS
 description: Create payment instruction.
-owner: "[system owner]"
+owner: claims-platform (simulated system of record)
 auth_scope: create-instruction (requires approval token)
 side_effects: money movement
-rate_limit: "[n] calls/min"
+rate_limit: 30 calls/min
 timeout_seconds: 10
 retries: 2
-input_schema: "[JSON schema]"
-output_schema: "[JSON schema]"
+input_schema: see operations.*.input
+output_schema: see operations.*.output
+implementation: tools/payments/impl.py (mock; enforced via shared/tool_gateway.py)
+operations:
+  verify_payee:
+    access: create-instruction
+    input:
+      claim_id: string
+      claimant_name: string
+    output:
+      holder_matches: boolean
+      account_masked: string
+  create_instruction:
+    access: create-instruction
+    input:
+      claim_id: string
+      amount_usd: number
+      approval_token_str: string (signed JWT, ADR-003)
+    output:
+      payment_id: string
+      status: instructed
+      account_masked: string

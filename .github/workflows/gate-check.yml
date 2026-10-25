@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: "3.11"}
-      - run: python scripts/gate_check.py --gate ${{ inputs.gate }}
+      - uses: astral-sh/setup-uv@v5
+        with: {python-version: "3.12"}
+      - run: uv sync --frozen
+      - run: uv run python scripts/gate_check.py --gate ${{ inputs.gate }}   # evidence files present
+      - run: uv run python scripts/adlc.py check ${{ inputs.gate }}         # automated evidence checks

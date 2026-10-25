@@ -1,0 +1,54 @@
+{
+  "system": "SYS-TRV-CLM",
+  "release": "0.1.0",
+  "bundle_hash": "969c40556ef777e6f830468d937ba010351d69c2a5886e120a41ce610079ed5e",
+  "bundled_paths": [
+    "system.yaml",
+    "agents",
+    "tools",
+    "guardrails",
+    "deploy/models.yaml",
+    "docs/design/tool-permission-matrix.yaml",
+    "evals/thresholds.yaml"
+  ],
+  "git_commit": "7e6868cba5b4854caf4dff487e3646a5ff312675",
+  "created_at": "2026-10-25T17:46:01.468976+00:00",
+  "agents": {
+    "AGT-TRV-ASSESS": {
+      "version": "0.1.0",
+      "model": "anthropic/claude-sonnet-5.5"
+    },
+    "AGT-TRV-COMMS": {
+      "version": "0.1.0",
+      "model": "anthropic/claude-haiku-5.5"
+    },
+    "AGT-TRV-COV": {
+      "version": "0.1.0",
+      "model": "anthropic/claude-sonnet-5.5"
+    },
+    "AGT-TRV-DOC": {
+      "version": "0.1.0",
+      "model": "anthropic/claude-haiku-5.5"
+    },
+    "AGT-TRV-FRAUD": {
+      "version": "0.1.0",
+      "model": "anthropic/claude-haiku-5.5"
+    },
+    "AGT-TRV-INTAKE": {
+      "version": "0.1.0",
+      "model": "anthropic/claude-haiku-5.5"
+    },
+    "AGT-TRV-ORCH": {
+      "version": "0.1.0",
+      "model": "anthropic/claude-haiku-5.5"
+    },
+    "AGT-TRV-SETTLE": {
+      "version": "0.1.0",
+      "model": "none"
+    },
+    "AGT-TRV-VER": {
+      "version": "0.1.0",
+      "model": "anthropic/claude-haiku-5.5"
+    }
+  }
+}

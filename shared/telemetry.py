@@ -69,12 +69,20 @@ def _phoenix_reachable(endpoint: str) -> bool:
         return False
 
 
+def _add_processor(provider: TracerProvider, processor) -> None:
+    # phoenix.otel's provider drops its OTLP exporter on add_span_processor unless told not to
+    try:
+        provider.add_span_processor(processor, replace_default_processor=False)
+    except TypeError:
+        provider.add_span_processor(processor)
+
+
 def init_telemetry(extra_processors: list | None = None) -> TracerProvider:
     """Idempotent. Exports to Phoenix only when it is reachable, so the app never blocks on it."""
     global _provider
     if _provider is not None:
         for p in extra_processors or []:
-            _provider.add_span_processor(p)
+            _add_processor(_provider, p)
         return _provider
     endpoint = os.environ.get("PHOENIX_COLLECTOR_ENDPOINT", "http://localhost:6006/v1/traces")
     enabled = os.environ.get("TELEMETRY_ENABLED", "true").lower() == "true"
@@ -86,9 +94,9 @@ def init_telemetry(extra_processors: list | None = None) -> TracerProvider:
     else:
         provider = TracerProvider()
         log.info("telemetry: Phoenix not reachable; spans stay in-process")
-    provider.add_span_processor(AdlcSpanProcessor())
+    _add_processor(provider, AdlcSpanProcessor())
     for p in extra_processors or []:
-        provider.add_span_processor(p)
+        _add_processor(provider, p)
     try:
         trace.set_tracer_provider(provider)
     except Exception:

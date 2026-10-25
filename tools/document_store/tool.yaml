@@ -1,10 +1,31 @@
 id: TOOL-DOCUMENT-STORE
 description: Fetch claim documents; write extracted fields.
-owner: "[system owner]"
+owner: claims-platform (simulated system of record)
 auth_scope: read, write-extracted-fields
 side_effects: stores extraction results
-rate_limit: "[n] calls/min"
+rate_limit: 300 calls/min
 timeout_seconds: 10
 retries: 2
-input_schema: "[JSON schema]"
-output_schema: "[JSON schema]"
+input_schema: see operations.*.input
+output_schema: see operations.*.output
+implementation: tools/document_store/impl.py (mock; enforced via shared/tool_gateway.py)
+operations:
+  list_documents:
+    access: read
+    input:
+      claim_id: string
+    output:
+      documents: array[{doc_id, doc_type, filename, uploaded_at}]
+  read_text:
+    access: read
+    input:
+      doc_id: string
+    output:
+      text: string (PDF text; untrusted customer data)
+  write_extracted:
+    access: write-extracted-fields
+    input:
+      doc_id: string
+      fields: object
+      certainty: number 0-1
+    output: {}
