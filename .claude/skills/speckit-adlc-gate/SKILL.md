@@ -41,6 +41,9 @@ persona decision (constitution I).
      with their paths, and the Spec Kit sections they came from (G1: `spec.md` "ADLC: G1
      Requirements"; G2: `plan.md` "ADLC: G2 Design Record"; G3/G4: `tasks.md` ADLC phase).
    - Decisions asked: open decisions recorded in the spec/plan, plus "approve or reject <GATE>".
+   - Checklists: for every `checklists/g<N>-*.md` of this gate (and `requirements.md` at G1), the
+     ticked / open counts and the open items, so the signers decide with them in view; once the gate
+     is approved, later commands treat those checklists as informational.
    - Constitution compliance: one line per principle I-VII; detail only exceptions.
    - Evidence: paths under `evidence/<release>/` as produced by the engine. Never write there.
    If checks fail, still write the brief, marked **NOT READY** at the top, listing what is missing.

@@ -17,6 +17,8 @@ Before anything else, confirm G0 is approved. This command produces G1 requireme
 3. If approved, continue. Feature folder: if `.specify/feature.json` names a folder created by
    `/speckit-adlc-intake` (`specs/<release>-<slug>/`), use it as `SPECIFY_FEATURE_DIRECTORY` instead
    of generating a numbered one.
+4. When creating a custom checklist, name it `g1-<topic>.md` (the gate it serves), so later
+   commands can tell which gate decided it.
 
 Constitution I and II apply throughout: never sign, approve, reset or simulate a gate.
 

@@ -3,7 +3,7 @@ schema_version: "1.0"
 preset:
   id: "adlc"
   name: "ADLC governed delivery"
-  version: "0.2.0"
+  version: "0.3.0"
   description: "ADLC gate sections in the spec, plan and tasks templates, a gate-brief template, /speckit-adlc-* commands, and a previous-gate check in front of the Spec Kit stage commands"
   author: "adlc-speckit-pilot"
   license: "MIT"
