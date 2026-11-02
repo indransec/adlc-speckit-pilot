@@ -37,8 +37,8 @@ companions = G2, `tasks.md` = build plan, `briefs/G*.md` = gate briefs for signe
 | 4 | Constitution via `/speckit-constitution` with the ADLC rules | done 2026-11-02 (v1.0.0, decision D-15) |
 | 5 | ADLC sections in spec / plan / tasks templates, gate-brief template, as the local `adlc` preset (below) | done 2026-11-02 |
 | 6 | `/speckit-adlc-intake`, `-gate <G>`, `-status`, `-rework` and the previous-gate check in the Spec Kit stage commands, all in the `adlc` preset (below) | done 2026-11-02 |
-| 7 | Run G0 → G2 for 0.4.0 (user signs as personas) | next |
-| 8 | Run G3 → G5 (release branch + PR, golden cases labelled by the user, one deliberate G4 rejection) | |
+| 7 | Run G0 → G2 for 0.4.0 (user signs as personas) | done 2026-11-02 (G0 11:39, G1 13:04, G2 15:59 UTC; notes below) |
+| 8 | Run G3 → G5 (release branch + PR, golden cases labelled by the user, one deliberate G4 rejection) | next |
 | 9 | Retro in `docs/pilot-retro.md` | |
 
 G6 / G7 are out of the first pass (they need traffic over time).
@@ -115,13 +115,28 @@ the CLI, with no roles, so they do not replace ADLC sign-off.
 |---|---|---|
 | G0 | `/speckit-adlc-intake CARD-101`; PO submits on the intake page, Data owner confirms classification | Sponsor, Risk, Data owner (hoc, risk, dataowner) |
 | G1 | `/speckit-specify`, `/speckit-clarify` (Business owner answers), `/speckit-checklist`, `/speckit-adlc-gate G1`; Business owner confirms limits/KPIs | Business owner, AI lead (hoc, ailead) |
-| G2 | `/speckit-plan`, `/speckit-analyze`, `/speckit-adlc-gate G2` | Architecture, Security (architect, security) |
-| G3 | `/speckit-tasks`, `/speckit-implement` on `release/0.4.0` with a PR, `/speckit-adlc-gate G3` | AI lead, Product owner (ailead, po) + code-owner PR review |
+| G2 | `/speckit-plan`, `/speckit-adlc-gate G2` | Architecture, Security (architect, security) |
+| G3 | `/speckit-tasks`, `/speckit-analyze` (needs `tasks.md`, so it runs here, not at G2), `/speckit-implement` on `release/0.4.0` with a PR, `/speckit-adlc-gate G3` | AI lead, Product owner (ailead, po) + code-owner PR review |
 | G4 | `/speckit-adlc-gate G4` | RAI/Risk, Compliance (rai, compliance) |
 | G5 | CR raised on the board, `/speckit-adlc-gate G5` | CAB, Head of Claims (cab, hoc) |
 
 ## Open questions on CARD-101 (for G1)
 
-1. Self-transfer itineraries on separate tickets: in or out?
-2. Shared travel delay limit or its own limit?
-3. Minimum connection time: airline published value or a fixed [60 minutes]?
+1. Self-transfer itineraries on separate tickets: in or out? **Out** (G1, `hoc`)
+2. Shared travel delay limit or its own limit? **Shared, per journey; outward and return separate** (G1)
+3. Minimum connection time: airline published value or a fixed [60 minutes]? **Airport published, 60 min fallback** (G1)
+
+### Step 7 notes (G0 → G2, 2026-11-02)
+
+- G0: record drafted by `claude`, submitted by `po`, classification confirmed by `dataowner`; signed
+  by hoc, risk, dataowner. Signers approved without recording the brief's suggested conditions.
+- G1: `/speckit-specify` (3 questions) + `/speckit-checklist` (31-item `g1-review.md`, found 7 real
+  gaps) + `/speckit-clarify` (5 questions). Business owner confirmed limits/KPIs in the G1 form.
+  KPI-07..09 baselines remain placeholders.
+- Found and fixed: a governed repo's `usecase/` leaked into simulation runs (`sim/workspace.py`
+  SKIP) and an isolation test assumed no repo record.
+- G2: `/speckit-plan` found that spec scenario US1-2 routed a 47% reduction to row 2; corrected to
+  row 4 and recorded as rework for the G1 signers (requirements unaffected).
+- Sequencing: `/speckit-analyze` needs `tasks.md`, which needs G2 approved; moved to G3.
+- Persona steps worked in the UI; the engine's role checks and ledger held throughout
+  (`verify-ledger` OK after every gate).

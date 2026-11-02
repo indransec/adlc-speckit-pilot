@@ -149,10 +149,75 @@
     },
     {
       "gate": "G2",
-      "status": "pending",
-      "approvers": [],
-      "decided_at": null,
-      "evidence": []
+      "status": "approved",
+      "approvers": [
+        {
+          "role": "Architecture",
+          "persona": "architect",
+          "name": "Victor Lindqvist",
+          "decision": "approved",
+          "notes": "ok",
+          "at": "2026-11-02T15:59:01+00:00"
+        },
+        {
+          "role": "Security",
+          "persona": "security",
+          "name": "Nadia Haddad",
+          "decision": "approved",
+          "notes": "ok",
+          "at": "2026-11-02T15:59:13+00:00"
+        }
+      ],
+      "decided_at": "2026-11-02T15:59:14+00:00",
+      "evidence": [
+        "9 agents, 8 tools, 45 requirements checked; 0 errors",
+        "7 ADRs",
+        "every tool and agent covered; model-attached operations are read-only",
+        "T1-T9 incl. document injection",
+        "redaction points documented",
+        "prompts, guardrails and routing rules need named reviewers",
+        "no changes since approval"
+      ],
+      "signatures": [],
+      "notes": "ok; ok",
+      "checks": [
+        {
+          "check": "Architecture documented; manifests validate",
+          "ok": true,
+          "detail": "9 agents, 8 tools, 45 requirements checked; 0 errors"
+        },
+        {
+          "check": "ADRs recorded",
+          "ok": true,
+          "detail": "7 ADRs"
+        },
+        {
+          "check": "Tool permission matrix covers every tool and agent",
+          "ok": true,
+          "detail": "every tool and agent covered; model-attached operations are read-only"
+        },
+        {
+          "check": "Threat model: OWASP Agentic + document injection",
+          "ok": true,
+          "detail": "T1-T9 incl. document injection"
+        },
+        {
+          "check": "Data flows and redaction points",
+          "ok": true,
+          "detail": "redaction points documented"
+        },
+        {
+          "check": "Change control on prompts / routing",
+          "ok": true,
+          "detail": "prompts, guardrails and routing rules need named reviewers"
+        },
+        {
+          "check": "Artifacts approved at earlier gates unchanged",
+          "ok": true,
+          "detail": "no changes since approval"
+        }
+      ],
+      "manifest_sha256": "619eb4aa408732018572836b6b6efcb7a36928dab816078b44aed6304c4c2ce6"
     }
   ]
 }
