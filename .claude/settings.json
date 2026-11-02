@@ -1,0 +1,44 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(python scripts/adlc.py sign:*)",
+      "Bash(python scripts/adlc.py approve:*)",
+      "Bash(python scripts/adlc.py reset-gates:*)",
+      "Bash(python scripts/adlc.py simulate:*)",
+      "Bash(uv run python scripts/adlc.py sign:*)",
+      "Bash(uv run python scripts/adlc.py approve:*)",
+      "Bash(uv run python scripts/adlc.py reset-gates:*)",
+      "Bash(uv run python scripts/adlc.py simulate:*)",
+      "Bash(make simulate:*)",
+      "Edit(evidence/**)",
+      "Write(evidence/**)",
+      "Edit(**/evidence/**)",
+      "Write(**/evidence/**)"
+    ],
+    "ask": [
+      "Edit(agents/orchestrator/src/routing.py)",
+      "Write(agents/orchestrator/src/routing.py)",
+      "Edit(evals/thresholds.yaml)",
+      "Write(evals/thresholds.yaml)",
+      "Edit(system.yaml)",
+      "Write(system.yaml)",
+      "Edit(docs/design/tool-permission-matrix.yaml)",
+      "Write(docs/design/tool-permission-matrix.yaml)",
+      "Edit(evals/datasets/**)",
+      "Write(evals/datasets/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/adlc_guard.py\""
+          }
+        ]
+      }
+    ]
+  }
+}

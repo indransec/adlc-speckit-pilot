@@ -33,8 +33,8 @@ companions = G2, `tasks.md` = build plan, `briefs/G*.md` = gate briefs for signe
 | 0 | Repo created from baseline, setup, tests green (105) | done 2026-11-02 |
 | 1 | Governed mode (`adlc_governed`), release 0.4.0, CARD-101; smoke test of intake + persona sign-off | done 2026-11-02 (`2a39001`) |
 | 2 | Spec Kit v1.2.5 installed unmodified (`specify init --here --integration claude`) | done 2026-11-02 (`1d18f7c`) |
-| 3 | Guardrails in `.claude/settings.json` (below); test that Claude cannot sign | next |
-| 4 | Constitution via `/speckit-constitution` with the ADLC rules | |
+| 3 | Guardrails in `.claude/settings.json` + `.claude/hooks/adlc_guard.py` (below); tested that Claude cannot sign | done 2026-11-02 |
+| 4 | Constitution via `/speckit-constitution` with the ADLC rules | next |
 | 5 | ADLC sections in spec / plan / tasks templates, gate-brief template | |
 | 6 | `/adlc.intake`, `/adlc.gate <G>`, `/adlc.status`, `/adlc.rework`; gate precondition in speckit-specify / -plan / -implement | |
 | 7 | Run G0 → G2 for 0.4.0 (user signs as personas) | |
@@ -49,6 +49,20 @@ G6 / G7 are out of the first pass (they need traffic over time).
   `Bash(python scripts/adlc.py reset-gates:*)` (and the `uv run` forms), Edit/Write on `evidence/**`
 - ask: Edit on `agents/orchestrator/src/routing.py`, `evals/thresholds.yaml`, `system.yaml`,
   `docs/design/tool-permission-matrix.yaml`, `evals/datasets/**`
+- also denied: `adlc.py simulate` and `make simulate` (they approve every gate with simulated approvers).
+- Prefix rules are easy to get around (`cd scripts && python adlc.py sign`, `curl`, `python -c`), so a
+  PreToolUse hook, `.claude/hooks/adlc_guard.py`, checks the whole command or path and blocks it (exit 2):
+  `adlc.py sign|approve|reset-gates|simulate` in any form, `make simulate`, POSTs to
+  `/lifecycle/gates/*/sign|approve`, `/lifecycle/gates/reset`, `/usecases/*/submit`,
+  `/usecases/*/classification/confirm`, `/changes/*/decide`, direct `lifecycle.sign/approve/...` and
+  `usecase.submit/confirm_classification` calls, and Edit/Write on `evidence/**`.
+- Test (2026-11-02): 22 hook cases (14 block, 8 allow) as expected. Live in the session, `adlc.py sign`
+  was blocked by the hook and a Write to `evidence/` by the deny rule; gates all still pending, ledger OK,
+  105 tests green.
+- Known false positive: the hook also matches those strings anywhere in a command's text (a heredoc,
+  `grep`, a commit message). Use the Edit tool or put the text in a file.
+- Not covered: writing the gate store or ledger directly (e.g. SQL). Ledger tampering is caught by
+  `adlc.py verify-ledger`. `make test` and engine actions still write `evidence/` as intended.
 
 ### Step 5 option to evaluate
 
