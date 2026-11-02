@@ -1,0 +1,25 @@
+{
+  "release": "0.4.0",
+  "generated_at": "2026-11-02T06:55:21+00:00",
+  "tests": 105,
+  "failed": 0,
+  "passed": true,
+  "modules": {
+    "agents/assessment/tests/test_calculator.py": "passed",
+    "agents/communication/tests/test_communication_templates.py": "passed",
+    "agents/document/tests/test_document_agent.py": "passed",
+    "agents/fraud-screening/tests/test_fraud_integration.py": "passed",
+    "agents/intake/tests/test_intake.py": "passed",
+    "agents/orchestrator/tests/test_routing.py": "passed",
+    "agents/settlement/tests/test_settlement.py": "passed",
+    "tests/test_agent_runtime.py": "passed",
+    "tests/test_audit_and_telemetry.py": "passed",
+    "tests/test_guardrails_and_permissions.py": "passed",
+    "tests/test_hitl.py": "passed",
+    "tests/test_sim_close.py": "passed",
+    "tests/test_sim_foundations.py": "passed",
+    "tests/test_sim_ops.py": "passed",
+    "tests/test_sim_story.py": "passed"
+  },
+  "summary": ""
+}
