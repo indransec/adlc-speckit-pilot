@@ -1,16 +1,57 @@
+# Alerts (G1 / G6). Windows are in business time: the simulation clock during a simulation run.
+#
+# expr          Prometheus expression over the adlc_* gauges served by the API at /metrics (shared/prom.py);
+#               scripts/sim_stack.py turns this file into Prometheus rules and Alertmanager routes.
+# team          who is paged (ops/teams.yaml); routed through Alertmanager to that team's GoAlert service
+# auto_action   applied the moment the alert fires, before anyone acknowledges (kill_switch | stp_off)
 alerts:
   - name: payment_without_token
-    condition: count > 0
+    condition: any payment instructed without a valid approval token in the last day
     severity: sev1
+    team: sre-oncall
+    also_inform: [risk]
+    auto_action: kill_switch
+    expr: adlc_payments_without_valid_token > 0
+  - name: stp_over_authority
+    condition: any straight-through payment above the G1-approved authority limit in the last day
+    severity: sev1
+    team: ai-oncall
+    also_inform: [hoc]
+    auto_action: stp_off
+    expr: adlc_stp_over_authority > 0
   - name: override_rate_high
-    condition: daily override rate > 20%
+    condition: daily override rate > 20% (at least 5 human decisions)
     severity: sev2
-  - name: decision_latency
-    condition: p95 > 10 min for 30 min
-    severity: sev3
-  - name: cost_spike
-    condition: cost per claim > 1.5x budget
-    severity: sev3
+    team: ai-oncall
+    also_inform: [claimsops]
+    expr: adlc_override_rate > 0.2 and adlc_human_decisions >= 5
+  - name: shadow_route_agreement_low
+    condition: shadow route agreement below the G3 routing threshold
+    severity: sev2
+    team: data-science
+    expr: adlc_shadow_route_agreement < adlc_shadow_route_threshold
+  - name: tool_error_rate
+    condition: one tool's error rate > 20% in the last day (at least 20 calls)
+    severity: sev2
+    team: sre-oncall
+    expr: adlc_tool_error_rate > 0.2 and adlc_tool_calls >= 20
   - name: fraud_flag_spike
-    condition: fraud flags > 2x 7-day average
+    condition: share of claims flagged for fraud > 3x its 7-day average (at least 6 flags)
     severity: sev2
+    team: siu
+    expr: adlc_fraud_flags >= 6 and adlc_fraud_flag_rate > 3 * adlc_fraud_flag_rate_baseline
+  - name: decision_latency
+    condition: p95 decision latency > 10 min
+    severity: sev3
+    team: sre-oncall
+    expr: adlc_decision_latency_p95_seconds > 600
+  - name: cost_spike
+    condition: cost per claim > 1.5x its 7-day average
+    severity: sev3
+    team: ai-oncall
+    expr: adlc_cost_per_claim_usd > 1.5 * adlc_cost_per_claim_baseline_usd and adlc_cost_per_claim_baseline_usd > 0
+  - name: injection_spike
+    condition: prompt-injection blocks per claim > 3x the 7-day average (at least 5 blocks)
+    severity: sev3
+    team: secops
+    expr: adlc_injection_blocks >= 5 and adlc_injection_block_rate > 3 * adlc_injection_block_rate_baseline

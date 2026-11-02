@@ -1,0 +1,56 @@
+# Seed for the G0 intake form (the story runner submits it as-is; a person can edit it in the form).
+# due_day = simulation day relative to day 0 (shadow start); converted to a date when the form opens.
+id: UC-TRV-CLM-001
+title: Travel Claims Assistant
+sponsor: hoc
+business_owner: hoc
+product_owner: po
+problem: >-
+  Trip delay and baggage claims are high-volume and low-to-medium value, yet each needs manual
+  document checks, policy look-ups and calculation. Most adjuster time is spent on claims under
+  USD 1,000, and handling times are long for customers waiting on small amounts.
+proposed_solution: >-
+  An agentic backend that receives submitted claims, extracts and cross-checks documents, verifies
+  coverage and facts, calculates the payable amount, and either decides simple, low-value,
+  no-deduction cases or prepares a decision package for L1 / L2 adjusters under a deterministic
+  routing matrix.
+value_hypothesis:
+  - {metric: "Handling time, delay + baggage", baseline: measure from last 6 months, target: "-40%"}
+  - {metric: Straight-through processing rate, baseline: "0%", target: "15-25%"}
+  - {metric: Adjuster minutes per claim, baseline: time study, target: "-30%"}
+  - {metric: Payment accuracy (QA sample), baseline: current QA error rate, target: ">= baseline"}
+scope_in: [Trip delay, Baggage loss and delay, Claims in USD, Backend from claim receipt to closure]
+scope_out: [Medical, Cancellation and interruption, Missed connection, Recovery, Customer front end, Payment rails]
+data_classification:
+  rows:
+    - {data: Claimant identity, classification: Confidential - PII, handling: Redact in logs and non-essential prompts}
+    - {data: Bank details, classification: Restricted, handling: Never sent to models; used only by Settlement}
+    - {data: Travel documents, classification: Confidential, handling: Stored in the document store; extracted fields only in prompts}
+    - {data: Claim outcome, classification: Confidential, handling: Audit trail retained per the records policy}
+  confirmed_by: null
+risk:
+  customer_outcome: true
+  takes_actions: true
+  personal_data: true
+  special_category: false
+  autonomy: decide_some
+  max_autonomous_usd: 1000
+  regulatory_exposure: true
+feasibility:
+  verdict: Go with conditions
+  rationale: >-
+    Hybrid design: AI for documents and coverage judgement, deterministic rules for arithmetic,
+    routing and payment release. Model risk is confined to document and judgement steps.
+  conditions:
+    - {condition: Golden set of 300-500 decided claims labelled by senior adjusters, owner: zoe, due_day: -35}
+    - {condition: Data residency and no-training terms confirmed for model hosting, owner: security, due_day: -40}
+    - {condition: Payments instruction API enforces the approval-token check, owner: ailead, due_day: -25}
+raci:
+  - {activity: Use case and value (G0), A: Head of Claims, R: Product owner, C: AI lead; Risk; Security, I: Platform; Compliance}
+  - {activity: Requirements and thresholds (G1), A: Head of Claims, R: Product owner; AI lead, C: Platform; Security; Risk; SIU, I: Finance}
+  - {activity: Design and threat model (G2), A: Product owner, R: AI lead; Platform; Security, C: Head of Claims; Risk; SIU, I: Compliance}
+  - {activity: Evals (G3), A: Product owner, R: AI lead, C: Head of Claims; Platform; Risk; SIU, I: Security}
+  - {activity: RAI assurance (G4), A: RAI/Risk, R: Product owner; AI lead; Compliance, C: Head of Claims; Security, I: Platform}
+  - {activity: Release (G5), A: Head of Claims, R: Product owner; AI lead; Platform, C: Security; Risk; Compliance; Finance, I: SIU}
+  - {activity: Run and hypercare (G6), A: Head of Claims, R: Product owner; AI lead; Platform, C: SIU, I: Security; Risk}
+  - {activity: Improve or retire (G7), A: Head of Claims, R: Product owner; AI lead, C: Risk; Compliance; SIU, I: Platform}

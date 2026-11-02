@@ -2,7 +2,7 @@
 import glob, json, os, sys
 import yaml
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # sim runs: workspace
 TIERS = ["low", "medium", "high"]
 
 

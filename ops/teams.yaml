@@ -1,0 +1,60 @@
+# Dummy organisation for the end-to-end ADLC simulation. All people are fictional personas.
+#
+# roles     = ADLC approver roles exactly as named in shared/lifecycle.py GATES; a persona can sign
+#             a gate only for a role it holds, and one persona fills at most one role per gate.
+# user_id   = the persona's login in the adjuster workbench (users table), when it has one.
+# on_call   = escalation order for alerts routed to the team (simulation step 3: GoAlert).
+teams:
+  - id: governance
+    name: Governance and approvers
+  - id: product-ai
+    name: Product and AI leadership
+  - id: ai-oncall
+    name: AI Engineering on-call
+    on_call: [ana, dev]
+  - id: data-science
+    name: Data Science
+    on_call: [zoe, omar]
+  - id: sre-oncall
+    name: Platform SRE on-call
+    on_call: [ravi, elena]
+  - id: secops
+    name: Security Operations
+    on_call: [jonas, dpo]
+  - id: siu
+    name: Special Investigations Unit
+    on_call: [siu-sam]
+  - id: claims-ops
+    name: Claims Operations
+
+personas:
+  # governance
+  - {id: hoc, name: Helen Ortiz, title: Head of Claims (Travel), team: governance,
+     roles: ["Sponsor (Head of Claims)", "Business owner (Head of Claims)", "Head of Claims"]}
+  - {id: risk, name: Daniel Okoro, title: Risk Officer, team: governance, roles: ["Risk"]}
+  - {id: dataowner, name: Mei Chen, title: Data Owner (Claims data), team: governance, roles: ["Data owner"]}
+  - {id: compliance, name: Laura Fischer, title: Compliance Officer, team: governance, roles: ["Compliance"]}
+  - {id: rai, name: Samuel Reyes, title: RAI Officer, team: governance, roles: ["RAI/Risk"]}
+  - {id: cab, name: Nora Mwangi, title: CAB Chair, team: governance, roles: ["CAB"]}
+  - {id: architect, name: Victor Lindqvist, title: Enterprise Architect (ARB), team: governance, roles: ["Architecture"]}
+  - {id: security, name: Nadia Haddad, title: Security Architect, team: governance, roles: ["Security"]}
+  - {id: dpo, name: Ilse Jansen, title: Data Protection Officer, team: secops, roles: []}
+  # product and AI
+  - {id: po, name: Arjun Rao, title: Product Owner, team: product-ai, roles: ["Product owner"]}
+  - {id: ailead, name: Kenji Sato, title: AI Lead, team: product-ai, roles: ["AI lead"]}
+  - {id: relmgr, name: Chris Novak, title: Release Manager, team: product-ai, roles: []}
+  # on-call engineering
+  - {id: ana, name: Ana Lima, title: AI Engineer, team: ai-oncall, roles: []}
+  - {id: dev, name: Dev Patel, title: AI Engineer, team: ai-oncall, roles: []}
+  - {id: zoe, name: Zoe Martin, title: Data Scientist, team: data-science, roles: []}
+  - {id: omar, name: Omar Farouk, title: Data Scientist, team: data-science, roles: []}
+  - {id: ravi, name: Ravi Kumar, title: Site Reliability Engineer, team: sre-oncall, roles: []}
+  - {id: elena, name: Elena Petrova, title: SRE Lead, team: sre-oncall, roles: []}
+  - {id: jonas, name: Jonas Berg, title: Security Operations Analyst, team: secops, roles: []}
+  # claims operations (workbench users from synthetic/materialize.py)
+  - {id: claimsops, name: Sofia Alvarez, title: Claims Ops Lead, team: claims-ops, roles: []}
+  - {id: l1-priya, name: Priya S., title: L1 adjuster, team: claims-ops, roles: [], user_id: l1.priya}
+  - {id: l1-marco, name: Marco D., title: L1 adjuster, team: claims-ops, roles: [], user_id: l1.marco}
+  - {id: l2-grace, name: Grace O., title: L2 senior adjuster, team: claims-ops, roles: [], user_id: l2.grace}
+  - {id: l2-tomas, name: Tomas R., title: L2 claims manager, team: claims-ops, roles: [], user_id: l2.tomas}
+  - {id: siu-sam, name: Sam K., title: SIU investigator, team: siu, roles: [], user_id: siu.sam}

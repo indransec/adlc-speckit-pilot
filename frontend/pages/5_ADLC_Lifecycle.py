@@ -2,9 +2,11 @@
 import pandas as pd
 import streamlit as st
 
-from common import call, get, ok_badge, page, post, try_action
+from common import call, clock_badge, gate_signoff, get, ok_badge, page, persona_picker, post, try_action
 
 page("ADLC lifecycle", "🛤️")
+persona = persona_picker()
+clock_badge()
 GATE_ACTIONS = {"G2": ["validate_manifests"], "G3": ["unit_tests", "evals", "perf_test", "traceability"],
                 "G5": ["bundle_release", "shadow_run", "kill_switch_drill", "rollback_drill"],
                 "G6": ["hypercare"], "G7": ["g7_review"]}
@@ -76,21 +78,15 @@ for g in gates:
                     r = try_action(post, f"/lifecycle/actions/{name}", {})
                     if r:
                         st.toast(f"{name} started")
-        if rec.get("approvers"):
-            st.write("Signed by: " + ", ".join(f"{x['role']}: {x['name']}" for x in rec["approvers"]))
         st.caption(f"Named approvers: {', '.join(g['approvers_required'])} · previous gate approved: "
                    f"{g['previous_gate_approved']} · ready: {g['ready']}")
-        with st.form(f"approve-{g['gate']}"):
-            names = {r: st.text_input(r, key=f"{g['gate']}-{r}", placeholder="approver name") for r in g["approvers_required"]}
-            notes = st.text_input("Notes / conditions", key=f"{g['gate']}-notes")
-            x, y = st.columns(2)
-            named = x.form_submit_button("Sign with named approvers")
-            sim = y.form_submit_button("Sign with simulated approvers")
-            if named or sim:
-                body = {"simulated": sim, "notes": notes,
-                        "approvals": [{"role": r, "name": n} for r, n in names.items() if n]}
-                if try_action(post, f"/lifecycle/gates/{g['gate']}/approve", body, success=f"{g['gate']} approved"):
-                    st.rerun()
+        gate_signoff(g, persona, g["gate"])
+        if rec["status"] not in ("approved", "approved_with_conditions") and \
+                st.button("Sign with all simulated approvers", key=f"sim-{g['gate']}",
+                          help="One persona per required role, from ops/teams.yaml"):
+            if try_action(post, f"/lifecycle/gates/{g['gate']}/approve", {"simulated": True},
+                          success=f"{g['gate']} approved"):
+                st.rerun()
 
 st.header("Evidence store")
 files = get("/lifecycle/evidence")

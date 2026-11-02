@@ -55,6 +55,7 @@ def guard_document(text: str, *, doc_id: str, doc_type: str, claim_id: str, agen
     s = scan(text)
     if s.detected:
         from shared.audit import guardrail_event
-        guardrail_event(claim_id, "document-injection", ",".join(POLICY["action_on_detection"]),
+        actions = POLICY["action_on_detection"]  # a comma-separated string in guardrails/document-injection.yaml
+        guardrail_event(claim_id, "document-injection", actions if isinstance(actions, str) else ", ".join(actions),
                         f"{doc_id}: {s.summary()}", agent_id)
     return wrap_as_data(text, doc_id, doc_type), s

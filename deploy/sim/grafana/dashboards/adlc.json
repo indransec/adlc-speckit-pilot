@@ -1,0 +1,259 @@
+{
+ "uid": "adlc-sim",
+ "title": "ADLC simulation - hypercare",
+ "refresh": "5s",
+ "time": {
+  "from": "now-1h",
+  "to": "now"
+ },
+ "schemaVersion": 39,
+ "panels": [
+  {
+   "type": "stat",
+   "title": "sim day",
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "expr": "adlc_sim_day",
+     "refId": "A"
+    }
+   ],
+   "datasource": {
+    "uid": "prometheus"
+   }
+  },
+  {
+   "type": "stat",
+   "title": "runtime kill switch",
+   "gridPos": {
+    "x": 4,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "expr": "adlc_runtime_kill_switch",
+     "refId": "A"
+    }
+   ],
+   "datasource": {
+    "uid": "prometheus"
+   }
+  },
+  {
+   "type": "stat",
+   "title": "runtime straight through enabled",
+   "gridPos": {
+    "x": 8,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "expr": "adlc_runtime_straight_through_enabled",
+     "refId": "A"
+    }
+   ],
+   "datasource": {
+    "uid": "prometheus"
+   }
+  },
+  {
+   "type": "stat",
+   "title": "payments without valid token",
+   "gridPos": {
+    "x": 12,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "expr": "adlc_payments_without_valid_token",
+     "refId": "A"
+    }
+   ],
+   "datasource": {
+    "uid": "prometheus"
+   }
+  },
+  {
+   "type": "stat",
+   "title": "stp over authority",
+   "gridPos": {
+    "x": 16,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "expr": "adlc_stp_over_authority",
+     "refId": "A"
+    }
+   ],
+   "datasource": {
+    "uid": "prometheus"
+   }
+  },
+  {
+   "type": "timeseries",
+   "title": "Override rate",
+   "gridPos": {
+    "x": 0,
+    "y": 4,
+    "w": 12,
+    "h": 7
+   },
+   "datasource": {
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "expr": "adlc_override_rate",
+     "refId": "A",
+     "legendFormat": "override_rate"
+    }
+   ]
+  },
+  {
+   "type": "timeseries",
+   "title": "Tool error rate",
+   "gridPos": {
+    "x": 12,
+    "y": 4,
+    "w": 12,
+    "h": 7
+   },
+   "datasource": {
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "expr": "adlc_tool_error_rate",
+     "refId": "A",
+     "legendFormat": "tool_error_rate"
+    }
+   ]
+  },
+  {
+   "type": "timeseries",
+   "title": "Decision latency p95 (s)",
+   "gridPos": {
+    "x": 0,
+    "y": 11,
+    "w": 12,
+    "h": 7
+   },
+   "datasource": {
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "expr": "adlc_decision_latency_p95_seconds",
+     "refId": "A",
+     "legendFormat": "decision_latency_p95_seconds"
+    }
+   ]
+  },
+  {
+   "type": "timeseries",
+   "title": "Cost per claim vs 7-day baseline (USD)",
+   "gridPos": {
+    "x": 12,
+    "y": 11,
+    "w": 12,
+    "h": 7
+   },
+   "datasource": {
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "expr": "adlc_cost_per_claim_usd",
+     "refId": "A",
+     "legendFormat": "cost_per_claim_usd"
+    },
+    {
+     "expr": "adlc_cost_per_claim_baseline_usd",
+     "refId": "B",
+     "legendFormat": "cost_per_claim_baseline_usd"
+    }
+   ]
+  },
+  {
+   "type": "timeseries",
+   "title": "Fraud-flag rate vs 7-day baseline",
+   "gridPos": {
+    "x": 0,
+    "y": 18,
+    "w": 12,
+    "h": 7
+   },
+   "datasource": {
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "expr": "adlc_fraud_flag_rate",
+     "refId": "A",
+     "legendFormat": "fraud_flag_rate"
+    },
+    {
+     "expr": "adlc_fraud_flag_rate_baseline",
+     "refId": "B",
+     "legendFormat": "fraud_flag_rate_baseline"
+    }
+   ]
+  },
+  {
+   "type": "timeseries",
+   "title": "Injection blocks per claim vs 7-day baseline",
+   "gridPos": {
+    "x": 12,
+    "y": 18,
+    "w": 12,
+    "h": 7
+   },
+   "datasource": {
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "expr": "adlc_injection_block_rate",
+     "refId": "A",
+     "legendFormat": "injection_block_rate"
+    },
+    {
+     "expr": "adlc_injection_block_rate_baseline",
+     "refId": "B",
+     "legendFormat": "injection_block_rate_baseline"
+    }
+   ]
+  },
+  {
+   "type": "alertlist",
+   "title": "Firing alerts",
+   "gridPos": {
+    "x": 0,
+    "y": 25,
+    "w": 24,
+    "h": 6
+   },
+   "options": {
+    "alertInstanceLabelFilter": "",
+    "stateFilter": {
+     "firing": true,
+     "pending": true
+    }
+   }
+  }
+ ]
+}

@@ -3,8 +3,13 @@ export PYTHONPATH := $(CURDIR):$(CURDIR)/agents/orchestrator/src
 UV ?= uv
 RELEASE ?= $(shell sed -n 's/^release: *//p' system.yaml)
 PORT ?= 8000
+SIM_RUN ?= $(shell cat sim/runs/CURRENT 2>/dev/null)
+SIM_ENV = set -a && . "$(CURDIR)/sim/runs/$(SIM_RUN)/run.env" && set +a &&
+NEED_RUN = @test -n "$(SIM_RUN)" || { echo "no simulation run: make sim-new"; exit 1; }
 
-.PHONY: help setup data datasets api ui phoenix dev test evals evals-quick perf traceability validate lifecycle simulate status clean
+.PHONY: help setup data datasets api ui phoenix dev test evals evals-quick perf traceability validate simulate status clean \
+        sim-new sim-api sim-ui sim-clock sim-list simulate-e2e verify-ledger \
+        sim-stack-up sim-stack-status sim-stack-down
 
 help:            ## list targets
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
@@ -54,6 +59,40 @@ status:          ## gate overview
 
 simulate:        ## walk the whole ADLC G0 -> G7 with simulated approvers
 	$(UV) run python scripts/adlc.py simulate
+
+sim-new:         ## new isolated simulation run (workspace, data, evidence, clock) under sim/runs/
+	$(UV) run python scripts/sim_run.py new $(ARGS)
+
+sim-list:        ## list simulation runs (* = current)
+	$(UV) run python scripts/sim_run.py list
+
+sim-api:         ## API on :8000 against the current simulation run
+	$(NEED_RUN)
+	$(SIM_ENV) $(UV) run uvicorn backend.app:app --port $(PORT) --reload --reload-dir backend --reload-dir shared --reload-dir agents --reload-dir tools
+
+sim-ui:          ## Streamlit on :8501 against the current simulation run
+	$(NEED_RUN)
+	$(SIM_ENV) cd frontend && $(UV) run streamlit run Home.py
+
+sim-clock:       ## show / control the simulation clock, e.g. make sim-clock ARGS="--skip-to-day -45"
+	$(NEED_RUN)
+	$(UV) run python scripts/sim_run.py clock $(ARGS)
+
+sim-stack-up:    ## alerting stack: Prometheus, Alertmanager, GoAlert (seeded from ops/teams.yaml), Mailpit, Grafana
+	$(UV) run python scripts/sim_stack.py up
+
+sim-stack-status: ## health of the alerting stack and the API scrape target
+	$(UV) run python scripts/sim_stack.py status
+
+sim-stack-down:  ## stop and remove the alerting stack
+	$(UV) run python scripts/sim_stack.py down
+
+simulate-e2e:    ## play the end-to-end ADLC story in a new run (ARGS="--interactive", "--per-day 20 --min-shadow 100")
+	$(UV) run python scripts/simulate_e2e.py $(ARGS)
+
+verify-ledger:   ## verify the evidence ledger (hash chain, manifests, artifact copies) of the current run
+	$(NEED_RUN)
+	$(SIM_ENV) $(UV) run python scripts/adlc.py verify-ledger
 
 clean:           ## remove runtime data (keeps evidence and datasets)
 	rm -rf data .pytest_cache

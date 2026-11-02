@@ -1,0 +1,42 @@
+# Alerting stack for the end-to-end ADLC simulation. Managed by scripts/sim_stack.py (make sim-stack-up / -down):
+# it writes ./generated/ (Prometheus rules and Alertmanager routes from observability/alerts.yaml and
+# ops/teams.yaml) and seeds GoAlert with the on-call teams. The API (make sim-api) runs on the host.
+#
+#   Prometheus   :9090   scrapes the API's /metrics (business-time gauges) and evaluates the alert rules
+#   Alertmanager :9093   routes each alert to the API (incident card, automatic action) and to the team in GoAlert
+#   GoAlert      :8081   on-call schedules and escalation (admin / admin123); pages go out by email
+#   Mailpit      :8025   inbox for every page and verification email (SMTP :1025)
+#   Grafana      :3000   dashboards over Prometheus (admin / admin)
+name: adlc-sim
+services:
+  prometheus:
+    image: prom/prometheus:v3.15.0
+    command: ["--config.file=/etc/prometheus/generated/prometheus.yml", "--web.enable-lifecycle",
+              "--storage.tsdb.retention.time=7d"]
+    volumes: ["./generated:/etc/prometheus/generated:ro"]
+    ports: ["9090:9090"]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+  alertmanager:
+    image: prom/alertmanager:v0.34.1
+    command: ["--config.file=/etc/alertmanager/generated/alertmanager.yml"]
+    volumes: ["./generated:/etc/alertmanager/generated:ro"]
+    ports: ["9093:9093"]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+  goalert:
+    image: goalert/demo:v0.35.0
+    environment:
+      SKIP_SEED: "1"
+    ports: ["8081:8081"]
+  mailpit:
+    image: axllent/mailpit:v1.31.4
+    ports: ["8025:8025", "1025:1025"]
+  grafana:
+    image: grafana/grafana:13.2.0
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports: ["3000:3000"]

@@ -106,3 +106,66 @@ def grouped_bar(df: pd.DataFrame, x: str, series: str, y: str, order: list[str],
 
 def money(v) -> str:
     return "–" if v is None else f"USD {v:,.2f}"
+
+
+# ------------------------------------------------------------------------------------------- simulation
+APPROVED = ("approved", "approved_with_conditions")
+GATE_ICON = {"approved": "✅", "approved_with_conditions": "🟡", "rejected": "❌", "pending": "⬜"}
+
+
+def persona_picker() -> dict:
+    """Sidebar 'acting as' selector. The backend checks the persona's roles on every signature."""
+    ps = get("/personas")
+    by_id = {p["id"]: p for p in ps}
+    pid = st.sidebar.selectbox("Acting as", list(by_id), key="persona",
+                               format_func=lambda i: f"{by_id[i]['name']} · {by_id[i]['title']}")
+    p = by_id[pid]
+    st.sidebar.caption("Approver roles: " + (", ".join(p["roles"]) or "none (cannot sign gates)"))
+    return p
+
+
+def clock_badge() -> dict:
+    c = get("/clock")
+    if c["simulated"]:
+        speed = "paused" if c["paused"] else f"×{c['rate']:g}"
+        st.sidebar.markdown(f"**Simulation clock**  \n{c['now'][:16].replace('T', ' ')} UTC  \nday {c['sim_day']:.1f} · {speed}")
+    else:
+        st.sidebar.warning("Not a simulation run. Start one with `make sim-new` then `make sim-api` / `make sim-ui`.")
+    return c
+
+
+def gate_signoff(gs: dict, persona: dict, key: str) -> None:
+    """Who has signed, who still must, and approve / reject for the acting persona (one role per person per gate)."""
+    rec = gs["record"]
+    decided = rec["status"] in (*APPROVED, "rejected")
+    sigs = {s["role"]: s for s in (rec.get("approvers") if decided else rec.get("signatures")) or []}
+    st.dataframe(pd.DataFrame([{"role": r, "signed by": sigs[r].get("name", "") if r in sigs else "—",
+                                "decision": sigs[r].get("decision", rec["status"]) if r in sigs else "awaiting",
+                                "at": (sigs[r].get("at") or "")[:16].replace("T", " ") if r in sigs else ""}
+                               for r in gs["approvers_required"]]), hide_index=True, width="stretch")
+    if rec["status"] in APPROVED:
+        st.success(f"{gs['gate']} {rec['status'].replace('_', ' ')} · manifest {(rec.get('manifest_sha256') or '')[:12]}")
+        return
+    open_roles = [r for r in gs["approvers_required"] if r not in sigs or decided]
+    mine = [r for r in open_roles if r in persona["roles"]]
+    if rec["status"] == "rejected":
+        st.error(f"Rejected: {rec.get('notes') or 'no reason given'}. Fix the findings, then sign again.")
+    if not mine:
+        holders = ", ".join(open_roles)
+        st.caption(f"{persona['name']} holds none of the open roles ({holders}). Switch persona in the sidebar to sign.")
+        return
+    if not gs["ready"]:
+        why = "previous gate not approved" if not gs["previous_gate_approved"] else \
+            "failing checks: " + "; ".join(c["check"] for c in gs["checks"] if not c["ok"])
+        st.warning(f"Not ready to approve ({why}). You can still reject.")
+    with st.form(f"sign-{key}"):
+        notes = st.text_input("Notes / conditions", key=f"notes-{key}")
+        c = st.columns(3)
+        approve = c[0].form_submit_button(f"✅ Approve as {mine[0]}", disabled=not gs["ready"], type="primary")
+        cond = c[1].form_submit_button("🟡 Approve with conditions", disabled=not gs["ready"])
+        reject = c[2].form_submit_button("❌ Reject")
+    decision = "approved" if approve else "approved_with_conditions" if cond else "rejected" if reject else None
+    if decision:
+        body = {"persona": persona["id"], "decision": decision, "notes": notes}
+        if try_action(post, f"/lifecycle/gates/{gs['gate']}/sign", body, success=f"Signed {gs['gate']} as {persona['name']}"):
+            st.rerun()

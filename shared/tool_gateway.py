@@ -13,6 +13,7 @@ from pathlib import Path
 
 import yaml
 
+from shared import faults
 from shared.audit import audit, control_event
 from shared.config import ROOT, load_yaml
 from shared.telemetry import hash_claim_id, tracer
@@ -65,6 +66,7 @@ def call_tool(agent_name: str, tool_id: str, op: str, *, claim_id: str | None = 
         if "claim_id" in inspect.signature(fn).parameters:
             kwargs["claim_id"] = claim_id
         try:
+            faults.apply("tool_call", None, tool_id=tool_id, claim_id=claim_id, op=op)  # simulation fault F7
             result = fn(**kwargs)
         except Exception:
             span.set_attribute("tool.status", "error")

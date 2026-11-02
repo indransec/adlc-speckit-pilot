@@ -1,7 +1,7 @@
 """Mock policy administration system (TOOL-POLICY-ADMIN): policies, schedules, FX table, claims history."""
 from __future__ import annotations
 
-from shared import db
+from shared import db, faults
 
 OPERATIONS = {"get_policy": "read", "claims_history": "read"}
 
@@ -21,7 +21,7 @@ def get_policy(policy_no: str) -> dict | None:
         return None
     p["insured_persons"] = db.jload(p["insured_persons"], [])
     p["limits"] = PLAN_LIMITS[p["plan"]]
-    p["fx_rates"] = FX_RATES
+    p["fx_rates"] = faults.apply("policy_fx_rates", dict(FX_RATES))  # simulation fault F2 (no-op outside sim runs)
     return p
 
 

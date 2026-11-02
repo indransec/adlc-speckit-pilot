@@ -2,6 +2,10 @@
 
 Paths that hold runtime data are functions (not constants) so evals and tests can
 point DATA_DIR at an isolated directory before anything touches the database.
+
+A simulation run (APP_ENV=sim, see sim/workspace.py) also sets PROJECT_ROOT to its own
+workspace copy of the governed project content (system.yaml, docs, prompts, routing rules)
+and EVIDENCE_DIR to its own evidence store, so the repo's files are never modified.
 """
 from __future__ import annotations
 
@@ -40,8 +44,21 @@ def faiss_dir() -> Path:
     return data_dir() / "faiss"
 
 
+def project_root() -> Path:
+    """Governed project content: the repo itself, or a simulation run's workspace."""
+    return Path(os.environ.get("PROJECT_ROOT") or ROOT)
+
+
+def evidence_root() -> Path:
+    return Path(os.environ.get("EVIDENCE_DIR") or ROOT / "evidence")
+
+
 def app_env() -> str:
     return os.environ.get("APP_ENV", "dev")
+
+
+def is_sim() -> bool:
+    return app_env() == "sim"
 
 
 def openrouter_api_key() -> str | None:
@@ -60,13 +77,24 @@ def load_yaml(rel_or_abs: str | Path):
 
 
 @lru_cache
+def _yaml_at(path: str, mtime: float):
+    with open(path) as f:
+        return yaml.safe_load(f)
+
+
 def system_manifest() -> dict:
-    return load_yaml("system.yaml")
+    """Re-read when the file changes: a simulation run cuts new releases into its workspace."""
+    p = project_root() / "system.yaml"
+    return _yaml_at(str(p), p.stat().st_mtime)
 
 
 @lru_cache
+def _env_config(env: str) -> dict:
+    return load_yaml(f"deploy/environments/{env}.yaml")
+
+
 def env_config() -> dict:
-    return load_yaml(f"deploy/environments/{app_env()}.yaml")
+    return _env_config(app_env())
 
 
 @lru_cache

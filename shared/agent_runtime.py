@@ -31,6 +31,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, Field, create_model
 
+from shared import faults
 from shared.config import ROOT
 from shared.guardrails.injection import guard_document
 from shared.guardrails.pii import redact, redact_for_model, restricted_present
@@ -160,7 +161,7 @@ def run_agent(ctx, *, task: str, schema: type[T], user_content: str, fallback: C
     from shared.registry import system_prompt
     init_telemetry()
     manifest = ctx.manifest
-    model = model_override or manifest["model"]["name"]
+    model = faults.apply("agent_model", model_override or manifest["model"]["name"])  # simulation fault F10
     temperature = float(manifest["model"].get("params", {}).get("temperature", 0.1))
 
     restricted = restricted_present(user_content)

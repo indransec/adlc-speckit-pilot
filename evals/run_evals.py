@@ -20,9 +20,13 @@ from datetime import datetime, timedelta, timezone
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-for p in (ROOT, os.path.join(ROOT, "agents", "orchestrator", "src")):
-    if p not in sys.path:
-        sys.path.insert(0, p)
+# A simulation run evaluates its release candidate: datasets, thresholds and routing rules from the workspace.
+PROJECT = os.environ.get("PROJECT_ROOT") or ROOT
+EVALS = os.path.join(PROJECT, "evals")
+for p in (ROOT, os.path.join(ROOT, "agents", "orchestrator", "src"), os.path.join(PROJECT, "agents", "orchestrator", "src")):
+    if p in sys.path:
+        sys.path.remove(p)
+    sys.path.insert(0, p)
 from routing import ClaimDecisionInput, Deduction, DeductionType, Recommendation, route_claim  # noqa: E402
 
 INTAKE, DOC, COV, VER, FRAUD, ASSESS = ("AGT-TRV-INTAKE", "AGT-TRV-DOC", "AGT-TRV-COV", "AGT-TRV-VER",
@@ -54,7 +58,7 @@ def rate(xs):
 
 # ------------------------------------------------------------------------------------------- 1. routing
 def routing_suite():
-    cases = load(os.path.join(HERE, "datasets", "golden", "routing_cases.jsonl"))
+    cases = load(os.path.join(EVALS, "datasets", "golden", "routing_cases.jsonl"))
     results = []
     for c in cases:
         inp = ClaimDecisionInput(
@@ -335,10 +339,10 @@ def main(release=None, quick=False):
     os.environ.setdefault("PHOENIX_PROJECT", "travel-claims-evals")
     from backend import service
     from evals.judges import letter_judge
-    from shared import db, metrics
+    from shared import clock, db, metrics
     from shared.runtime import effective_llm_mode, set_runtime
     from synthetic import adjuster_bot
-    from synthetic.generate import ADVERSARIAL_E2E, GOLDEN, setup_platform
+    from synthetic.generate import setup_platform
     from synthetic.materialize import materialize
     from synthetic.scenarios import build_case
 
@@ -346,8 +350,11 @@ def main(release=None, quick=False):
     service.bootstrap()
     for k, v in {"mode": "full", "straight_through_enabled": True, "payments_enabled": True, "kill_switch": False}.items():
         set_runtime(k, v, by="eval-runner")
+    if os.environ.get("EVAL_LLM_MODE"):  # e.g. live G3 runs in a simulation (sim.yaml defaults to mock)
+        set_runtime("llm_mode", os.environ["EVAL_LLM_MODE"], by="eval-runner")
     llm_mode = effective_llm_mode()
-    golden, adv = load(GOLDEN), load(ADVERSARIAL_E2E)
+    golden = load(os.path.join(EVALS, "datasets", "golden", "claims_cases.jsonl"))
+    adv = load(os.path.join(EVALS, "datasets", "adversarial", "e2e_cases.jsonl"))
     if quick:
         golden = golden[::2]
     print(f"evals: release {release}, llm={llm_mode}, golden={len(golden)}, adversarial={len(adv)}, data={tmp}")
@@ -393,7 +400,7 @@ def main(release=None, quick=False):
         "audit_record_complete": rate(chk["audit"]),
         "step_and_cost_budget_respected": rate(chk["budget"]),
     }
-    thresholds = yaml.safe_load(open(os.path.join(HERE, "thresholds.yaml")))["thresholds"]
+    thresholds = yaml.safe_load(open(os.path.join(EVALS, "thresholds.yaml")))["thresholds"]
     results, ok = compare(m, thresholds)
     suites = {s: [k for k in ks if k in results] for s, ks in {
         "EVS-ORCHESTRATOR": ["routing_correctness"], "EVS-INTAKE": ["claim_type_classification_accuracy"],
@@ -407,7 +414,7 @@ def main(release=None, quick=False):
                        "audit_record_complete", "high_confidence_precision", "final_payment_accuracy_within_1usd"],
         "EVS-RAI": ["injection_suite_pass_rate", "pii_leak_count", "counterfactual_fairness_parity", "letter_rubric_pass_rate"],
     }.items()}
-    now = datetime.now(timezone.utc).isoformat()
+    now = clock.now_iso()
     report = {"release": release, "generated_at": now, "llm_mode": llm_mode, "quick": quick,
               "suite": "full" if not quick else "quick", "routing_correctness": m["routing_correctness"],
               "threshold": thresholds["routing_correctness"]["min"], "passed": ok, "metrics": results, "suites": suites,
@@ -417,7 +424,7 @@ def main(release=None, quick=False):
            "injection": inj, "pii": pii, "fairness": {"counterfactual": cf, "observational": metrics.fairness()},
            "letters": {k: letters[k] for k in ("letter_compliance_rate", "letter_rubric_pass_rate", "letters", "judged")},
            "red_team": findings}
-    out_dir = os.path.join(ROOT, "evidence", release)
+    out_dir = os.path.join(os.environ.get("EVIDENCE_DIR") or os.path.join(ROOT, "evidence"), release)
     os.makedirs(out_dir, exist_ok=True)
     json.dump(report, open(os.path.join(out_dir, "eval-report.json"), "w"), indent=2, default=str)
     json.dump(rai, open(os.path.join(out_dir, "rai-report.json"), "w"), indent=2, default=str)

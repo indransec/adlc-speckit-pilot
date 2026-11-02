@@ -107,7 +107,7 @@ decide queue items from that ground truth, which produces realistic override rat
 
 | Gate | Stage | Evidence (generated where marked *) | Automated checks / actions |
 |---|---|---|---|
-| G0 | Intake & triage | `docs/use-case-card.md`, `feasibility.md`, `risk-assessment.md`, `raci.md` | documents present, risk tier consistent |
+| G0 | Intake & triage | `docs/use-case-card.md`, `feasibility.md`, `risk-assessment.md`, `raci.md`; in simulation runs `usecase/<id>.yaml`* + risk file + card from the intake form | documents present, risk tier consistent; record complete, classification confirmed, card current, submitted |
 | G1 | Requirements | `docs/requirements/`, `docs/kpis.yaml`, `evals/thresholds.yaml` | every REQ has a verification method; routing constants match `system.yaml` |
 | G2 | Design | `docs/design/`, `system.yaml`, `agents/*/agent.yaml`, `tools/*/tool.yaml` | manifests validate, matrix covers every tool, threat model T1-T9 |
 | CI | Build | `agents/`, `tools/`, `guardrails/`, `shared/` | `make test` -> `test-report.json`* |
@@ -120,6 +120,99 @@ decide queue items from that ground truth, which produces realistic override rat
 Gate records: `evidence/<release>/gate-records.json`* (named approvers and timestamps).
 Checklists: `docs/gates/`. Run a gate from the CLI (`python scripts/adlc.py check G3`) or the
 **ADLC Lifecycle** page.
+
+Every approval or rejection freezes the artifacts listed for that gate in `adlc/gate_artifacts.yaml`
+into the evidence ledger (`shared/ledger.py`): each file is hashed and copied into a
+content-addressed store, a manifest records approvers, checks and artifacts, and one hash-chained
+event points at it. Later gates re-hash earlier approved files; a change to the authority rules
+(`routing.py`, routing keys in `system.yaml`, `evals/thresholds.yaml`, the tool matrix) blocks until
+the earlier gate is re-approved. `python scripts/adlc.py verify-ledger` checks the whole chain.
+
+## End-to-end simulation runs
+
+A simulation run plays the use case through the lifecycle with personas (`ops/teams.yaml`) on a
+simulated calendar, isolated from the repo's own files and evidence
+(plan: `docs/design/ADLC-E2E-Simulation-Plan.docx`).
+
+```bash
+make sim-new            # sim/runs/<id>/: workspace copy (own git), data, evidence, clock; becomes current
+make sim-api            # API against the current run (APP_ENV=sim)
+make sim-ui             # Streamlit: Use case intake, ADLC board, ADLC lifecycle, ...
+make sim-clock ARGS="--skip-to-day -45"     # or --pause / --resume / --rate 720 / --skip-days 2
+make verify-ledger
+```
+
+In the UI, pick a persona under **Acting as**. The Product owner saves and submits the G0 record,
+the Data owner confirms the classification, and the Sponsor, Risk Officer and Data owner each sign
+G0. The Business owner confirms limits and KPIs for G1, then signs G1 with the AI Lead. A persona
+can sign only a role it holds, and one role per gate. The **ADLC board** shows the card move and
+every frozen artifact. The same steps are available from the CLI (`python scripts/adlc.py sign G0 --persona hoc`).
+
+### The scripted story (G0 → G5)
+
+`make simulate-e2e` creates a new run and plays `sim/story_e2e.yaml` through the real engine
+(about 30 minutes; watch it with `make sim-api` + `make sim-ui`). `ARGS="--interactive"` leaves
+gate and change-request decisions to you in the UI; `ARGS="--per-day 20 --min-shadow 100"` makes
+the shadow windows smaller; `--run current` resumes a stopped story.
+
+| Sim day | What happens | Expected outcome |
+|---|---|---|
+| -60 to -30 | Intake, G0, G1, G2 signed by personas | approved once for the use case |
+| -21 / -20 | Release 0.3.0-rc1 raises the STP limit in `routing.py` (fault **F1**); CI runs | G3 blocked: routing evals fail, drift against the G1 approval; rejected and closed |
+| -16 to -14 | Release 0.3.0 (hides fault **F2**: JPY missing from the policy FX table) | passes G3 and G4: the golden set has no yen receipts |
+| -2 to 6 | CR-001 approved by CAB, deployed in shadow, 7 days × 55 live claims | shadow route agreement below 0.99, all misses are JPY baggage claims sent straight through |
+| 7 | CAB rejects G5 (CR-002); 0.3.0 superseded | |
+| 7 to 15 | Release 0.3.1 restores JPY and adds JPY golden cases; G3, G4, CR-003, shadow again | shadow agreement met; G5 approved by CAB + Head of Claims |
+
+Releases are commits and tags in the run's workspace; change requests, deployments, injected and
+detected faults are ledger events; the board shows epic, release and change-request cards.
+Fault catalogue: `sim/faults.yaml` (faults fire only when `APP_ENV=sim`).
+
+### Rollout, hypercare and incidents (alerting stack)
+
+```bash
+make sim-stack-up       # Prometheus :9090, Alertmanager :9093, GoAlert :8081 (admin/admin123), Mailpit :8025, Grafana :3000
+make sim-new            # a fresh run, then in other terminals:
+make sim-api            # the API on :8000 serves /metrics and receives Alertmanager webhooks
+make sim-ui
+make simulate-e2e ARGS="--run current"
+```
+
+`scripts/sim_stack.py` generates the Prometheus rules from `observability/alerts.yaml` and the
+Alertmanager routes from `ops/teams.yaml`, and seeds GoAlert with every on-call persona (email
+verified through Mailpit), one service and escalation policy per team. The API's `/metrics` gauges
+are computed over business-time windows (the simulation clock), so a simulated day of traffic raises
+and clears real alerts. Each alert opens an incident (Incidents page, board), Sev1 alerts apply their
+automatic action at once (kill switch, straight-through off), GoAlert pages the team's primary and
+escalates to the secondary after a minute without an acknowledgement.
+
+| Sim day | Fault | Alert → team | What the story checks |
+|---|---|---|---|
+| 19 (assisted) | F3 coverage model degradation | override_rate_high → ai-oncall | adjusters override; Ana acknowledges; model pin restored |
+| 29 | — | phase change CR (Head of Claims) | refused unless the 7-day override rate is under 15% |
+| 33 (full) | F4 STP limit raised at runtime | stp_over_authority (Sev1) → ai-oncall | straight-through switched off automatically |
+| 37 | F6 gateway latency | decision_latency → sre-oncall | |
+| 40 | F7 flight-status outage | tool_error_rate → sre-oncall | per-tool error rate |
+| 43 | F8 fraud ring (fraud x25) | fraud_flag_spike → siu | |
+| 45 | F9 injection campaign | injection_spike → secops | guardrails block every attempt |
+| 47 | F5 token check bypassed | payment_without_token (Sev1) → sre-oncall | kill switch automatically; Ravi misses the page, GoAlert escalates to Elena |
+| 51 | F10 fast tier moved to Sonnet | cost_spike → ai-oncall | cost relative to its 7-day baseline |
+| 54 | — | — | every incident closed with a root cause once its alert cleared |
+
+### G6 extension, fix release, G7 and the report
+
+| Sim day | What happens |
+|---|---|
+| 59 | Hypercare report over days 29-59: payments without a valid token (F5) → G6 not ready; the Head of Claims extends hypercare to day 75 with conditions |
+| 60 | Fix release 0.3.2 on the emergency path: CI, G3, G4, emergency change (CAB + Head of Claims), **replayed shadow** of the last 330 claims' mix, drills, G5, deployed in full mode |
+| 61-75 | Extended hypercare; the report over days 61-75 is clean → G6 approved |
+| 76-77 | G7 review generated from telemetry and signed; release 0.4.0 cut with golden cases for the scenarios adjusters overrode most (the loop back to G3) |
+| 77 | `sim/report.py` writes `evidence/e2e-report.md`: the detection matrix (each fault's expected control, alert, team, escalation and automatic action vs what the ledger shows), gate decisions, releases, change requests, incidents and KPIs |
+
+The **Simulation** page shows the run, the clock, story progress and the detection matrix. Evidence
+packs (manifests, frozen artifacts, the hash-chained ledger and a verification note an auditor can follow
+with `sha256sum`) download from the board, the Simulation page, `GET /evidence-pack?release=&gate=` or
+`python scripts/adlc.py evidence-pack --release 0.3.2 --gate G5`.
 
 ## Folder layout
 

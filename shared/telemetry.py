@@ -115,7 +115,8 @@ class TelemetrySink(SpanProcessor):
 
     @staticmethod
     def _common(span, a) -> dict:
-        return {"ts": _iso(span.end_time), "claim_id": _claim_by_hash.get(a.get("claim.id")),
+        from shared import clock  # rows use business time (the simulation clock in a run); latency stays real
+        return {"ts": clock.now_iso(), "claim_id": _claim_by_hash.get(a.get("claim.id")),
                 "run_no": a.get("adlc.run_no"), "agent_id": a.get("adlc.agent.id"),
                 "latency_ms": round(((span.end_time or 0) - (span.start_time or 0)) / 1e6, 1),
                 "trace_id": format(span.context.trace_id, "032x")}

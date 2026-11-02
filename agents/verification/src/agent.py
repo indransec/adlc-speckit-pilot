@@ -6,6 +6,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
+from shared.tool_gateway import ToolPermissionError
+
 DELAY_THRESHOLD_H = 6      # clause 3.1 / 3.3
 BAG_DELAY_THRESHOLD_H = 12  # clause 4.1
 
@@ -16,7 +18,14 @@ class VerificationSummary(BaseModel):
 
 
 def run(ctx, *, claim_type: str, facts: dict) -> dict:
-    f = ctx.tool("TOOL-FLIGHT-STATUS", "lookup", flight_no=facts.get("flight_no"), flight_date=facts.get("flight_date"))
+    unavailable = None
+    try:
+        f = ctx.tool("TOOL-FLIGHT-STATUS", "lookup", flight_no=facts.get("flight_no"), flight_date=facts.get("flight_date"))
+    except ToolPermissionError:
+        raise  # a control, never swallowed
+    except Exception as e:  # source down: verify nothing, degrade, and let routing send the claim to a person
+        f, unavailable = None, f"flight-status source unavailable ({type(e).__name__})"
+        ctx.degrade(unavailable)
     out = {"flight_found": bool(f), "delay_hours_verified": None, "cause": None, "meets_threshold": None,
            "strike_announced_before_booking": False, "discrepancies": []}
     if f:
@@ -32,7 +41,7 @@ def run(ctx, *, claim_type: str, facts: dict) -> dict:
                 out["strike_announced_before_booking"] = True
                 out["discrepancies"].append(f"strike announced {f['cause_announced_at'][:10]}, before booking on {facts['booking_date']}")
     else:
-        out["discrepancies"].append("flight not found in the flight-status source")
+        out["discrepancies"].append(unavailable or "flight not found in the flight-status source")
     if claim_type == "baggage_delay":
         bh = facts.get("bag_delay_hours")
         out["bag_delay_hours"] = bh

@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import uuid
 
-from shared import db
+from shared import db, faults
 from shared.audit import audit, control_event
 from shared.hitl import approval_token
 from shared.runtime import get_runtime
@@ -40,7 +40,10 @@ def create_instruction(claim_id: str, amount_usd: float, approval_token_str: str
             raise PaymentRejected("kill switch active: payment instructions stopped")
         if not rt["payments_enabled"]:
             raise PaymentRejected("payments disabled in this rollout phase")
-        claims = approval_token.verify(approval_token_str, claim_id=claim_id, amount_usd=amount_usd)
+        if faults.apply("skip_token_check", False):  # simulation fault F5: a hotfix bypasses verification
+            claims, verified = {"jti": "UNVERIFIED-" + uuid.uuid4().hex[:8], "approvers": [], "route_row": None}, 0
+        else:
+            claims, verified = approval_token.verify(approval_token_str, claim_id=claim_id, amount_usd=amount_usd), 1
         if db.one("SELECT jti FROM used_tokens WHERE jti = ?", [claims["jti"]]):
             raise PaymentRejected("approval token already used")
         c = db.one("SELECT claimant_name, bank_account_holder, bank_account_no FROM claims WHERE claim_id = ?", [claim_id])
@@ -53,7 +56,7 @@ def create_instruction(claim_id: str, amount_usd: float, approval_token_str: str
     db.insert("used_tokens", {"jti": claims["jti"], "claim_id": claim_id, "used_at": db.now()})
     pay = {"payment_id": "PAY-" + uuid.uuid4().hex[:10].upper(), "claim_id": claim_id,
            "amount_usd": round(amount_usd, 2), "payee_name": c["claimant_name"],
-           "account_masked": _mask(c["bank_account_no"]), "token_jti": claims["jti"], "token_verified": 1,
+           "account_masked": _mask(c["bank_account_no"]), "token_jti": claims["jti"], "token_verified": verified,
            "approvers": db.jdump(claims["approvers"]), "status": "instructed", "created_at": db.now()}
     db.insert("payments", pay)
     control_event(claim_id, "payment_requires_token", "passed", f"row {claims['route_row']}")

@@ -93,6 +93,7 @@ class AgentContext:
     known_pii: dict = field(default_factory=dict)     # claimant contact data to redact from tool results
     documents: dict = field(default_factory=dict)     # guarded document text, by doc_id
     doc_types: dict = field(default_factory=dict)
+    degraded_reasons: list = field(default_factory=list)  # e.g. a dependency was unavailable
 
     @property
     def name(self) -> str:
@@ -116,7 +117,12 @@ class AgentContext:
 
     @property
     def degraded(self) -> bool:
-        return any(r.degraded for r in self.runs)
+        return any(r.degraded for r in self.runs) or bool(self.degraded_reasons)
+
+    def degrade(self, reason: str) -> None:
+        """Mark this agent's output as degraded (confidence is capped, so the claim goes to a person)."""
+        self.degraded_reasons.append(reason)
+        self.audit("agent_degraded", {"reason": reason})
 
     def audit(self, event: str, payload: dict | None = None):
         audit(self.claim_id, event, payload, actor=self.name, agent_id=self.agent_id,

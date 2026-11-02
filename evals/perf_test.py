@@ -12,7 +12,6 @@ import sys
 import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -39,7 +38,7 @@ def main():
     if not a.live:
         os.environ["OPENROUTER_API_KEY"] = ""  # empty, so load_dotenv cannot re-add a key from .env
     from backend import service
-    from shared import db
+    from shared import clock, db
     from shared.runtime import effective_llm_mode
     from synthetic.generate import add_traffic, setup_platform
     setup_platform()
@@ -57,13 +56,13 @@ def main():
     wall = time.perf_counter() - t0
     lat = sorted(r["package_latency_s"] for r in db.query("SELECT package_latency_s FROM claims WHERE package_latency_s IS NOT NULL"))
     p95 = lat[min(len(lat) - 1, int(round(0.95 * (len(lat) - 1))))] if lat else None
-    report = {"release": a.release, "generated_at": datetime.now(timezone.utc).isoformat(), "llm_mode": effective_llm_mode(),
+    report = {"release": a.release, "generated_at": clock.now_iso(), "llm_mode": effective_llm_mode(),
               "claims": a.claims, "concurrency": a.workers, "load_factor_vs_peak": round(a.workers / EXPECTED_PEAK_CONCURRENT * 3, 1),
               "simulated_model_latency_ms": a.latency_ms if effective_llm_mode() == "mock" else None,
               "p95_package_latency_s": p95, "max_package_latency_s": lat[-1] if lat else None, "errors": errors,
               "throughput_claims_per_min": round(60 * a.claims / wall, 1), "wall_s": round(wall, 1),
               "slo_seconds": SLO_SECONDS, "passed": errors == 0 and p95 is not None and p95 <= SLO_SECONDS}
-    out = os.path.join(ROOT, "evidence", a.release)
+    out = os.path.join(os.environ.get("EVIDENCE_DIR") or os.path.join(ROOT, "evidence"), a.release)
     os.makedirs(out, exist_ok=True)
     json.dump(report, open(os.path.join(out, "perf-report.json"), "w"), indent=2)
     print(json.dumps(report, indent=1))

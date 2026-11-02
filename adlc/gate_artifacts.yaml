@@ -1,0 +1,61 @@
+# Artifacts frozen into the evidence ledger when a gate is approved or rejected (shared/ledger.py).
+#
+# path      relative to the project root (the repo, or a simulation run's workspace);
+#           "evidence:" = relative to the evidence store; "file.yaml#a,b" = only those top-level keys
+#           (so a new release number in system.yaml does not count as a change to the routing rules);
+#           {use_case} and {release} are filled in; * expands to every matching file.
+# required  true | false | structured | legacy
+#           structured = the use case was captured through the intake form (simulation runs);
+#           legacy     = hand-written documents (the repo outside a simulation run).
+# skip_when structured | legacy: not captured at all in that mode.
+# on_drift  block: a later gate cannot pass while the live file differs from the approved copy;
+#           flag (default): the change is shown on the board and in the gate's check details.
+gates:
+  G0:
+    - {name: use-case-record, path: "usecase/{use_case}.yaml", required: structured}
+    - {name: use-case-card, path: "usecase/{use_case}-card.md", required: structured}
+    - {name: risk-questionnaire, path: "usecase/{use_case}.risk.json", required: structured}
+    - {name: use-case-card, path: docs/use-case-card.md, required: legacy, skip_when: structured}
+    - {name: feasibility, path: docs/feasibility.md, required: legacy}
+    - {name: risk-assessment, path: docs/risk-assessment.md, required: legacy}
+    - {name: raci, path: docs/raci.md, required: legacy}
+  G1:
+    - {name: g1-confirmation, path: "usecase/{use_case}.g1.yaml", required: structured}
+    - {name: requirements, path: "docs/requirements/*.yaml", required: true}
+    - {name: kpis, path: docs/kpis.yaml, required: true}
+    - {name: eval-thresholds, path: evals/thresholds.yaml, required: true, on_drift: block}
+    - {name: routing-rules, path: agents/orchestrator/src/routing.py, required: true, on_drift: block}
+    - {name: system-authority, path: "system.yaml#routing,risk_tier,hitl_points", required: true, on_drift: block}
+    - {name: routing-matrix, path: docs/design/routing-matrix.md}
+  G2:
+    - {name: architecture, path: docs/design/architecture.md, required: true}
+    - {name: adr, path: "docs/design/adr/ADR-*.md", required: true}
+    - {name: threat-model, path: docs/design/threat-model.md, required: true}
+    - {name: tool-permission-matrix, path: docs/design/tool-permission-matrix.yaml, required: true, on_drift: block}
+    - {name: data-flows, path: docs/design/data-flows.md, required: true}
+    - {name: codeowners, path: CODEOWNERS, required: true}
+    - {name: system-topology, path: "system.yaml#topology", required: true}
+  G3:
+    - {name: test-report, path: "evidence:{release}/test-report.json", required: true}
+    - {name: eval-report, path: "evidence:{release}/eval-report.json", required: true}
+    - {name: traceability-matrix, path: "evidence:{release}/traceability-matrix.json", required: true}
+    - {name: perf-report, path: "evidence:{release}/perf-report.json", required: true}
+    - {name: golden-dataset, path: "evals/datasets/golden/*.jsonl", required: true}
+    - {name: adversarial-dataset, path: "evals/datasets/adversarial/*.jsonl", required: true}
+  G4:
+    - {name: rai-report, path: "evidence:{release}/rai-report.json", required: true}
+    - {name: rai-card, path: docs/rai/rai-card.md, required: true}
+    - {name: transparency-notice, path: docs/rai/transparency-notice.md, required: true}
+    - {name: letter-templates, path: agents/communication/templates/approved.yaml, required: true}
+  G5:
+    - {name: release-record, path: "evidence:{release}/release-record.json", required: true}
+    - {name: shadow-report, path: "evidence:{release}/shadow-report.json", required: true}
+    - {name: drills, path: "evidence:{release}/drills.json", required: true}
+    - {name: rollback-runbook, path: deploy/rollback.md, required: true}
+    - {name: runbook, path: deploy/runbook.md}
+  G6:
+    - {name: hypercare-report, path: "evidence:{release}/hypercare-report.json", required: true}
+    - {name: slos, path: observability/slos.yaml, required: true}
+    - {name: alerts, path: observability/alerts.yaml, required: true}
+  G7:
+    - {name: g7-review, path: "docs/reviews/G7-review-{release}.md", required: true}

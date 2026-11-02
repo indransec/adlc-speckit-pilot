@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import operator
 import sqlite3
+import time
 from datetime import datetime
 from typing import Annotated, Optional, TypedDict
 
@@ -22,7 +23,7 @@ from pydantic import BaseModel, Field
 import confidence as conf
 from routing import (CONFIDENCE_CUTOFF, ClaimDecisionInput, Deduction, DeductionType, Recommendation, Route,
                      RoutingDecision, route_claim)
-from shared import db, rag, registry
+from shared import clock, db, faults, rag, registry
 from shared.audit import audit
 from shared.config import checkpoint_db_path, release
 from shared.hitl import approval_token
@@ -35,6 +36,7 @@ AGENTS = {"intake": "AGT-TRV-INTAKE", "document": "AGT-TRV-DOC", "coverage": "AG
           "verification": "AGT-TRV-VER", "fraud": "AGT-TRV-FRAUD", "assessment": "AGT-TRV-ASSESS",
           "settlement": "AGT-TRV-SETTLE", "communication": "AGT-TRV-COMMS"}
 ROW_OF = {r: int(r.value[3]) for r in Route}
+_WALL_T0: dict[tuple[str, int], float] = {}  # (claim, run) -> monotonic start of processing
 
 
 class ClaimState(TypedDict, total=False):
@@ -132,6 +134,7 @@ def _outcome_from_amount(amount: float, claimed: float) -> str:
 def intake(s: ClaimState) -> dict:
     claim = _claims("get_claim", s["claim_id"])
     rt = get_runtime()
+    _WALL_T0[(s["claim_id"], s["run_no"])] = time.monotonic()
     _update(s, status="processing", processing_started_at=db.now(), run_no=s["run_no"], mode=rt["mode"],
             release=release(), thread_id=f"{s['claim_id']}:r{s['run_no']}", queue=None, error=None)
     out = _delegate(s, "intake", submission=claim)
@@ -172,6 +175,7 @@ def fraud(s: ClaimState) -> dict:
 def assessment(s: ClaimState) -> dict:
     out = _delegate(s, "assessment", claim_type=s["intake"]["claim_type"], document=s["document"],
                     coverage=s["coverage"], verification=s["verification"])
+    out = faults.apply("assessment_result", out, claim_id=s["claim_id"])  # simulation fault F3
     return {"assessment": out, "steps": 1, "cost_usd": _cost(out)}
 
 
@@ -223,7 +227,13 @@ def route(s: ClaimState) -> dict:
         note_cost = registry.llm_usage_since(s["claim_id"], s["run_no"], ORCH, last_id)["cost_usd"]
 
     started = _claims("get_claim", s["claim_id"]).get("processing_started_at")
-    latency = (datetime.fromisoformat(db.now()) - datetime.fromisoformat(started)).total_seconds() if started else None
+    t0 = _WALL_T0.pop((s["claim_id"], s["run_no"]), None)
+    if t0 is not None:  # real processing time, independent of the simulation clock's speed
+        latency = time.monotonic() - t0
+    else:  # resumed in another invocation (e.g. after missing documents arrived)
+        latency = clock.wall_seconds((datetime.fromisoformat(db.now()) - datetime.fromisoformat(started)).total_seconds()) \
+            if started else None
+    latency = faults.apply("decision_latency_s", latency)  # simulation fault F6 (recorded, not slept)
     package = {**s["assessment"]["package"], "claim_id": s["claim_id"], "routing": routing, "confidence": c,
                "fraud": {k: s["fraud"][k] for k in ("risk_level", "score", "reasons", "ai_flags")},
                "verification": {k: s["verification"].get(k) for k in ("summary", "discrepancies", "delay_hours_verified", "cause")},

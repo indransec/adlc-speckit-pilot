@@ -7,3 +7,10 @@ data/
 .cache/
 .pytest_cache/
 .DS_Store
+# simulation runs (make sim-new) and the evidence ledger written by local dev runs
+sim/runs/
+evidence/ledger.jsonl
+evidence/ledger.lock
+evidence/artifacts/
+evidence/manifests/
+deploy/sim/generated/

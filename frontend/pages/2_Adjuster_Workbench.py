@@ -1,5 +1,5 @@
 """Simulated adjuster workbench (ADR-004 stand-in): L1, investigation, L2, SIU and manual queues."""
-from datetime import datetime, timezone
+from datetime import datetime
 
 import pandas as pd
 import streamlit as st
@@ -8,7 +8,7 @@ from common import call, get, money, page, post, status_label, try_action
 
 page("Adjuster workbench", "🧑‍💼")
 q = get("/queues")
-now = datetime.now(timezone.utc)
+now = datetime.fromisoformat(get("/clock")["now"])  # simulation clock during a run
 for r in q:
     r["age_min"] = round((now - datetime.fromisoformat(r["queue_since"])).total_seconds() / 60, 1) if r["queue_since"] else None
 

@@ -1,0 +1,12 @@
+environment: sim                 # end-to-end ADLC simulation run (sim/workspace.py, make sim-new)
+model_endpoint: https://openrouter.ai/api/v1
+region: local-sim
+mode: shadow                     # the story moves it through shadow -> assisted -> full
+feature_flags:
+  straight_through_enabled: false
+  payments_enabled: false
+  kill_switch: false
+limits:
+  max_cost_per_claim_usd: 0.25
+  max_agent_steps: 40
+llm_mode: mock                   # bulk traffic runs on the mock model; G3 eval runs switch to live

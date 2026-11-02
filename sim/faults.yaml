@@ -1,0 +1,90 @@
+# Fault catalogue for the end-to-end simulation (shared/faults.py). Faults fire only when APP_ENV=sim.
+#
+# kind      release_change: injected by cutting a release with a changed file (no runtime hook)
+#           code_defect:    a hook changes behaviour while one of active_in_releases is the current release
+# expected  where the lifecycle must catch it; the final report (step 4) compares this with what happened.
+# runtime:  injected and cleared during a run (shared/faults.py inject/clear); traffic faults change the claim mix.
+faults:
+  F1:
+    name: Wrong routing configuration in a release
+    kind: release_change
+    injected_by: release 0.3.0-rc1 raises STP_LIMIT_USD in routing.py from 1000 to 5000
+    expected: {caught_at: G3, by: ["routing evals (routing_correctness, stp_that_should_be_human)",
+                   drift against the G1-approved routing.py, traceability], alert: null, team: ai-engineering}
+  F2:
+    name: Policy FX table ships without JPY
+    kind: code_defect
+    hook: policy_fx_rates
+    active_in_releases: ["0.3.0"]
+    params: {drop: [JPY]}
+    injected_by: release 0.3.0 loses the JPY policy rate, so yen receipts skip the clause 6.2 conversion
+    expected: {caught_at: G5, by: [shadow route agreement below 0.99 on live traffic],
+               alert: shadow_route_agreement_low, severity: sev2, team: data-science}
+  F3:
+    name: Coverage model degradation
+    kind: runtime
+    hook: assessment_result
+    params: {pct: 35}
+    injected_by: the coverage step starts recommending full rejection for about a third of payable claims
+    expected: {caught_at: assisted mode, by: [adjusters override the recommendations], alert: override_rate_high,
+               severity: sev2, team: ai-oncall}
+    remedy: restore the pinned model version (roll back to the previous image digest)
+  F4:
+    name: Runtime authority drift
+    kind: runtime
+    hook: stp_limit
+    params: {limit: 5000}
+    injected_by: an operator raises the straight-through limit to USD 5,000 at runtime, outside G1
+    expected: {caught_at: hypercare, by: [straight-through payment above the G1-approved limit], alert: stp_over_authority,
+               severity: sev1, team: ai-oncall, auto_action: straight-through processing switched off}
+    remedy: remove the runtime override path; Claims Ops re-reviews the claims paid straight through
+  F5:
+    name: Payment control bypassed by a hotfix
+    kind: runtime
+    hook: skip_token_check
+    injected_by: a hotfix makes the payments tool accept instructions without verifying the approval token
+    expected: {caught_at: hypercare, by: [payment without a valid token], alert: payment_without_token, severity: sev1,
+               team: sre-oncall, auto_action: kill switch on, escalation: primary misses the page}
+    remedy: emergency fix release; recover the unverified payments
+  F6:
+    name: LLM gateway latency
+    kind: runtime
+    hook: decision_latency_s
+    params: {add_s: 720}
+    injected_by: the model gateway adds about 12 minutes to every decision package (recorded, not slept)
+    expected: {caught_at: hypercare, by: [p95 decision latency above 10 minutes], alert: decision_latency, severity: sev3,
+               team: sre-oncall}
+    remedy: fail over the gateway region
+  F7:
+    name: Flight-status API outage
+    kind: runtime
+    hook: tool_call
+    params: {tool: TOOL-FLIGHT-STATUS, pct: 50}
+    injected_by: half of the flight-status calls fail
+    expected: {caught_at: hypercare, by: [tool error rate above 20%], alert: tool_error_rate, severity: sev2, team: sre-oncall}
+    remedy: wait for the provider; affected claims go to people
+  F8:
+    name: Fraud ring
+    kind: traffic
+    traffic_scale: {fraud: 25}
+    injected_by: a ring submits staged claims; about a third of the day's claims are staged
+    expected: {caught_at: hypercare, by: [share of claims flagged above 3x the 7-day average], alert: fraud_flag_spike,
+               severity: sev2, team: siu}
+    remedy: SIU investigates the referrals
+  F9:
+    name: Prompt-injection campaign
+    kind: traffic
+    traffic_scale: {injection: 40}
+    injected_by: claimants paste instructions into uploaded documents
+    expected: {caught_at: hypercare, by: [injection blocks per claim above 3x the 7-day average], alert: injection_spike,
+               severity: sev3, team: secops}
+    remedy: informational - the guardrails blocked every attempt
+  F10:
+    name: Cost spike
+    kind: runtime
+    hook: agent_model
+    params: {swap: {anthropic/claude-haiku-5.5: anthropic/claude-sonnet-5.5}}
+    injected_by: a configuration change routes every fast-tier task to the reasoning model
+    expected: {caught_at: hypercare, by: [cost per claim above 1.5x its 7-day average], alert: cost_spike, severity: sev3,
+               team: ai-oncall}
+    remedy: restore the model tier pins

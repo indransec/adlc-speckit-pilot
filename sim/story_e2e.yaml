@@ -1,0 +1,190 @@
+# End-to-end ADLC story for UC-TRV-CLM-001: G0 -> G5 (step 2), rollout and hypercare incidents (step 3),
+# G6 extension, fix release, G7 loop-back and the final report (step 4).
+#
+# day       simulation day relative to day 0 (first day of shadow); hour defaults to 09:00
+# do        action (sim/story.py ACTIONS); by = persona id(s) from ops/teams.yaml
+# expect    must hold afterwards or the run stops: {G3: approved|rejected|pending|ready|not_ready, shadow: passed|failed}
+# fault     the release injects this fault (sim/faults.yaml); detects = the step where it must be caught
+# Steps from day 15 on (rollout and hypercare) need the alerting stack and the API serving this run:
+#   make sim-stack-up  and  make sim-api  (then run the story with --run current)
+settings:
+  per_day: 55               # claims per simulated day of shadow traffic
+  per_day_live: 40          # claims per simulated day once adjusters decide (assisted and full mode)
+  min_shadow_claims: 300    # G5: rule of three -> 300 claims to claim 99% route agreement
+  shadow_extra: {bagloss_fx_jpy: 3}
+steps:
+  # ------------------------------------------------------------------ G0-G2: once per use case
+  - {day: -60, do: intake, by: po, note: Product owner captures the use case in the intake form}
+  - {day: -60, hour: 15, do: submit, by: po}
+  - {day: -59, do: confirm_classification, by: dataowner}
+  - {day: -58, do: sign, gate: G0, by: [hoc, risk, dataowner], expect: {G0: approved}}
+  - {day: -45, do: g1_confirm, by: hoc, note: "Business owner confirms authority limits, KPI targets, thresholds and SLOs"}
+  - {day: -44, do: sign, gate: G1, by: [hoc, ailead], expect: {G1: approved}}
+  - {day: -31, do: ci, actions: [validate_manifests]}
+  - {day: -30, do: sign, gate: G2, by: [architect, security], expect: {G2: approved}}
+
+  # ------------------------------------------------------------------ F1: a bad release is stopped at G3
+  - {day: -21, do: cut_release, version: 0.3.0-rc1, by: relmgr, fault: F1,
+     message: raise the straight-through limit to clear the L1 backlog,
+     edits: [[agents/orchestrator/src/routing.py, "STP_LIMIT_USD = 1000.0", "STP_LIMIT_USD = 5000.0"]]}
+  - {day: -20, do: ci, actions: [unit_tests, evals, perf_test, traceability], detects: F1, expect: {G3: not_ready}}
+  - {day: -20, hour: 15, do: sign, gate: G3, by: [ailead], decision: rejected, expect: {G3: rejected},
+     notes: routing.py raises the STP limit without a G1 change; routing evals send over-authority claims straight through}
+  - {day: -20, hour: 16, do: close_release, version: 0.3.0-rc1, state: rejected_at_G3, by: ailead,
+     reason: authority limit changed outside G1}
+
+  # ------------------------------------------------------------------ 0.3.0 passes G3/G4 (F2 hides in it)
+  - {day: -16, do: cut_release, version: 0.3.0, by: relmgr, fault: F2,
+     message: restore the STP limit; refactor the policy FX table,
+     edits: [[agents/orchestrator/src/routing.py, "STP_LIMIT_USD = 5000.0", "STP_LIMIT_USD = 1000.0"]]}
+  - {day: -15, do: ci, actions: [unit_tests, evals, perf_test, traceability], expect: {G3: ready}}
+  - {day: -15, hour: 15, do: sign, gate: G3, by: [ailead, po], expect: {G3: approved}}
+  - {day: -14, do: sign, gate: G4, by: [rai, compliance], expect: {G4: approved}}
+  - {day: -2, do: ci, actions: [bundle_release]}
+  - {day: -2, hour: 11, do: raise_cr, kind: deploy_shadow, by: relmgr}
+  - {day: -1, do: decide_cr, by: [cab]}
+
+  # ------------------------------------------------------------------ F2: shadow traffic exposes the gap
+  - {day: 0, hour: 7, do: deploy, phase: shadow, by: relmgr}
+  - {day: 0, do: traffic, days: 7}
+  - {day: 6, hour: 18, do: shadow_report, expect: {shadow: failed, G5: not_ready}}
+  - {day: 6, hour: 18, do: incident, alert: shadow_route_agreement_low, ack_by: zoe, detects: F2,
+     note: all disagreements are JPY baggage claims sent straight through at the claimant's card rate}
+  - {day: 6, hour: 19, do: ci, actions: [kill_switch_drill, rollback_drill]}
+  - {day: 7, do: raise_cr, kind: go_live, by: relmgr}
+  - {day: 7, hour: 10, do: sign, gate: G5, by: [cab], decision: rejected, expect: {G5: rejected},
+     notes: shadow route agreement below 0.99 - JPY baggage claims go straight through at the claimant's card rate}
+  - {day: 7, hour: 11, do: close_release, version: 0.3.0, state: superseded, by: relmgr,
+     reason: JPY missing from the policy FX table; replaced by 0.3.1}
+
+  # ------------------------------------------------------------------ 0.3.1: fix + new golden cases, shadow again
+  - {day: 7, hour: 14, do: cut_release, version: 0.3.1, by: relmgr, golden_add: [bagloss_fx_jpy],
+     message: restore JPY in the policy FX table; add JPY baggage cases to the golden set}
+  - {day: 7, hour: 14, do: close_incident, alert: shadow_route_agreement_low, by: zoe,
+     rca: JPY dropped from the policy FX table in 0.3.0 and the golden set had no yen receipts; both fixed in 0.3.1}
+  - {day: 7, hour: 15, do: ci, actions: [unit_tests, evals, perf_test, traceability], expect: {G3: ready}}
+  - {day: 7, hour: 18, do: sign, gate: G3, by: [ailead, po], expect: {G3: approved}}
+  - {day: 7, hour: 19, do: sign, gate: G4, by: [rai, compliance], expect: {G4: approved}}
+  - {day: 7, hour: 20, do: ci, actions: [bundle_release]}
+  - {day: 7, hour: 21, do: raise_cr, kind: deploy_shadow, by: relmgr}
+  - {day: 7, hour: 22, do: decide_cr, by: [cab]}
+  - {day: 8, hour: 7, do: deploy, phase: shadow, by: relmgr}
+  - {day: 8, do: traffic, days: 7}
+  - {day: 14, hour: 18, do: shadow_report, expect: {shadow: passed}}
+  - {day: 14, hour: 19, do: ci, actions: [kill_switch_drill, rollback_drill]}
+  - {day: 15, do: raise_cr, kind: go_live, by: relmgr}
+  - {day: 15, hour: 10, do: sign, gate: G5, by: [cab, hoc], expect: {G5: approved},
+     notes: shadow agreement met on live traffic; go live in assisted mode}
+
+  # ------------------------------------------------------------------ assisted mode: F3 caught by the adjusters
+  - {day: 15, hour: 11, do: deploy, phase: assisted, by: relmgr}
+  - {day: 16, do: traffic, days: 3, adjusters: true}
+  - {day: 19, hour: 7, do: inject, fault: F3}
+  - {day: 19, do: traffic, days: 1, adjusters: true}
+  - {day: 19, hour: 18, do: incident, alert: override_rate_high, ack_by: ana, clear: F3, detects: F3,
+     note: "Phoenix traces show the coverage step rejecting payable claims; pinned model restored (previous digest)"}
+  - {day: 20, do: traffic, days: 9, adjusters: true}
+  - {day: 29, hour: 8, do: close_incident, alert: override_rate_high, by: ana,
+     rca: "coverage model version drifted from the pin; deployment now verifies model pins against the release record"}
+
+  # ------------------------------------------------------------------ phase gate: assisted -> full
+  - {day: 29, hour: 9, do: raise_cr, kind: phase_full, by: relmgr}
+  - {day: 29, hour: 10, do: decide_cr, by: [hoc], note: override rate under 15% since the fix}
+  - {day: 29, hour: 11, do: deploy, phase: full, by: relmgr}
+  - {day: 30, do: traffic, days: 3, adjusters: true}
+
+  # ------------------------------------------------------------------ hypercare in full mode: F4-F10
+  - {day: 33, hour: 7, do: inject, fault: F4, note: an operator raises the straight-through limit at runtime}
+  - {day: 33, do: traffic, days: 1, adjusters: true}
+  - {day: 33, hour: 18, do: incident, alert: stp_over_authority, ack_by: ana, clear: F4, detects: F4,
+     note: "runtime override of the STP limit removed; Claims Ops re-reviews the claims paid straight through"}
+  - {day: 34, hour: 7, do: runtime, set: {straight_through_enabled: true}, by: hoc,
+     note: re-review complete - straight-through back on}
+  - {day: 34, do: traffic, days: 3, adjusters: true}
+  - {day: 37, hour: 7, do: inject, fault: F6}
+  - {day: 37, do: traffic, days: 1, adjusters: true}
+  - {day: 37, hour: 18, do: incident, alert: decision_latency, ack_by: ravi, clear: F6, detects: F6,
+     note: model gateway failed over to the secondary region}
+  - {day: 38, do: traffic, days: 2, adjusters: true}
+  - {day: 40, hour: 7, do: inject, fault: F7}
+  - {day: 40, do: traffic, days: 1, adjusters: true}
+  - {day: 40, hour: 18, do: incident, alert: tool_error_rate, ack_by: ravi, clear: F7, detects: F7,
+     note: flight-status provider recovered; claims hit by the outage went to adjusters}
+  - {day: 41, do: traffic, days: 2, adjusters: true}
+  - {day: 43, do: traffic, days: 1, adjusters: true, scale: {fraud: 25}, fault: F8}
+  - {day: 43, hour: 18, do: incident, alert: fraud_flag_spike, ack_by: siu-sam, detects: F8,
+     note: SIU investigating the referred claims as one ring}
+  - {day: 44, do: traffic, days: 1, adjusters: true}
+  - {day: 45, do: traffic, days: 1, adjusters: true, scale: {injection: 40}, fault: F9}
+  - {day: 45, hour: 18, do: incident, alert: injection_spike, ack_by: jonas, detects: F9,
+     note: guardrails blocked every attempt; campaign reported to the fraud team}
+  - {day: 46, do: traffic, days: 1, adjusters: true}
+  - {day: 47, hour: 7, do: inject, fault: F5, note: a hotfix bypasses approval-token verification}
+  - {day: 47, do: traffic, days: 1, adjusters: true}
+  - {day: 47, hour: 18, do: incident, alert: payment_without_token, ack_by: elena, escalate: true, clear: F5, detects: F5,
+     note: hotfix rolled back; unverified payments listed for recovery}
+  - {day: 48, hour: 9, do: raise_cr, kind: emergency, by: relmgr}
+  - {day: 48, hour: 10, do: decide_cr, by: [cab, hoc]}
+  - {day: 48, hour: 11, do: runtime, set: {kill_switch: false}, by: elena, note: token verification restored under the emergency change}
+  - {day: 49, do: traffic, days: 2, adjusters: true}
+  - {day: 51, hour: 7, do: inject, fault: F10}
+  - {day: 51, do: traffic, days: 1, adjusters: true}
+  - {day: 51, hour: 18, do: incident, alert: cost_spike, ack_by: ana, clear: F10, detects: F10,
+     note: model tier pins restored}
+  - {day: 52, do: traffic, days: 2, adjusters: true}
+
+  # ------------------------------------------------------------------ root causes recorded once the alerts cleared
+  - {day: 54, hour: 9, do: close_incident, alert: stp_over_authority, by: ana,
+     rca: "authority limits were editable at runtime; the override path is removed and limits change only through G1"}
+  - {day: 54, hour: 9, do: close_incident, alert: decision_latency, by: ravi,
+     rca: model gateway region degraded; automatic failover added}
+  - {day: 54, hour: 9, do: close_incident, alert: tool_error_rate, by: ravi,
+     rca: flight-status provider outage; circuit breaker sends affected claims to adjusters}
+  - {day: 54, hour: 9, do: close_incident, alert: fraud_flag_spike, by: siu-sam,
+     rca: coordinated ring of staged baggage claims; referred to SIU and blocked}
+  - {day: 54, hour: 9, do: close_incident, alert: injection_spike, by: jonas,
+     rca: "injection campaign in uploaded PDFs; guardrails held, no data exposed"}
+  - {day: 54, hour: 9, do: close_incident, alert: payment_without_token, by: elena,
+     rca: "hotfix disabled token verification; payments now refuse to start without the verifier (fix release in step 4)"}
+  - {day: 54, hour: 9, do: close_incident, alert: cost_spike, by: ana,
+     rca: configuration change moved fast-tier tasks to the reasoning model; model tiers are now pinned per release}
+
+  # ------------------------------------------------------------------ G6: thirty days of full mode, then the decision
+  - {day: 54, do: traffic, days: 5, adjusters: true}
+  - {day: 59, hour: 8, do: hypercare_report, from_day: 29, to_day: 59, expect: {G6: not_ready}}
+  - {day: 59, hour: 10, do: extend_hypercare, by: hoc, until_day: 75,
+     conditions: "fix release with token verification enforced; recover the unverified payments; daily stand-ups resume"}
+
+  # ------------------------------------------------------------------ fix release 0.3.2 on the emergency path
+  - {day: 59, hour: 14, do: close_release, version: 0.3.1, state: superseded, by: relmgr,
+     reason: G6 not approved after the payment-control incident; replaced by fix release 0.3.2}
+  - {day: 60, do: cut_release, version: 0.3.2, by: relmgr,
+     message: payments refuse to start without the approval-token verifier; unverified payments flagged for recovery}
+  - {day: 60, hour: 10, do: ci, actions: [unit_tests, evals, perf_test, traceability], expect: {G3: ready}}
+  - {day: 60, hour: 13, do: sign, gate: G3, by: [ailead, po], expect: {G3: approved}}
+  - {day: 60, hour: 14, do: sign, gate: G4, by: [rai, compliance], expect: {G4: approved}}
+  - {day: 60, hour: 15, do: ci, actions: [bundle_release]}
+  - {day: 60, hour: 16, do: raise_cr, kind: emergency, by: relmgr}
+  - {day: 60, hour: 17, do: decide_cr, by: [cab, hoc]}
+  - {day: 60, hour: 18, do: replay_shadow, n: 330, by: relmgr,
+     note: G5 shadow evidence from a replay of the last 330 claims' mix instead of a week of new traffic}
+  - {day: 60, hour: 19, do: shadow_report, expect: {shadow: passed}}
+  - {day: 60, hour: 20, do: ci, actions: [kill_switch_drill, rollback_drill]}
+  - {day: 60, hour: 21, do: raise_cr, kind: go_live, by: relmgr}
+  - {day: 60, hour: 22, do: sign, gate: G5, by: [cab, hoc], expect: {G5: approved},
+     notes: emergency change - replayed shadow agreement met; drills passed}
+  - {day: 60, hour: 23, do: deploy, phase: full, by: relmgr}
+
+  # ------------------------------------------------------------------ extended hypercare, then G6 again
+  - {day: 61, do: traffic, days: 14, adjusters: true}
+  - {day: 75, hour: 8, do: hypercare_report, from_day: 61, to_day: 75, expect: {G6: ready}}
+  - {day: 75, hour: 10, do: sign, gate: G6, by: [hoc], expect: {G6: approved},
+     notes: "extension clean - SLOs met, no control breaches, no open Sev1/Sev2"}
+
+  # ------------------------------------------------------------------ G7: periodic review and the loop back
+  - {day: 76, do: ci, actions: [g7_review]}
+  - {day: 76, hour: 14, do: sign, gate: G7, by: [hoc, ailead], expect: {G7: approved},
+     notes: "iterate: add the override patterns to the golden set; propose widening row 1 to type A <= USD 100 in a later release (reopens G1)"}
+  - {day: 77, do: cut_release, version: 0.4.0, by: relmgr, golden_from_overrides: 3,
+     message: G7 loop-back - golden cases for the scenarios adjusters overrode most}
+  - {day: 77, hour: 12, do: report}

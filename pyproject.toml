@@ -37,6 +37,7 @@ dependencies = [
     "arize-phoenix-otel>=0.6",
     "openinference-instrumentation-langchain>=0.1.29",
     "opentelemetry-sdk>=1.27",
+    "prometheus-client>=0.21",
 ]
 
 [dependency-groups]

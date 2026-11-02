@@ -278,6 +278,20 @@ SCENARIOS = {
     "poor_scan": s_poor_scan, "fraud": s_fraud, "injection": s_injection, "incomplete": s_incomplete,
     "pii_request": s_pii_request,
 }
+
+
+def s_bagloss_fx_jpy(d, rng):
+    """Same shape as s_bagloss_fx with a yen receipt: not in the golden set, so only live traffic exercises JPY."""
+    return dict(title="Bag lost, JPY receipt converted at policy rate", plan="PREMIER", type="baggage_loss",
+                lines=[L("Wool jacket", "clothing", 60000, cur="JPY", claimed=430, purchased=_recent(d, rng)),
+                       L("Cabin suitcase", "luggage", 180, purchased=_recent(d, rng))],
+                narrative="Bag lost on arrival. The jacket was bought in Tokyo; I converted at my card rate.",
+                expected=X(2, 582.0, "partial", [("A", "6.2", 28.0)]),
+                requirements=["REQ-F-012"])
+
+
+# Scenarios used only by simulation traffic (kept out of SCENARIOS so dataset generation is unchanged)
+EXTRA_SCENARIOS = {"bagloss_fx_jpy": s_bagloss_fx_jpy}
 # Production-like traffic mix (mostly simple claims)
 TRAFFIC_WEIGHTS = {"delay_stp": 14, "bagdelay_stp": 12, "delay_offset": 6, "bagloss_excess": 8, "bagloss_fx": 3,
                    "over_authority": 4, "linked_trip": 2, "missing_receipt": 5, "valuables": 3, "depreciation": 4,
@@ -327,7 +341,7 @@ def build_case(scenario: str, rng: random.Random, claim_id: str, *, flight_date:
         if shared.get("flight") or flight_date or (flight_no, d.isoformat()) not in used:
             break
     used.add((flight_no, d.isoformat()))
-    spec = s_split(d, rng, part) if scenario == "claim_split" else SCENARIOS[scenario](d, rng)
+    spec = s_split(d, rng, part) if scenario == "claim_split" else {**SCENARIOS, **EXTRA_SCENARIOS}[scenario](d, rng)
     person = shared.get("person") or _claimant(rng)
     plan = spec["plan"]
     policy_no = shared.get("policy_no") or f"TRV-{'STD' if plan == 'STANDARD' else 'PRM'}-{rng.randint(100000, 999999)}"

@@ -22,8 +22,9 @@ from fastapi.responses import Response  # noqa: E402
 from pydantic import BaseModel  # noqa: E402
 
 from backend import service  # noqa: E402
-from shared import db, lifecycle, metrics, object_store  # noqa: E402
-from shared.config import release, system_manifest  # noqa: E402
+from shared import (board, changes, clock, db, faults, incidents, ledger, lifecycle, metrics, object_store,  # noqa: E402
+                    releases, teams, usecase)
+from shared.config import is_sim, project_root, release, system_manifest  # noqa: E402
 from shared.runtime import get_runtime, set_runtime  # noqa: E402
 
 app = FastAPI(title="Travel Claims Assistant API", version=release(),
@@ -48,7 +49,7 @@ class RuntimeUpdate(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "release": release()}
+    return {"status": "ok", "release": release(), "run": os.environ.get("SIM_RUN_ID")}
 
 
 @app.get("/system")
@@ -276,6 +277,21 @@ def approve_gate(gate: str, a: Approval):
         raise HTTPException(409, str(e))
 
 
+class Signature(BaseModel):
+    persona: str
+    decision: str = "approved"
+    notes: str = ""
+
+
+@app.post("/lifecycle/gates/{gate}/sign")
+def sign_gate(gate: str, s: Signature):
+    """One persona signs one approver role; the last required signature approves the gate."""
+    try:
+        return lifecycle.sign(gate, s.persona, s.decision, s.notes)
+    except (ValueError, KeyError) as e:
+        raise HTTPException(409, str(e))
+
+
 @app.post("/lifecycle/gates/reset")
 def reset(frm: str = "G0"):
     lifecycle.reset_gates(frm)
@@ -325,5 +341,270 @@ def evidence(name: str):
 
 @app.get("/lifecycle/review")
 def g7_review():
-    p = ROOT / "docs" / "reviews" / f"G7-review-{release()}.md"
+    p = project_root() / "docs" / "reviews" / f"G7-review-{release()}.md"
     return {"markdown": p.read_text() if p.exists() else None}
+
+
+# ------------------------------------------------------------------------------------------- simulation
+def _require_sim():
+    if not is_sim():
+        raise HTTPException(409, "only inside a simulation run: make sim-new, then make sim-api")
+
+
+class ClockControl(BaseModel):
+    action: str                    # pause | resume | rate | skip_days | skip_to_day
+    value: Optional[float] = None
+
+
+@app.get("/clock")
+def get_clock():
+    return clock.state()
+
+
+@app.post("/clock")
+def control_clock(c: ClockControl):
+    _require_sim()
+    try:
+        {"pause": lambda: clock.pause(), "resume": lambda: clock.resume(), "rate": lambda: clock.set_rate(c.value),
+         "skip_days": lambda: clock.advance(c.value * clock.DAY), "skip_to_day": lambda: clock.skip_to_day(c.value)}[c.action]()
+    except KeyError:
+        raise HTTPException(400, f"unknown clock action {c.action}")
+    except (ValueError, RuntimeError, TypeError) as e:
+        raise HTTPException(409, str(e))
+    return clock.state()
+
+
+@app.get("/personas")
+def personas():
+    return teams.personas()
+
+
+@app.get("/teams")
+def team_list():
+    return teams.teams()
+
+
+class ByPersona(BaseModel):
+    by: str
+
+
+class UseCaseSave(BaseModel):
+    by: str
+    record: dict
+
+
+class G1Save(BaseModel):
+    by: str
+    data: dict
+
+
+def _uc(fn, *a):
+    try:
+        return fn(*a)
+    except (ValueError, KeyError) as e:  # pydantic ValidationError is a ValueError
+        raise HTTPException(409, str(e))
+
+
+@app.get("/usecases/current")
+def usecase_current():
+    return usecase.summary()
+
+
+@app.get("/usecases/template")
+def usecase_template():
+    return usecase.template()
+
+
+@app.post("/usecases")
+def usecase_save(u: UseCaseSave):
+    _require_sim()
+    return _uc(usecase.save, u.record, u.by)
+
+
+@app.post("/usecases/{uc}/submit")
+def usecase_submit(uc: str, b: ByPersona):
+    _require_sim()
+    return _uc(usecase.submit, uc, b.by)
+
+
+@app.post("/usecases/{uc}/classification/confirm")
+def usecase_confirm_classification(uc: str, b: ByPersona):
+    _require_sim()
+    return _uc(usecase.confirm_classification, uc, b.by)
+
+
+@app.get("/usecases/{uc}/g1/template")
+def usecase_g1_template(uc: str):
+    return usecase.g1_template(uc)
+
+
+@app.post("/usecases/{uc}/g1")
+def usecase_g1(uc: str, g: G1Save):
+    _require_sim()
+    return _uc(usecase.save_g1, uc, g.data, g.by)
+
+
+@app.get("/board")
+def get_board():
+    return board.board()
+
+
+@app.get("/board/items/{item_id}")
+def board_item(item_id: str):
+    try:
+        return board.item(item_id)
+    except KeyError as e:
+        raise HTTPException(404, str(e))
+
+
+@app.get("/ledger")
+def ledger_events(item: Optional[str] = None, limit: int = 200):
+    evs = ledger.for_item(item) if item else ledger.events()
+    return evs[-limit:]
+
+
+@app.get("/ledger/verify")
+def ledger_verify():
+    return ledger.verify()
+
+
+@app.get("/ledger/manifests/{digest}")
+def ledger_manifest(digest: str):
+    try:
+        return ledger.manifest(digest)
+    except ledger.LedgerError as e:
+        raise HTTPException(404, str(e))
+
+
+@app.get("/ledger/artifacts/{digest}")
+def ledger_artifact(digest: str):
+    try:
+        return Response(ledger.get_bytes(digest), media_type="application/octet-stream")
+    except ledger.LedgerError as e:
+        raise HTTPException(404, str(e))
+
+
+@app.get("/releases")
+def release_list():
+    return releases.history()
+
+
+@app.get("/changes")
+def change_list(release: Optional[str] = None):
+    return changes.crs(release)
+
+
+@app.post("/changes/{cr_id}/decide")
+def change_decide(cr_id: str, s: Signature):
+    """A CAB member (or other named approver) decides a change request."""
+    _require_sim()
+    try:
+        return changes.decide(cr_id, s.persona, s.decision, s.notes)
+    except (ValueError, KeyError) as e:
+        raise HTTPException(409, str(e))
+
+
+_metrics_registry = None
+
+
+@app.get("/metrics", include_in_schema=False)
+def prometheus_metrics():
+    """Alert inputs over business-time windows (shared/prom.py), scraped by Prometheus in simulation runs."""
+    global _metrics_registry
+    from prometheus_client import CollectorRegistry, generate_latest
+    from prometheus_client.exposition import CONTENT_TYPE_LATEST
+    from shared.prom import AdlcCollector
+    if _metrics_registry is None:
+        _metrics_registry = CollectorRegistry()
+        _metrics_registry.register(AdlcCollector())
+    return Response(generate_latest(_metrics_registry), media_type=CONTENT_TYPE_LATEST)
+
+
+# ------------------------------------------------------------------------------------------- incidents
+@app.post("/webhooks/alertmanager", include_in_schema=False)
+def alertmanager_webhook(payload: dict):
+    """Alertmanager posts firing and resolved alerts here (deploy/sim): incident cards and automatic actions."""
+    _require_sim()
+    return {"changed": [i["id"] for i in incidents.from_alertmanager(payload)]}
+
+
+@app.get("/incidents")
+def incident_list():
+    return incidents.incidents()
+
+
+class IncidentUpdate(BaseModel):
+    persona: str
+    text: str = ""
+
+
+@app.post("/incidents/{inc_id}/{action}")
+def incident_update(inc_id: str, action: str, u: IncidentUpdate):
+    _require_sim()
+    fn = {"ack": lambda: incidents.acknowledge(inc_id, u.persona, u.text), "note": lambda: incidents.note(inc_id, u.persona, u.text),
+          "close": lambda: incidents.close(inc_id, u.persona, u.text)}.get(action)
+    if fn is None:
+        raise HTTPException(404, f"unknown incident action {action}")
+    try:
+        return fn()
+    except (ValueError, KeyError) as e:
+        raise HTTPException(409, str(e))
+
+
+@app.get("/faults")
+def fault_list():
+    active = {f["id"] for f in faults.active()}
+    return [{"id": k, **v, "active": k in active} for k, v in faults.catalog().items()]
+
+
+class FaultToggle(BaseModel):
+    on: bool
+    by: str = "simulator"
+    note: str = ""
+
+
+@app.post("/faults/{fault_id}")
+def fault_toggle(fault_id: str, t: FaultToggle):
+    _require_sim()
+    try:
+        faults.inject(fault_id, by=t.by, note=t.note) if t.on else faults.clear(fault_id, by=t.by, note=t.note)
+    except (ValueError, KeyError) as e:
+        raise HTTPException(409, str(e))
+    return fault_list()
+
+
+@app.get("/evidence-pack")
+def evidence_pack(release: Optional[str] = None, gate: Optional[str] = None):
+    """Zip of manifests, frozen artifacts and the hash-chained ledger for an auditor (optionally one release / gate)."""
+    name = "-".join(x for x in ("evidence", release, gate) if x) + ".zip"
+    return Response(ledger.evidence_pack(release, gate), media_type="application/zip",
+                    headers={"Content-Disposition": f'attachment; filename="{name}"'})
+
+
+@app.get("/simulation/report")
+def simulation_report(refresh: bool = False):
+    """The end-of-run detection matrix (sim/report.py); refresh=true rebuilds it from the ledger now."""
+    import json as _json
+    from shared.config import evidence_root
+    p = evidence_root() / "e2e-report.json"
+    if refresh or not p.exists():
+        from sim import report
+        report.write()
+    return _json.loads(p.read_text())
+
+
+@app.get("/simulation/story")
+def simulation_story():
+    """Story progress: steps in sim/story_e2e.yaml and what the runner has done in this run."""
+    import json as _json
+    from shared.config import evidence_root
+    from sim.story import Story, load
+    steps = load()["steps"]
+    p = evidence_root() / "story-log.jsonl"
+    log = [_json.loads(x) for x in p.read_text().splitlines()] if p.exists() else []
+    done = {r["key"] for r in log if r.get("done") and r.get("key")}
+    return {"total": len(steps), "done": sum(Story.key(s) in done for s in steps),
+            "steps": [{"n": i + 1, "day": s.get("day"), "do": s["do"], "what": s.get("gate") or s.get("version") or s.get("alert")
+                       or s.get("fault") or s.get("kind") or s.get("phase") or "", "done": Story.key(s) in done}
+                      for i, s in enumerate(steps)],
+            "last": [r for r in log if not r.get("done")][-12:]}

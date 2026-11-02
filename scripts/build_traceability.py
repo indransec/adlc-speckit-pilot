@@ -11,7 +11,7 @@ import sys
 
 import yaml
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # sim runs: workspace
 
 METHOD_EVIDENCE = {
     "test:routing": ("test", "agents/orchestrator/tests/test_routing.py"),
@@ -54,7 +54,7 @@ def _load(path):
 
 def main(release=None):
     release = release or yaml.safe_load(open(os.path.join(ROOT, "system.yaml")))["release"]
-    ev = os.path.join(ROOT, "evidence", release)
+    ev = os.path.join(os.environ.get("EVIDENCE_DIR") or os.path.join(ROOT, "evidence"), release)
     reqs = []
     for p in sorted(glob.glob(os.path.join(ROOT, "docs", "requirements", "*.yaml"))):
         reqs += yaml.safe_load(open(p))["requirements"]

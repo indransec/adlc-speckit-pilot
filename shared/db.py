@@ -4,9 +4,9 @@ from __future__ import annotations
 import json
 import sqlite3
 from contextlib import contextmanager
-from datetime import datetime, timezone
 from typing import Any, Iterable
 
+from shared import clock
 from shared.config import db_path
 
 SCHEMA = """
@@ -104,7 +104,8 @@ CREATE INDEX IF NOT EXISTS ix_tool_claim ON tool_calls(claim_id);
 
 
 def now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+    """Business time: the simulation clock during a simulation run, otherwise real UTC."""
+    return clock.now_iso()
 
 
 def connect() -> sqlite3.Connection:

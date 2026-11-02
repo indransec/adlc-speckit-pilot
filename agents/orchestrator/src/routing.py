@@ -99,11 +99,18 @@ def route_claim(c: ClaimDecisionInput) -> RoutingDecision:
         return RoutingDecision(Route.L1_POLICY_NORM, 1, ["type A (policy-norm) deductions only"])
 
     # Row 3: above agent authority
-    if aggregate > STP_LIMIT_USD:
-        return RoutingDecision(Route.L1_AUTHORITY, 1, [f"aggregate USD {aggregate:,.2f} > {STP_LIMIT_USD:,.0f}"])
+    limit = stp_limit()
+    if aggregate > limit:
+        return RoutingDecision(Route.L1_AUTHORITY, 1, [f"aggregate USD {aggregate:,.2f} > {limit:,.0f}"])
 
     # Row 1: straight-through
     return RoutingDecision(Route.STRAIGHT_THROUGH, 0, ["within agent authority, no deduction, low risk"])
+
+
+def stp_limit() -> float:
+    """The agent's authority limit. Simulation fault F4 (runtime authority drift) can raise it; never outside a sim run."""
+    from shared import faults
+    return faults.apply("stp_limit", STP_LIMIT_USD)
 
 
 def l1_outcome_reroute(c: ClaimDecisionInput, l1_removed_all_type_b: bool) -> RoutingDecision:

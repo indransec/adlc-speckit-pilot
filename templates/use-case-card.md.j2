@@ -1,0 +1,56 @@
+# Use-case card: {{ uc.title }}
+
+_Generated from `usecase/{{ uc.id }}.yaml` by the G0 intake form. Edit the record, not this card._
+
+| Field | Value |
+|---|---|
+| Use-case ID | {{ uc.id }} |
+| Sponsor | {{ people[uc.sponsor] }} |
+| Business owner | {{ people[uc.business_owner] }} |
+| Product owner | {{ people[uc.product_owner] }} |
+| Risk tier (computed) | **{{ tier }}** |
+
+## Problem
+{{ uc.problem }}
+
+## Proposed solution
+{{ uc.proposed_solution }}
+
+## Value hypothesis
+| Metric | Baseline | Target |
+|---|---|---|
+{% for v in uc.value_hypothesis -%}
+| {{ v.metric }} | {{ v.baseline }} | {{ v.target }} |
+{% endfor %}
+## Scope
+- **In:** {{ uc.scope_in | join(", ") }}
+- **Out:** {{ uc.scope_out | join(", ") }}
+
+## Risk tier: {{ tier }}
+{% for r in tier_reasons -%}
+- {{ r }}
+{% endfor %}
+## Data classification
+| Data | Class | Handling |
+|---|---|---|
+{% for d in uc.data_classification.rows -%}
+| {{ d.data }} | {{ d.classification }} | {{ d.handling }} |
+{% endfor %}
+Confirmed by: {{ people[uc.data_classification.confirmed_by] if uc.data_classification.confirmed_by else "not yet confirmed by the Data owner" }}
+
+## Feasibility: {{ uc.feasibility.verdict }}
+{{ uc.feasibility.rationale }}
+
+| Condition | Owner | Due |
+|---|---|---|
+{% for c in uc.feasibility.conditions -%}
+| {{ c.condition }} | {{ people[c.owner] }} | {{ c.due }} |
+{% endfor %}
+## RACI
+| Activity | Accountable | Responsible | Consulted | Informed |
+|---|---|---|---|---|
+{% for r in uc.raci -%}
+| {{ r.activity }} | {{ r.A }} | {{ r.R }} | {{ r.C }} | {{ r.I }} |
+{% endfor %}
+---
+Record sha256: {{ record_sha }}

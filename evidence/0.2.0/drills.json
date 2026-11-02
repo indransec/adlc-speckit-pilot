@@ -1,12 +1,12 @@
 {
   "kill_switch": {
     "passed": true,
-    "at": "2026-10-25T20:29:39.987377+00:00",
+    "at": "2026-10-28T07:17:02.429003+00:00",
     "summary": "new claim -> manual_queue; payment attempt blocked"
   },
   "rollback": {
     "passed": true,
-    "at": "2026-10-25T20:29:39.989365+00:00",
+    "at": "2026-10-28T07:17:02.431007+00:00",
     "steps": [
       "1. Set `kill_switch: true` (stops straight-through and payment instructions immediately).",
       "2. Route all new claims to the manual queue.",
