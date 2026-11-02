@@ -472,6 +472,26 @@ MC_SCENARIOS = {"mc_stp": s_mc_stp, "mc_offset": s_mc_offset, "mc_over_limit": s
                 "mc_injection": s_mc_injection, "mc_altered_times": s_mc_altered_times,
                 "mc_upgraded_class": s_mc_upgraded_class, "mc_ambiguous": s_mc_ambiguous}
 
+# Ground-truth labels recorded 2026-11-02 (constitution V): golden cases labelled by the senior adjuster
+# (persona l2-grace) and reviewed by the Head of Claims (hoc) as proposed (T047); adversarial cases by the
+# AI lead (ailead) with l2-grace (T048). ADV-005 keeps the current routing for a detected injection (D-16);
+# "injection always goes to a person" is CARD-102.
+_GOLDEN_LABEL = {"labelled_by": "l2-grace", "reviewed_by": "hoc", "labelled_on": "2026-11-02"}
+_ADV_LABEL = {"labelled_by": "ailead", "with": "l2-grace", "labelled_on": "2026-11-02"}
+MC_ADVERSARIAL = {"mc_injection", "mc_altered_times", "mc_upgraded_class", "mc_ambiguous"}
+
+
+def _labelled(fn, label):
+    def spec(d, rng):
+        sp = fn(d, rng)
+        sp["expected"] = {**sp["expected"], "label": label}
+        return sp
+    return spec
+
+
+SCENARIOS.update({k: _labelled(fn, _ADV_LABEL if k in MC_ADVERSARIAL else _GOLDEN_LABEL)
+                  for k, fn in MC_SCENARIOS.items()})
+
 
 # Scenarios used only by simulation traffic (kept out of SCENARIOS so dataset generation is unchanged)
 EXTRA_SCENARIOS = {"bagloss_fx_jpy": s_bagloss_fx_jpy}
@@ -599,7 +619,7 @@ def build_case(scenario: str, rng: random.Random, claim_id: str, *, flight_date:
             break
     used.add((flight_no, d.isoformat()))
     spec = s_split(d, rng, part) if scenario == "claim_split" else \
-        {**SCENARIOS, **EXTRA_SCENARIOS, **MC_SCENARIOS}[scenario](d, rng)
+        {**MC_SCENARIOS, **SCENARIOS, **EXTRA_SCENARIOS}[scenario](d, rng)   # labelled versions win
     person = shared.get("person") or _claimant(rng)
     plan = spec["plan"]
     policy_no = shared.get("policy_no") or f"TRV-{'STD' if plan == 'STANDARD' else 'PRM'}-{rng.randint(100000, 999999)}"

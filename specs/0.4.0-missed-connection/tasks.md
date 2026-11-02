@@ -142,8 +142,8 @@ Existing repository layout (plan.md "Source Code"): `agents/<agent>/src/`, `tool
 - [X] T044 [P] Metrics in `evals/run_evals.py` for the 4 G1 thresholds: `missed_connection_eligibility_accuracy`, `connection_time_check_accuracy`, `inbound_leg_attribution_accuracy`, `duplicate_expense_paid_count`; each must be measured (not "not measured in this run") whenever missed connection cases exist [REQ-F-033..038]
 - [X] T045 [P] Agent suites: missed connection cases in `evals/agents/verification/suite.yaml`, `evals/agents/assessment/suite.yaml`, `evals/agents/intake/suite.yaml`, `evals/agents/document/suite.yaml`
 - [X] T046 [P] Adversarial cases: injected instruction in a receipt, altered boarding-pass time, self-transfer, upgraded class, three legs, ambiguous connection in `evals/datasets/adversarial/` source (via `synthetic/generate.py`)
-- [ ] T047 [HUMAN: l2-grace] Senior adjuster labels the proposed golden cases (at least the 12 planned at G1; T018, T028, T035 propose 14) (expected outcome, amount, deductions, route); `hoc` reviews; only labelled cases are added to `SCENARIOS` [Constitution V]
-- [ ] T048 [HUMAN: ailead] AI lead labels the 6 adversarial cases with `l2-grace`
+- [X] T047 [HUMAN: l2-grace] Senior adjuster labels the proposed golden cases (at least the 12 planned at G1; T018, T028, T035 propose 14) (expected outcome, amount, deductions, route); `hoc` reviews; only labelled cases are added to `SCENARIOS` [Constitution V]
+- [X] T048 [HUMAN: ailead] AI lead labels the 6 adversarial cases with `l2-grace`
 - [ ] T049 Regenerate datasets with `make datasets` (golden + adversarial, versioned) after T047-T048 [AUTHORITY: `evals/datasets/**` edits need approval]
 - [ ] T050 Add missed connection scenarios to `TRAFFIC_WEIGHTS` in `synthetic/scenarios.py` so `make perf` covers them [REQ-N-001, REQ-N-004]
 - [ ] T051 Traceability: map `REQ-F-032..039`, `REQ-B-012/013` verification methods in `scripts/build_traceability.py` if new methods need mapping; `make traceability` shows no unverified requirement
