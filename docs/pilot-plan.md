@@ -34,8 +34,8 @@ companions = G2, `tasks.md` = build plan, `briefs/G*.md` = gate briefs for signe
 | 1 | Governed mode (`adlc_governed`), release 0.4.0, CARD-101; smoke test of intake + persona sign-off | done 2026-11-02 (`2a39001`) |
 | 2 | Spec Kit v1.2.5 installed unmodified (`specify init --here --integration claude`) | done 2026-11-02 (`1d18f7c`) |
 | 3 | Guardrails in `.claude/settings.json` + `.claude/hooks/adlc_guard.py` (below); tested that Claude cannot sign | done 2026-11-02 |
-| 4 | Constitution via `/speckit-constitution` with the ADLC rules | next |
-| 5 | ADLC sections in spec / plan / tasks templates, gate-brief template | |
+| 4 | Constitution via `/speckit-constitution` with the ADLC rules | done 2026-11-02 (v1.0.0, decision D-15) |
+| 5 | ADLC sections in spec / plan / tasks templates, gate-brief template | next |
 | 6 | `/adlc.intake`, `/adlc.gate <G>`, `/adlc.status`, `/adlc.rework`; gate precondition in speckit-specify / -plan / -implement | |
 | 7 | Run G0 → G2 for 0.4.0 (user signs as personas) | |
 | 8 | Run G3 → G5 (release branch + PR, golden cases labelled by the user, one deliberate G4 rejection) | |
