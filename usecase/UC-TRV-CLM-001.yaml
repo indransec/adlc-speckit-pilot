@@ -1,0 +1,141 @@
+id: UC-TRV-CLM-001
+title: Travel Claims Assistant
+sponsor: hoc
+business_owner: hoc
+product_owner: po
+problem: 'Trip delay and baggage claims are high-volume and low-to-medium value, yet each needs manual document
+  checks, policy look-ups and calculation. Most adjuster time is spent on claims under USD 1,000, and handling times
+  are long for customers waiting on small amounts. Release 0.4.0 (CARD-101): customers whose delayed inbound flight
+  makes them miss a booked onward connection have no cover today. The travel delay benefit (policy section 3) only
+  pays while a departure is delayed by 6 hours or more, so a 3-hour weather delay that strands someone overnight
+  at a hub is declined. These claims arrive as complaints and manual goodwill payments, handled outside the claims
+  system with no audit trail.'
+proposed_solution: 'An agentic backend that receives submitted claims, extracts and cross-checks documents, verifies
+  coverage and facts, calculates the payable amount, and either decides simple, low-value, no-deduction cases or
+  prepares a decision package for L1 / L2 adjusters under a deterministic routing matrix. Release 0.4.0 (CARD-101):
+  add a missed connection benefit (new policy clause 3.7), handled like trip delay and baggage: extract the documents
+  for both legs, verify the inbound delay with the flight-status service, match the clause, calculate the amount
+  and route the claim with the existing routing matrix. Pays reasonable extra costs to reach the booked destination
+  (rebooked or new tickets, accommodation and meals until the next available departure) when a delay of the arriving
+  flight from a covered cause (clause 3.2) makes the customer miss a booked onward departure; the itinerary must
+  allow at least the minimum connection time; same exclusions and compensation offset as travel delay (clause 3.4);
+  limit [USD 500] Standard, [USD 1,000] Premier, per journey. The agents recommend; routing, limits and payment
+  authority stay unchanged.'
+value_hypothesis:
+- metric: Handling time, delay + baggage
+  baseline: measure from last 6 months
+  target: -40%
+- metric: Straight-through processing rate
+  baseline: 0%
+  target: 15-25%
+- metric: Adjuster minutes per claim
+  baseline: time study
+  target: -30%
+- metric: Payment accuracy (QA sample)
+  baseline: current QA error rate
+  target: '>= baseline'
+- metric: Missed-connection complaints per month (CARD-101)
+  baseline: '[40]'
+  target: '[10]'
+- metric: Goodwill payments outside the claims system (CARD-101)
+  baseline: '[USD 12,000 / month]'
+  target: '[0]'
+- metric: Decision time for a missed-connection claim (CARD-101)
+  baseline: '[9 days, manual]'
+  target: '[2 days]'
+scope_in:
+- Trip delay
+- Baggage loss and delay
+- Claims in USD
+- Backend from claim receipt to closure
+- Missed connection, Standard and Premier plans, flights only (CARD-101, release 0.4.0)
+- 'Missed-connection documents: bookings or boarding passes for both legs, rebooking, accommodation and meal receipts'
+- Inbound delay verified with the flight-status tool
+- New customer letter for missed-connection decisions (Compliance to approve)
+scope_out:
+- Medical
+- Cancellation and interruption
+- Recovery
+- Customer front end
+- Payment rails
+- Missed connections by rail, ferry or coach
+- Self-transfer itineraries booked on separate tickets [to be confirmed]
+- Any change to the routing matrix, straight-through limit or approval authority
+data_classification:
+  rows:
+  - data: Claimant identity
+    classification: Confidential - PII
+    handling: Redact in logs and non-essential prompts
+  - data: Bank details
+    classification: Restricted
+    handling: Never sent to models; used only by Settlement
+  - data: Travel documents
+    classification: Confidential
+    handling: Stored in the document store; extracted fields only in prompts
+  - data: Claim outcome
+    classification: Confidential
+    handling: Audit trail retained per the records policy
+  confirmed_by: dataowner
+risk:
+  customer_outcome: true
+  takes_actions: true
+  personal_data: true
+  special_category: false
+  autonomy: decide_some
+  max_autonomous_usd: 1000.0
+  regulatory_exposure: true
+feasibility:
+  verdict: Go with conditions
+  rationale: 'Hybrid design: AI for documents and coverage judgement, deterministic rules for arithmetic, routing
+    and payment release. Model risk is confined to document and judgement steps.'
+  conditions:
+  - condition: Golden set of 300-500 decided claims labelled by senior adjusters
+    owner: zoe
+    due: '2026-09-28'
+  - condition: Data residency and no-training terms confirmed for model hosting
+    owner: security
+    due: '2026-09-23'
+  - condition: Payments instruction API enforces the approval-token check
+    owner: ailead
+    due: '2026-10-08'
+raci:
+- activity: Use case and value (G0)
+  A: Head of Claims
+  R: Product owner
+  C: AI lead; Risk; Security
+  I: Platform; Compliance
+- activity: Requirements and thresholds (G1)
+  A: Head of Claims
+  R: Product owner; AI lead
+  C: Platform; Security; Risk; SIU
+  I: Finance
+- activity: Design and threat model (G2)
+  A: Product owner
+  R: AI lead; Platform; Security
+  C: Head of Claims; Risk; SIU
+  I: Compliance
+- activity: Evals (G3)
+  A: Product owner
+  R: AI lead
+  C: Head of Claims; Platform; Risk; SIU
+  I: Security
+- activity: RAI assurance (G4)
+  A: RAI/Risk
+  R: Product owner; AI lead; Compliance
+  C: Head of Claims; Security
+  I: Platform
+- activity: Release (G5)
+  A: Head of Claims
+  R: Product owner; AI lead; Platform
+  C: Security; Risk; Compliance; Finance
+  I: SIU
+- activity: Run and hypercare (G6)
+  A: Head of Claims
+  R: Product owner; AI lead; Platform
+  C: SIU
+  I: Security; Risk
+- activity: Improve or retire (G7)
+  A: Head of Claims
+  R: Product owner; AI lead
+  C: Risk; Compliance; SIU
+  I: Platform

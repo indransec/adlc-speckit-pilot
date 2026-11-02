@@ -1,0 +1,99 @@
+{
+  "use_case": "UC-TRV-CLM-001",
+  "gates": [
+    {
+      "gate": "G0",
+      "status": "approved",
+      "approvers": [
+        {
+          "role": "Sponsor (Head of Claims)",
+          "persona": "hoc",
+          "name": "Helen Ortiz",
+          "decision": "approved",
+          "notes": "ok",
+          "at": "2026-11-02T11:39:10+00:00"
+        },
+        {
+          "role": "Risk",
+          "persona": "risk",
+          "name": "Daniel Okoro",
+          "decision": "approved",
+          "notes": "ok",
+          "at": "2026-11-02T11:39:31+00:00"
+        },
+        {
+          "role": "Data owner",
+          "persona": "dataowner",
+          "name": "Mei Chen",
+          "decision": "approved",
+          "notes": "",
+          "at": "2026-11-02T11:39:44+00:00"
+        }
+      ],
+      "decided_at": "2026-11-02T11:39:45+00:00",
+      "evidence": [
+        "7 value metrics, 8 in-scope items, owners named",
+        "questionnaire tier HIGH = system.yaml risk_tier HIGH",
+        "4 data types, confirmed by Mei Chen",
+        "'Go with conditions', 3 conditions, each with an owner and due date",
+        "8 activities, one Accountable each",
+        "card generated from the current record",
+        "submitted for G0"
+      ],
+      "signatures": [],
+      "notes": "ok; ok",
+      "checks": [
+        {
+          "check": "Use-case record complete (problem, value, scope, owners)",
+          "ok": true,
+          "detail": "7 value metrics, 8 in-scope items, owners named"
+        },
+        {
+          "check": "Risk tier assessed (questionnaire = system.yaml)",
+          "ok": true,
+          "detail": "questionnaire tier HIGH = system.yaml risk_tier HIGH"
+        },
+        {
+          "check": "Data classification agreed with the Data owner",
+          "ok": true,
+          "detail": "4 data types, confirmed by Mei Chen"
+        },
+        {
+          "check": "Feasibility verdict with owned conditions",
+          "ok": true,
+          "detail": "'Go with conditions', 3 conditions, each with an owner and due date"
+        },
+        {
+          "check": "RACI agreed (one Accountable per activity)",
+          "ok": true,
+          "detail": "8 activities, one Accountable each"
+        },
+        {
+          "check": "Use-case card generated from the current record",
+          "ok": true,
+          "detail": "card generated from the current record"
+        },
+        {
+          "check": "Submitted for G0",
+          "ok": true,
+          "detail": "submitted for G0"
+        }
+      ],
+      "manifest_sha256": "87cb66d1a29e3caeaea6600f19aee18e60c6f816d1cc57bff4ecfe1889e853d2"
+    },
+    {
+      "gate": "G1",
+      "status": "pending",
+      "approvers": [],
+      "decided_at": null,
+      "evidence": []
+    },
+    {
+      "gate": "G2",
+      "status": "pending",
+      "approvers": [],
+      "decided_at": null,
+      "evidence": []
+    }
+  ]
+}

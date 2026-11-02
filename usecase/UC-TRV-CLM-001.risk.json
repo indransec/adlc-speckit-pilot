@@ -1,0 +1,24 @@
+{
+  "use_case": "UC-TRV-CLM-001",
+  "answers": {
+    "customer_outcome": true,
+    "takes_actions": true,
+    "personal_data": true,
+    "special_category": false,
+    "autonomy": "decide_some",
+    "max_autonomous_usd": 1000.0,
+    "regulatory_exposure": true
+  },
+  "tier": "HIGH",
+  "reasons": [
+    "affects customer outcomes and takes actions in systems",
+    "processes personal data and decides on its own"
+  ],
+  "rules": [
+    "HIGH if special-category data is processed",
+    "HIGH if it affects customer outcomes and takes actions in systems or decides on its own",
+    "HIGH if it processes personal data and decides on its own",
+    "MEDIUM if it affects customer outcomes, processes personal data or has any autonomy",
+    "LOW otherwise"
+  ]
+}
