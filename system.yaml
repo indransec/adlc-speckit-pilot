@@ -1,6 +1,6 @@
 id: SYS-TRV-CLM
 name: travel-claims-assistant
-release: 0.2.0
+release: 0.4.0
 owner: claims-travel-product
 business_owner: head-of-claims-travel
 risk_tier: high

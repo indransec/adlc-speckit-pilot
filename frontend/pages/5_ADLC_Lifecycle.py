@@ -6,7 +6,7 @@ from common import call, clock_badge, gate_signoff, get, ok_badge, page, persona
 
 page("ADLC lifecycle", "🛤️")
 persona = persona_picker()
-clock_badge()
+clk = clock_badge()
 GATE_ACTIONS = {"G2": ["validate_manifests"], "G3": ["unit_tests", "evals", "perf_test", "traceability"],
                 "G5": ["bundle_release", "shadow_run", "kill_switch_drill", "rollback_drill"],
                 "G6": ["hypercare"], "G7": ["g7_review"]}
@@ -39,7 +39,7 @@ for col, g in zip(cols, gates):
                  f"<small>checks {sum(c['ok'] for c in g['checks'])}/{len(g['checks'])}</small>", unsafe_allow_html=True)
 
 a, b, c = st.columns([2, 2, 3])
-if a.button("🚀 Simulate the full lifecycle (G0 → G7)", type="primary",
+if not clk.get("governed") and a.button("🚀 Simulate the full lifecycle (G0 → G7)", type="primary",
             help="Runs every stage's actions, checks each gate and signs with simulated approvers (~3 min)"):
     r = try_action(post, "/lifecycle/actions/simulate_lifecycle", {})
     if r:
@@ -81,7 +81,7 @@ for g in gates:
         st.caption(f"Named approvers: {', '.join(g['approvers_required'])} · previous gate approved: "
                    f"{g['previous_gate_approved']} · ready: {g['ready']}")
         gate_signoff(g, persona, g["gate"])
-        if rec["status"] not in ("approved", "approved_with_conditions") and \
+        if not clk.get("governed") and rec["status"] not in ("approved", "approved_with_conditions") and \
                 st.button("Sign with all simulated approvers", key=f"sim-{g['gate']}",
                           help="One persona per required role, from ops/teams.yaml"):
             if try_action(post, f"/lifecycle/gates/{g['gate']}/approve", {"simulated": True},

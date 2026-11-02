@@ -61,6 +61,16 @@ def is_sim() -> bool:
     return app_env() == "sim"
 
 
+def adlc_governed() -> bool:
+    """The repo is governed by its own ADLC (deploy/environments/<env>.yaml): the intake form writes into the
+    repo and gates are signed one persona at a time, never with simulated approvers."""
+    return bool(env_config().get("adlc_governed"))
+
+
+def intake_enabled() -> bool:
+    return is_sim() or adlc_governed()
+
+
 def openrouter_api_key() -> str | None:
     return os.environ.get("OPENROUTER_API_KEY") or None
 

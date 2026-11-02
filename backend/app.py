@@ -24,7 +24,7 @@ from pydantic import BaseModel  # noqa: E402
 from backend import service  # noqa: E402
 from shared import (board, changes, clock, db, faults, incidents, ledger, lifecycle, metrics, object_store,  # noqa: E402
                     releases, teams, usecase)
-from shared.config import is_sim, project_root, release, system_manifest  # noqa: E402
+from shared.config import adlc_governed, intake_enabled, is_sim, project_root, release, system_manifest  # noqa: E402
 from shared.runtime import get_runtime, set_runtime  # noqa: E402
 
 app = FastAPI(title="Travel Claims Assistant API", version=release(),
@@ -351,6 +351,11 @@ def _require_sim():
         raise HTTPException(409, "only inside a simulation run: make sim-new, then make sim-api")
 
 
+def _require_intake():
+    if not intake_enabled():
+        raise HTTPException(409, "the intake form writes only into a simulation run or a governed repo (adlc_governed)")
+
+
 class ClockControl(BaseModel):
     action: str                    # pause | resume | rate | skip_days | skip_to_day
     value: Optional[float] = None
@@ -358,7 +363,7 @@ class ClockControl(BaseModel):
 
 @app.get("/clock")
 def get_clock():
-    return clock.state()
+    return {**clock.state(), "governed": adlc_governed(), "intake_enabled": intake_enabled()}
 
 
 @app.post("/clock")
@@ -417,19 +422,19 @@ def usecase_template():
 
 @app.post("/usecases")
 def usecase_save(u: UseCaseSave):
-    _require_sim()
+    _require_intake()
     return _uc(usecase.save, u.record, u.by)
 
 
 @app.post("/usecases/{uc}/submit")
 def usecase_submit(uc: str, b: ByPersona):
-    _require_sim()
+    _require_intake()
     return _uc(usecase.submit, uc, b.by)
 
 
 @app.post("/usecases/{uc}/classification/confirm")
 def usecase_confirm_classification(uc: str, b: ByPersona):
-    _require_sim()
+    _require_intake()
     return _uc(usecase.confirm_classification, uc, b.by)
 
 
@@ -440,7 +445,7 @@ def usecase_g1_template(uc: str):
 
 @app.post("/usecases/{uc}/g1")
 def usecase_g1(uc: str, g: G1Save):
-    _require_sim()
+    _require_intake()
     return _uc(usecase.save_g1, uc, g.data, g.by)
 
 

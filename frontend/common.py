@@ -129,6 +129,8 @@ def clock_badge() -> dict:
     if c["simulated"]:
         speed = "paused" if c["paused"] else f"×{c['rate']:g}"
         st.sidebar.markdown(f"**Simulation clock**  \n{c['now'][:16].replace('T', ' ')} UTC  \nday {c['sim_day']:.1f} · {speed}")
+    elif c.get("governed"):
+        st.sidebar.info(f"**Governed repo** (real time)  \n{c['now'][:16].replace('T', ' ')} UTC  \nEach persona signs for itself.")
     else:
         st.sidebar.warning("Not a simulation run. Start one with `make sim-new` then `make sim-api` / `make sim-ui`.")
     return c

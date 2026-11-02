@@ -26,7 +26,7 @@ from typing import Callable
 import yaml
 
 from shared import clock, db, ledger, metrics, teams, usecase
-from shared.config import ROOT, evidence_root, project_root, release, system_manifest
+from shared.config import ROOT, adlc_governed, evidence_root, project_root, release, system_manifest
 from shared.runtime import get_runtime, set_runtime
 
 BUNDLE_PATHS = ["system.yaml", "agents", "tools", "guardrails", "deploy/models.yaml",
@@ -444,6 +444,9 @@ def approve(gate: str, approvals: list[dict], decision: str = "approved", notes:
     approvals and rejections alike freeze their artifacts into the evidence ledger."""
     with ledger.locked():
         st = check_gate(gate)
+        if adlc_governed() and not all(a.get("persona") and a["role"] in teams.persona(a["persona"])["roles"]
+                                       for a in approvals):
+            raise ValueError(f"{gate}: in a governed repo every decision is signed by a persona holding the role")
         if decision in APPROVED:
             if not st["previous_gate_approved"]:
                 raise ValueError(f"{gate}: previous gate not approved")
@@ -524,6 +527,8 @@ def reset_gates(from_gate: str = "G0") -> None:
 
 def sim_approvals(gate: str) -> list[dict]:
     """The first persona holding each required role (simulated sign-off)."""
+    if adlc_governed():
+        raise ValueError("simulated sign-off is disabled in a governed repo: each persona signs for itself")
     g = next(x for x in GATES if x["gate"] == gate)
     out = []
     for r in g["approvers"]:

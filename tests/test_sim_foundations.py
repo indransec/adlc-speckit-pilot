@@ -1,6 +1,7 @@
 """test:sim-foundations: simulation clock, isolated runs, G0/G1 intake, persona sign-off, evidence ledger, board."""
 import json
 import os
+import re
 import time
 from datetime import datetime, timedelta, timezone
 
@@ -167,7 +168,7 @@ def test_release_bump_is_not_drift_for_authority_rules(sim_run):
     with open(sysf) as f:
         src = f.read()
     with open(sysf, "w") as f:
-        f.write(src.replace("release: 0.2.0", "release: 0.3.0-rc1"))
+        f.write(re.sub(r"(?m)^release: .*$", "release: 0.3.0-rc1", src))
     assert lifecycle.ev_dir().name == "0.3.0-rc1"                     # release() re-reads the changed manifest
     assert not [d for d in ledger.drift(before_gate="G2") if d["on_drift"] == "block"]
 

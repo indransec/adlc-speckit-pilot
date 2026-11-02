@@ -36,7 +36,7 @@ c[1].metric("State", "not saved" if not summary["exists"] else "submitted" if su
 c[2].metric("Risk tier", summary.get("tier") or "—")
 c[3].metric("G0", f"{GATE_ICON.get(g0['record']['status'], '⬜')} {g0['record']['status']}")
 c[4].metric("G1", f"{GATE_ICON.get(g1['record']['status'], '⬜')} {g1['record']['status']}")
-if not clk["simulated"]:
+if not clk.get("intake_enabled", clk["simulated"]):
     st.info("The intake form writes into a simulation run's workspace. Start one with `make sim-new`, "
             "then run `make sim-api` and `make sim-ui`.")
 
@@ -84,7 +84,7 @@ with t[0]:
             "due": st.column_config.DateColumn("due", required=True)})
         st.markdown("**RACI** (exactly one Accountable per activity)")
         raci = st.data_editor(pd.DataFrame(rec["raci"]), num_rows="dynamic", width="stretch", key="raci")
-        saved = st.form_submit_button("💾 Save record", type="primary", disabled=not clk["simulated"])
+        saved = st.form_submit_button("💾 Save record", type="primary", disabled=not clk.get("intake_enabled", clk["simulated"]))
     if saved:
         record = {"id": uc, "title": title, "sponsor": sponsor, "business_owner": bo, "product_owner": po,
                   "problem": problem, "proposed_solution": solution, "value_hypothesis": rows(value),

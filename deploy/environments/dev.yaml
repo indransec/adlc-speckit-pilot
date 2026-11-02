@@ -10,3 +10,4 @@ limits:
   max_cost_per_claim_usd: 0.25
   max_agent_steps: 40
 llm_mode: auto          # auto (live if OPENROUTER_API_KEY set, else mock) | live | mock
+adlc_governed: true     # this repo is governed by its own ADLC (Spec Kit pilot): intake writes here, personas sign
