@@ -15,11 +15,11 @@ templates:
      subject: "Decision on your claim {claim_id}", approved_by: "[Compliance]", approved_on: 2026-10-25}
   - {id: decision_rejected, file: decision_rejected.j2, version: "1.0", status: approved, decision: true,
      subject: "Decision on your claim {claim_id}", approved_by: "[Compliance]", approved_on: 2026-10-25}
-  # Release 0.4.0 missed connection letters (REQ-F-039). Drafted by Claude; status changes to "approved" only when
-  # Compliance approves them at G4 (task T043). Until then missed connection claims use the decision_* templates.
-  - {id: missed_connection_paid, file: missed_connection_paid.j2, version: "0.1", status: pending_compliance, decision: true,
-     subject: "Decision on your claim {claim_id}", approved_by: null, approved_on: null}
-  - {id: missed_connection_partial, file: missed_connection_partial.j2, version: "0.1", status: pending_compliance, decision: true,
-     subject: "Decision on your claim {claim_id}", approved_by: null, approved_on: null}
-  - {id: missed_connection_rejected, file: missed_connection_rejected.j2, version: "0.2", status: pending_compliance, decision: true,
-     subject: "Decision on your claim {claim_id}", approved_by: null, approved_on: null}
+  # Release 0.4.0 missed connection letters (REQ-F-039). Drafted by Claude; approved by Compliance (Laura Fischer)
+  # on 2026-11-02 after the G4 rework (rejection letter v0.2, briefs/rework-G4-20261102.md) - task T043.
+  - {id: missed_connection_paid, file: missed_connection_paid.j2, version: "0.1", status: approved, decision: true,
+     subject: "Decision on your claim {claim_id}", approved_by: "compliance (Laura Fischer)", approved_on: 2026-11-02}
+  - {id: missed_connection_partial, file: missed_connection_partial.j2, version: "0.1", status: approved, decision: true,
+     subject: "Decision on your claim {claim_id}", approved_by: "compliance (Laura Fischer)", approved_on: 2026-11-02}
+  - {id: missed_connection_rejected, file: missed_connection_rejected.j2, version: "0.2", status: approved, decision: true,
+     subject: "Decision on your claim {claim_id}", approved_by: "compliance (Laura Fischer)", approved_on: 2026-11-02}

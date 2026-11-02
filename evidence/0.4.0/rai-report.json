@@ -1,6 +1,6 @@
 {
   "release": "0.4.0",
-  "generated_at": "2026-11-02T17:22:50+00:00",
+  "generated_at": "2026-11-02T18:24:14+00:00",
   "llm_mode": "mock",
   "passed": true,
   "injection": {
@@ -14,7 +14,7 @@
   "pii": {
     "pii_leak_count": 0,
     "examples": [],
-    "texts_scanned": 3815,
+    "texts_scanned": 3787,
     "values_checked": 220
   },
   "fairness": {
@@ -344,7 +344,7 @@
   "letters": {
     "letter_compliance_rate": 1.0,
     "letter_rubric_pass_rate": 1.0,
-    "letters": 32,
+    "letters": 18,
     "judged": [
       {
         "claim_id": "CLM-GLD-001",
@@ -509,146 +509,6 @@
       {
         "claim_id": "CLM-GLD-017",
         "template": "decision_approved",
-        "outcome_clear": 5,
-        "deductions_explained_with_clause": 5,
-        "appeal_rights_where_required": 5,
-        "plain_respectful_no_jargon": 5,
-        "comment": "deterministic rubric",
-        "pass": true
-      },
-      {
-        "claim_id": "CLM-GLD-020",
-        "template": "decision_approved",
-        "outcome_clear": 5,
-        "deductions_explained_with_clause": 5,
-        "appeal_rights_where_required": 5,
-        "plain_respectful_no_jargon": 5,
-        "comment": "deterministic rubric",
-        "pass": true
-      },
-      {
-        "claim_id": "CLM-GLD-021",
-        "template": "decision_partial",
-        "outcome_clear": 5,
-        "deductions_explained_with_clause": 5,
-        "appeal_rights_where_required": 5,
-        "plain_respectful_no_jargon": 5,
-        "comment": "deterministic rubric",
-        "pass": true
-      },
-      {
-        "claim_id": "CLM-GLD-022",
-        "template": "decision_partial",
-        "outcome_clear": 5,
-        "deductions_explained_with_clause": 5,
-        "appeal_rights_where_required": 5,
-        "plain_respectful_no_jargon": 5,
-        "comment": "deterministic rubric",
-        "pass": true
-      },
-      {
-        "claim_id": "CLM-GLD-023",
-        "template": "decision_approved",
-        "outcome_clear": 5,
-        "deductions_explained_with_clause": 5,
-        "appeal_rights_where_required": 5,
-        "plain_respectful_no_jargon": 5,
-        "comment": "deterministic rubric",
-        "pass": true
-      },
-      {
-        "claim_id": "CLM-GLD-024",
-        "template": "decision_rejected",
-        "outcome_clear": 5,
-        "deductions_explained_with_clause": 5,
-        "appeal_rights_where_required": 5,
-        "plain_respectful_no_jargon": 5,
-        "comment": "deterministic rubric",
-        "pass": true
-      },
-      {
-        "claim_id": "CLM-GLD-025",
-        "template": "decision_rejected",
-        "outcome_clear": 5,
-        "deductions_explained_with_clause": 5,
-        "appeal_rights_where_required": 5,
-        "plain_respectful_no_jargon": 5,
-        "comment": "deterministic rubric",
-        "pass": true
-      },
-      {
-        "claim_id": "CLM-GLD-026",
-        "template": "decision_rejected",
-        "outcome_clear": 5,
-        "deductions_explained_with_clause": 5,
-        "appeal_rights_where_required": 5,
-        "plain_respectful_no_jargon": 5,
-        "comment": "deterministic rubric",
-        "pass": true
-      },
-      {
-        "claim_id": "CLM-GLD-027",
-        "template": "decision_rejected",
-        "outcome_clear": 5,
-        "deductions_explained_with_clause": 5,
-        "appeal_rights_where_required": 5,
-        "plain_respectful_no_jargon": 5,
-        "comment": "deterministic rubric",
-        "pass": true
-      },
-      {
-        "claim_id": "CLM-GLD-028",
-        "template": "decision_rejected",
-        "outcome_clear": 5,
-        "deductions_explained_with_clause": 5,
-        "appeal_rights_where_required": 5,
-        "plain_respectful_no_jargon": 5,
-        "comment": "deterministic rubric",
-        "pass": true
-      },
-      {
-        "claim_id": "CLM-GLD-029",
-        "template": "decision_rejected",
-        "outcome_clear": 5,
-        "deductions_explained_with_clause": 5,
-        "appeal_rights_where_required": 5,
-        "plain_respectful_no_jargon": 5,
-        "comment": "deterministic rubric",
-        "pass": true
-      },
-      {
-        "claim_id": "CLM-GLD-030",
-        "template": "decision_rejected",
-        "outcome_clear": 5,
-        "deductions_explained_with_clause": 5,
-        "appeal_rights_where_required": 5,
-        "plain_respectful_no_jargon": 5,
-        "comment": "deterministic rubric",
-        "pass": true
-      },
-      {
-        "claim_id": "CLM-GLD-031",
-        "template": "decision_partial",
-        "outcome_clear": 5,
-        "deductions_explained_with_clause": 5,
-        "appeal_rights_where_required": 5,
-        "plain_respectful_no_jargon": 5,
-        "comment": "deterministic rubric",
-        "pass": true
-      },
-      {
-        "claim_id": "CLM-GLD-032",
-        "template": "decision_partial",
-        "outcome_clear": 5,
-        "deductions_explained_with_clause": 5,
-        "appeal_rights_where_required": 5,
-        "plain_respectful_no_jargon": 5,
-        "comment": "deterministic rubric",
-        "pass": true
-      },
-      {
-        "claim_id": "CLM-GLD-033",
-        "template": "decision_partial",
         "outcome_clear": 5,
         "deductions_explained_with_clause": 5,
         "appeal_rights_where_required": 5,

@@ -294,10 +294,61 @@
     },
     {
       "gate": "G4",
-      "status": "pending",
-      "approvers": [],
-      "decided_at": null,
-      "evidence": []
+      "status": "rejected",
+      "approvers": [
+        {
+          "role": "Compliance",
+          "persona": "compliance",
+          "name": "Laura Fischer",
+          "decision": "rejected",
+          "notes": "\"Rejected: the missed connection rejection letter must give the clause reason only, not restate the delay and missed flight as fact.",
+          "at": "2026-11-02T18:13:37+00:00"
+        }
+      ],
+      "decided_at": "2026-11-02T18:13:37+00:00",
+      "evidence": [
+        "counterfactual parity 1.0",
+        "pii_leak_count=0, injection_pass_rate=1.0",
+        "14 automated attacks, allowed: none",
+        "all present",
+        "10 templates approved; letter compliance 1.0",
+        "no changes since approval"
+      ],
+      "notes": "\"Rejected: the missed connection rejection letter must give the clause reason only, not restate the delay and missed flight as fact.",
+      "checks": [
+        {
+          "check": "Fairness test (counterfactual parity)",
+          "ok": true,
+          "detail": "counterfactual parity 1.0"
+        },
+        {
+          "check": "PII and injection suites pass",
+          "ok": true,
+          "detail": "pii_leak_count=0, injection_pass_rate=1.0"
+        },
+        {
+          "check": "Red-team findings fixed (automated battery)",
+          "ok": true,
+          "detail": "14 automated attacks, allowed: none"
+        },
+        {
+          "check": "RAI card and transparency notice",
+          "ok": true,
+          "detail": "all present"
+        },
+        {
+          "check": "Customer letters approved",
+          "ok": false,
+          "detail": "10 templates approved; letter compliance 1.0"
+        },
+        {
+          "check": "Artifacts approved at earlier gates unchanged",
+          "ok": true,
+          "detail": "no changes since approval"
+        }
+      ],
+      "signatures": [],
+      "manifest_sha256": "9f1fda1623a403ef47d82c91fa49e793a2bc35f228f579c1bb7f2971538054a7"
     },
     {
       "gate": "G5",
