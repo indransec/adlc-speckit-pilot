@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS policies(
 CREATE TABLE IF NOT EXISTS flights(
   flight_no TEXT, flight_date TEXT, origin TEXT, destination TEXT,
   scheduled_dep TEXT, actual_dep TEXT, delay_minutes INTEGER, status TEXT,
-  cause TEXT, cause_announced_at TEXT, PRIMARY KEY(flight_no, flight_date));
+  cause TEXT, cause_announced_at TEXT, scheduled_arr TEXT, actual_arr TEXT, PRIMARY KEY(flight_no, flight_date));
 
 CREATE TABLE IF NOT EXISTS claims(
   claim_id TEXT PRIMARY KEY, policy_no TEXT, trip_id TEXT,
@@ -37,7 +37,8 @@ CREATE TABLE IF NOT EXISTS claims(
   mode TEXT, thread_id TEXT, run_no INTEGER DEFAULT 0,
   processing_started_at TEXT, package_at TEXT, package_latency_s REAL, closed_at TEXT,
   docs_requested_at TEXT, reminders_sent INTEGER DEFAULT 0, sim_days_waiting INTEGER DEFAULT 0,
-  decided_by TEXT, release TEXT, error TEXT, updated_at TEXT);
+  decided_by TEXT, release TEXT, error TEXT, updated_at TEXT,
+  journey_direction TEXT, itinerary_json TEXT, refund_declared_usd REAL);
 
 CREATE TABLE IF NOT EXISTS documents(
   doc_id TEXT PRIMARY KEY, claim_id TEXT, doc_type TEXT, filename TEXT, object_key TEXT,
@@ -128,7 +129,10 @@ def tx():
         conn.close()
 
 
-MIGRATIONS = {"llm_calls": {"run_no": "INTEGER", "agent_version": "TEXT", "trace_id": "TEXT", "span_id": "TEXT"}}
+MIGRATIONS = {"llm_calls": {"run_no": "INTEGER", "agent_version": "TEXT", "trace_id": "TEXT", "span_id": "TEXT"},
+              # release 0.4.0: missed connection (arrival times, journey, itinerary, unused-ticket refund)
+              "flights": {"scheduled_arr": "TEXT", "actual_arr": "TEXT"},
+              "claims": {"journey_direction": "TEXT", "itinerary_json": "TEXT", "refund_declared_usd": "REAL"}}
 
 
 def init_db() -> None:

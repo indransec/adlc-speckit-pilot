@@ -27,6 +27,16 @@ FLIGHTS = [("BA2490", "British Airways", "LHR-JFK"), ("LH903", "Lufthansa", "FRA
            ("EK007", "Emirates", "DXB-LHR"), ("AF1080", "Air France", "CDG-LHR"),
            ("UA901", "United Airlines", "SFO-FRA"), ("QR015", "Qatar Airways", "DOH-LHR"),
            ("NH211", "ANA", "HND-LHR"), ("KQ100", "Kenya Airways", "NBO-LHR"), ("LA8084", "LATAM", "GRU-LHR")]
+# Block times in minutes for the synthetic routes (scheduled arrival = departure + block time; 0.4.0)
+ROUTE_MIN = {"LHR-JFK": 480, "FRA-LHR": 105, "SIN-LHR": 820, "BOM-LHR": 590, "DXB-LHR": 470, "CDG-LHR": 75,
+             "SFO-FRA": 660, "DOH-LHR": 445, "HND-LHR": 870, "NBO-LHR": 535, "GRU-LHR": 690}
+
+
+def _at(d, minutes: int) -> str:
+    """Clock time `minutes` after midnight of date d, as 'YYYY-MM-DD HH:MM' (rolls over days)."""
+    return f"{(d + timedelta(days=minutes // 1440)).isoformat()} {(minutes % 1440) // 60:02d}:{minutes % 60:02d}"
+
+
 CAUSE_TEXT = {"weather": "adverse weather", "mechanical": "technical fault with the aircraft",
               "atc": "air traffic control restrictions", "industrial_action": "industrial action (strike)"}
 MERCHANTS = {"accommodation": "Airport Grand Hotel", "meals": "Terminal Brasserie", "transport": "City Taxi Co.",
@@ -382,8 +392,10 @@ def build_case(scenario: str, rng: random.Random, claim_id: str, *, flight_date:
     policy = {"policy_no": policy_no, "plan": plan, "holder_name": person["claimant_name"],
               "insured_persons": [person["claimant_name"]], "start_date": start.isoformat(),
               "end_date": end.isoformat(), "purchased_at": purchased.isoformat(), "region": "Worldwide"}
+    block = ROUTE_MIN.get(route, 180)
     flight = {"flight_no": flight_no, "flight_date": d.isoformat(), "origin": route[:3], "destination": route[-3:],
               "scheduled_dep": sched, "actual_dep": actual, "delay_minutes": delay_min,
+              "scheduled_arr": _at(d, 8 * 60 + block), "actual_arr": _at(d, dep_minutes + block),
               "status": "departed", "cause": spec.get("cause") if delay_min >= 60 else None,
               "cause_announced_at": announced}
     docs = [{"doc_type": "claim_form", "filename": "claim_form.pdf"}]

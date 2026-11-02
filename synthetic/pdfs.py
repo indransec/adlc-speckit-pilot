@@ -39,11 +39,13 @@ def render_lines(title: str, lines: list[str]) -> bytes:
 
 
 def line_row(i: int, l: dict) -> str:
-    return (f"{i} | {l['description']} | {l['category']} | {l['amount_orig']:.2f} {l['currency']} | "
-            f"claimed USD {l['claimed_usd']:.2f} | purchased {l['purchase_date']}")
+    row = (f"{i} | {l['description']} | {l['category']} | {l['amount_orig']:.2f} {l['currency']} | "
+           f"claimed USD {l['claimed_usd']:.2f} | purchased {l['purchase_date']}")
+    return row + (f" | benefit {l['benefit']}" if l.get("benefit") else "")  # 0.4.0 combined claims
 
 
-CLAIM_TYPE_LABEL = {"delay": "Travel delay", "baggage_delay": "Baggage delay", "baggage_loss": "Baggage loss"}
+CLAIM_TYPE_LABEL = {"delay": "Travel delay", "baggage_delay": "Baggage delay", "baggage_loss": "Baggage loss",
+                    "missed_connection": "Missed connection"}
 
 
 def claim_form(c: dict) -> bytes:
@@ -68,6 +70,12 @@ def claim_form(c: dict) -> bytes:
                   f"Compensation received from airline (USD): {c['compensation_received_usd']:.2f}"]
     if c["claim_type_declared"] == "baggage_delay":
         lines += [f"Bag delayed (hours): {c['bag_delay_hours_claimed']}"]
+    if c["claim_type_declared"] == "missed_connection":
+        lines += [f"Compensation received from airline (USD): {c['compensation_received_usd']:.2f}"]
+        if c.get("refund_declared_usd") is not None:
+            lines += [f"Refund received for unused onward ticket (USD): {c['refund_declared_usd']:.2f}"]
+    if c.get("journey_direction"):
+        lines += [f"Journey: {c['journey_direction']}"]
     lines += ["", f"What happened: {c['description']}", "", "Items / expenses claimed:"]
     lines += [line_row(i + 1, l) for i, l in enumerate(c["lines"])]
     lines += [f"Total claimed (USD): {c['claimed_usd']:.2f}", "", "Bank details for payment",
@@ -116,5 +124,14 @@ def receipt(f: dict) -> bytes:
     return render_lines("RECEIPT", lines)
 
 
+def itinerary(f: dict) -> bytes:
+    """E-ticket itinerary (0.4.0): one booking reference, one row per leg."""
+    rows = [f"Leg {i} | {l['flight_no']} | {l['flight_date']} | {l['origin']}-{l['destination']} | "
+            f"dep {l['scheduled_dep']} | arr {l['scheduled_arr']}" for i, l in enumerate(f["legs"], 1)]
+    return render_lines(f"{f['airline']} - E-TICKET ITINERARY", [
+        f"Passenger name: {f['passenger_name']}", f"Booking reference: {f['booking_ref']}",
+        f"Ticket number: {f['ticket_no']}", "", "Flights:", *rows])
+
+
 RENDERERS = {"claim_form": claim_form, "boarding_pass": boarding_pass,
-             "airline_delay_letter": airline_delay_letter, "pir": pir, "receipt": receipt}
+             "airline_delay_letter": airline_delay_letter, "pir": pir, "receipt": receipt, "itinerary": itinerary}

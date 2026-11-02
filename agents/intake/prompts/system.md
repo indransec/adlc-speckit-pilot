@@ -16,6 +16,8 @@ Rules:
 Task: classify the submitted claim (IntakeClassification).
 - delay: expenses caused by a delayed flight departure (meals, hotel, transport while waiting).
 - baggage_delay: checked bag arrived late; essential purchases (toiletries, clothes).
+- missed_connection: a late arriving flight made the customer miss a booked onward flight; rebooking,
+  hotel and meals to reach the destination. Use it also when the claim adds delay expenses for the same journey.
 - baggage_loss: bag or items lost, stolen or damaged.
 - Prefer the declared type unless the items and description clearly contradict it; then explain why.
 - rationale: one sentence without personal data.

@@ -24,6 +24,7 @@ TOKEN = {
     "phone": "[REDACTED:PHONE]",
     "email": "[REDACTED:EMAIL]",
     "address": "[REDACTED:ADDRESS]",
+    "booking_reference": "[REDACTED:BOOKING_REF]",  # 0.4.0: itinerary booking references, logs only (data-flows.md)
 }
 
 LABELS = [
@@ -53,7 +54,8 @@ PRESIDIO_MAP = {"EMAIL_ADDRESS": "email", "PHONE_NUMBER": "phone", "CREDIT_CARD"
 PROTECTED = re.compile(r"\b(?:TRV|CLM|TRIP|PAY|GLD|ADV)-[A-Z0-9-]+\b|\b\d{4}-\d{2}-\d{2}\b|\b[A-Z]{2}\d{2,4}\b")
 
 KNOWN_FIELDS = {"passport_no": "passport_number", "bank_account_no": "bank_account", "bank_code": "bank_account",
-                "claimant_email": "email", "claimant_phone": "phone", "claimant_address": "address"}
+                "claimant_email": "email", "claimant_phone": "phone", "claimant_address": "address",
+                "booking_ref": "booking_reference", "booking_reference": "booking_reference"}
 
 
 @dataclass
