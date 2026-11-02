@@ -222,10 +222,75 @@
     },
     {
       "gate": "G3",
-      "status": "pending",
-      "approvers": [],
-      "decided_at": null,
-      "evidence": []
+      "status": "approved",
+      "approvers": [
+        {
+          "role": "AI lead",
+          "persona": "ailead",
+          "name": "Kenji Sato",
+          "decision": "approved",
+          "notes": "great",
+          "at": "2026-11-02T18:03:54+00:00"
+        },
+        {
+          "role": "Product owner",
+          "persona": "po",
+          "name": "Arjun Rao",
+          "decision": "approved",
+          "notes": "great",
+          "at": "2026-11-02T18:04:07+00:00"
+        }
+      ],
+      "decided_at": "2026-11-02T18:04:07+00:00",
+      "evidence": [
+        "171 tests, 0 failed",
+        "routing_cases.jsonl@02cb5da1bfc0, claims_cases.jsonl@16c0df4aabb9, cases.jsonl@be3c2bac55d9, e2e_cases.jsonl@ad942b2e2b20",
+        "27 metrics, llm=mock, failed=[]",
+        "type_b_labelled_as_a = 0",
+        "status {'verified': 43, 'partially_verified': 0, 'failed': 0, 'not_run': 2}",
+        "p95 12.51s at 10 concurrent, 0 errors",
+        "no changes since approval"
+      ],
+      "signatures": [],
+      "notes": "great; great",
+      "checks": [
+        {
+          "check": "Unit and routing tests pass (CI)",
+          "ok": true,
+          "detail": "171 tests, 0 failed"
+        },
+        {
+          "check": "Datasets versioned",
+          "ok": true,
+          "detail": "routing_cases.jsonl@02cb5da1bfc0, claims_cases.jsonl@16c0df4aabb9, cases.jsonl@be3c2bac55d9, e2e_cases.jsonl@ad942b2e2b20"
+        },
+        {
+          "check": "Component + system evals pass all thresholds",
+          "ok": true,
+          "detail": "27 metrics, llm=mock, failed=[]"
+        },
+        {
+          "check": "Zero type B -> A mislabels",
+          "ok": true,
+          "detail": "type_b_labelled_as_a = 0"
+        },
+        {
+          "check": "Traceability: requirements linked to verification",
+          "ok": true,
+          "detail": "status {'verified': 43, 'partially_verified': 0, 'failed': 0, 'not_run': 2}"
+        },
+        {
+          "check": "Performance test at 3x peak",
+          "ok": true,
+          "detail": "p95 12.51s at 10 concurrent, 0 errors"
+        },
+        {
+          "check": "Artifacts approved at earlier gates unchanged",
+          "ok": true,
+          "detail": "no changes since approval"
+        }
+      ],
+      "manifest_sha256": "b4b6a5c7e2484c1ec36bc7844fd6b27f49d0e801b1e18b7829e615a945f7a3e0"
     },
     {
       "gate": "G4",
