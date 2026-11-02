@@ -24,6 +24,12 @@ Before anything else, confirm G2 is approved. This command produces the G3 build
 3. If approved, continue. Code changes go on `release/<version>` (version from `system.yaml`), never
    on `main`; create the branch if it does not exist. Stop at any task marked `[HUMAN: ...]` and ask
    that person; stop and ask before changing a file marked `[AUTHORITY]` beyond what G1/G2 approved.
+4. Checklists (this overrides the checklist stop below for gates already decided): a checklist in
+   `<feature folder>/checklists/` belongs to a gate by its file name, `g<N>-<topic>.md` → G<N>, and
+   `requirements.md` → G1. If that gate is `approved` or `approved_with_conditions`, its signers
+   have already decided with the checklist in front of them (see `briefs/G<N>.md`): list its open
+   items as **informational** and do **not** stop for it. Apply the normal checklist stop only to
+   checklists of gates not yet approved, and to checklists without a gate prefix.
 
 Constitution I and II apply throughout: never sign, approve, reset or simulate a gate.
 

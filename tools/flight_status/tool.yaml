@@ -12,9 +12,10 @@ implementation: tools/flight_status/impl.py (mock; enforced via shared/tool_gate
 operations:
   lookup:
     access: read
-    description: "Look up a flight's scheduled and actual departure, delay minutes and delay cause."
+    description: "Look up a flight's scheduled and actual departure and arrival, delay minutes and delay cause."
     input:
       flight_no: string
       flight_date: date
     output:
-      flight: object {scheduled_dep, actual_dep, delay_minutes, cause, cause_announced_at} | null
+      flight: object {scheduled_dep, actual_dep, delay_minutes, scheduled_arr, actual_arr, arrival_delay_minutes,
+        cause, cause_announced_at} | null   # arrival fields added at 0.4.0 (missed connection, ADR-007 contracts)

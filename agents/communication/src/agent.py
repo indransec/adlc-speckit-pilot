@@ -13,7 +13,10 @@ from shared.audit import guardrail_event
 from shared.guardrails.output_policy import check_slot_text
 
 TOOL = "TOOL-NOTIFY"
-LABEL = {"delay": "travel delay", "baggage_delay": "baggage delay", "baggage_loss": "baggage loss"}
+LABEL = {"delay": "travel delay", "baggage_delay": "baggage delay", "baggage_loss": "baggage loss",
+         "missed_connection": "missed connection"}
+MC_TEMPLATE = {"approve": "missed_connection_paid", "partial": "missed_connection_partial",
+               "reject": "missed_connection_rejected"}   # 0.4.0, used once Compliance has approved them (G4)
 
 
 class Explanation(BaseModel):
@@ -55,8 +58,14 @@ def _fallback_text(item: dict) -> str:
     return item["reason"][:1].upper() + item["reason"][1:] + "."
 
 
+def _approved(template_id: str) -> bool:
+    from tools.notify.impl import approved
+    return (approved().get(template_id) or {}).get("status") == "approved"
+
+
 def decision_letter(ctx, *, claimant_name: str, outcome: str, claimed_usd: float, approved_usd: float,
-                    deductions: list[dict], reasons: list[dict], payment: dict | None) -> dict:
+                    deductions: list[dict], reasons: list[dict], payment: dict | None,
+                    claim_type: str | None = None, connection: dict | None = None) -> dict:
     items = reasons if outcome == "reject" else deductions
     prompt = ("Write the customer-facing slots for a travel insurance decision letter. The template already states "
               "the amounts, clause numbers and appeal rights. Do not mention internal processes, scores or reviews. "
@@ -81,13 +90,17 @@ def decision_letter(ctx, *, claimant_name: str, outcome: str, claimed_usd: float
     else:
         note = "We will confirm the payment to you separately."
     template = {"approve": "decision_approved", "partial": "decision_partial", "reject": "decision_rejected"}[outcome]
+    if claim_type == "missed_connection" and connection and _approved(MC_TEMPLATE[outcome]):
+        template = MC_TEMPLATE[outcome]
     ctx_vars = {"claimant_name": claimant_name, "claim_id": ctx.claim_id, "outcome": outcome, "opening": slots.opening,
                 "claimed_usd": claimed_usd, "approved_usd": approved_usd, "payment_note": note,
                 "deductions": [{"clause": d["clause"], "clause_title": d.get("clause_title", ""),
                                 "amount_usd": d["amount_usd"], "explanation": explain(d)} for d in deductions]
                 if outcome == "partial" else [],
                 "reasons": [{"clause": r["clause"], "clause_title": r.get("clause_title", ""),
-                             "explanation": explain(r)} for r in reasons] if outcome == "reject" else []}
+                             "explanation": explain(r)} for r in reasons] if outcome == "reject" else [],
+                "inbound_leg": (connection or {}).get("inbound_leg"), "onward_leg": (connection or {}).get("onward_leg"),
+                "connection_airport": (connection or {}).get("airport")}
     res = _send(ctx, template, ctx_vars)
     return {"template": template, "sent": res["sent"], "violations": res["violations"], "subject": res["subject"],
             "body": res["body"]}

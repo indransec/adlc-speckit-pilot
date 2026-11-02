@@ -1,0 +1,25 @@
+# Minimum connection times (MCT) for missed connection eligibility (clause 3.7, REQ-F-035, ADR-006).
+# One value per airport (minutes). Read by verification code only; never by a model.
+# Owner: Product owner (Claims operations). Reviewed quarterly. Changes by pull request approved by
+# CODEOWNERS (Business owner + AI lead), because the value decides eligibility.
+#
+# STATUS: values proposed by Claude for the synthetic pilot airports and confirmed unchanged by the
+# Product owner (po, Arjun Rao) on 2026-11-02 (task T004), source: general published information.
+as_of: 2026-11-02
+source: "General published information (pilot reference values), confirmed by the Product owner"
+owner: product-owner
+confirmed_by: po
+fallback_minutes: 60
+airports:
+  BOM: 90   # Mumbai
+  CDG: 90   # Paris Charles de Gaulle
+  DOH: 60   # Doha
+  DXB: 75   # Dubai
+  FRA: 45   # Frankfurt
+  GRU: 90   # Sao Paulo Guarulhos
+  HND: 75   # Tokyo Haneda
+  JFK: 90   # New York JFK
+  LHR: 90   # London Heathrow
+  NBO: 60   # Nairobi
+  SFO: 90   # San Francisco
+  SIN: 60   # Singapore

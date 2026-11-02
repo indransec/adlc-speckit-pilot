@@ -1,12 +1,16 @@
 """Verification agent (AGT-TRV-VER): verify delay facts against the flight-status source (REQ-F-014).
 
 Facts and thresholds are checked in code; the model only writes the adjuster-facing summary.
+Release 0.4.0: missed connection inbound leg, connection time and single ticket (connection.py;
+REQ-F-033..035, REQ-B-012, REQ-B-013).
 """
 from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
 from shared.tool_gateway import ToolPermissionError
+
+from .connection import verify_missed_connection
 
 DELAY_THRESHOLD_H = 6      # clause 3.1 / 3.3
 BAG_DELAY_THRESHOLD_H = 12  # clause 4.1
@@ -17,7 +21,40 @@ class VerificationSummary(BaseModel):
     discrepancies: list[str] = Field(default_factory=list)
 
 
+def _missed_connection(ctx, facts: dict) -> dict:
+    def lookup(flight_no, flight_date):
+        try:
+            return ctx.tool("TOOL-FLIGHT-STATUS", "lookup", flight_no=flight_no, flight_date=flight_date)
+        except ToolPermissionError:
+            raise  # a control, never swallowed
+        except Exception as e:  # source down: verify nothing; the claim goes to a person (row 6)
+            ctx.degrade(f"flight-status source unavailable ({type(e).__name__})")
+            return None
+    out = verify_missed_connection(facts, lookup)
+    out["late_check_in"] = bool(facts.get("late_check_in"))   # inbound leg check-in (spec FR-006, G1 clarification)
+    c = out.get("connection") or {}
+
+    def fallback():
+        if not out["inbound_leg"]:
+            s = "The inbound leg of the missed connection could not be identified from the itinerary."
+        else:
+            s = (f"Inbound {out['inbound_leg']} arrived {out.get('inbound_arrival_delay_min')} min late "
+                 f"(cause: {out.get('inbound_cause')}); booked connection {c.get('booked_connection_min')} min at "
+                 f"{c.get('airport')} vs minimum {c.get('mct_min')} min ({c.get('mct_source')}); "
+                 f"{'single ticket' if c.get('single_ticket') else 'separate tickets'}.")
+        return VerificationSummary(summary=s, discrepancies=out["discrepancies"])
+
+    prompt = (f"Claim type: missed_connection\nItinerary legs: {[(l.get('flight_no'), l.get('flight_date')) for l in facts.get('legs') or []]}\n"
+              f"Checks done in code: {out}\nSummarise the verified facts for the adjuster and list discrepancies.")
+    summary = ctx.agent("summarise_verification", VerificationSummary, prompt, fallback=fallback, mock_plan=[
+        ("flight_status_lookup", {"flight_no": out.get("inbound_leg") or "", "flight_date": facts.get("flight_date") or ""})])
+    out["summary"] = summary.summary
+    return out
+
+
 def run(ctx, *, claim_type: str, facts: dict) -> dict:
+    if claim_type == "missed_connection":
+        return _missed_connection(ctx, facts)
     unavailable = None
     try:
         f = ctx.tool("TOOL-FLIGHT-STATUS", "lookup", flight_no=facts.get("flight_no"), flight_date=facts.get("flight_date"))

@@ -11,7 +11,7 @@ CTX = {"claimant_name": "A B", "claim_id": "CLM-X", "claim_label": "baggage", "m
        "reasons": [{"clause": "3.3", "clause_title": "Delay exclusions", "explanation": "Under 6 hours."}]}
 
 
-@pytest.mark.parametrize("tid", sorted(approved()))
+@pytest.mark.parametrize("tid", sorted(k for k, t in approved().items() if t.get("status") == "approved"))  # drafts pending Compliance excluded (0.4.0)
 def test_every_approved_template_renders(tid):
     subject, body = render(tid, CTX)
     assert "CLM-X" in subject and "A B" in body

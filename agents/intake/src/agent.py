@@ -1,4 +1,8 @@
-"""Intake agent (AGT-TRV-INTAKE): classify and register the claim (REQ-F-001)."""
+"""Intake agent (AGT-TRV-INTAKE): classify and register the claim (REQ-F-001).
+
+Release 0.4.0 adds missed_connection (category delay); a claim with both travel delay and missed
+connection expenses for the same journey stays one missed_connection claim, lines tagged by benefit.
+"""
 from __future__ import annotations
 
 import json
@@ -9,12 +13,14 @@ from pydantic import BaseModel, Field
 from shared.guardrails.injection import wrap_as_data
 from shared.guardrails.pii import redact_for_model
 
-CATEGORY = {"delay": "delay", "baggage_delay": "baggage", "baggage_loss": "baggage"}
+CATEGORY = {"delay": "delay", "baggage_delay": "baggage", "baggage_loss": "baggage", "missed_connection": "delay"}
 
 
 class IntakeClassification(BaseModel):
-    claim_type: Literal["delay", "baggage_delay", "baggage_loss"] = Field(
-        description="delay = flight departure delay expenses; baggage_delay = bag arrived late; baggage_loss = bag lost/stolen/damaged")
+    claim_type: Literal["delay", "baggage_delay", "baggage_loss", "missed_connection"] = Field(
+        description="delay = flight departure delay expenses; baggage_delay = bag arrived late; baggage_loss = bag "
+                    "lost/stolen/damaged; missed_connection = a late arriving flight made the customer miss a booked "
+                    "onward flight (also when the claim includes delay expenses for the same journey)")
     rationale: str = Field(description="One sentence, no personal data")
 
 
@@ -23,7 +29,8 @@ def _heuristic(submission: dict) -> IntakeClassification:
     if declared in CATEGORY:
         return IntakeClassification(claim_type=declared, rationale=f"Declared claim type '{declared}' matches the items claimed.")
     text = (submission.get("description") or "").lower()
-    t = "baggage_loss" if "lost" in text else "baggage_delay" if "bag" in text else "delay"
+    t = ("missed_connection" if "connection" in text or "missed my" in text else
+         "baggage_loss" if "lost" in text else "baggage_delay" if "bag" in text else "delay")
     return IntakeClassification(claim_type=t, rationale="Classified from the claim description.")
 
 

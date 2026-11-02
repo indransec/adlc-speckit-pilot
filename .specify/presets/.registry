@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "presets": {
     "adlc": {
-      "version": "0.2.0",
+      "version": "0.3.0",
       "source": "local",
-      "manifest_hash": "sha256:e986913839e8d9c0cebefddba8e21a2f19d070b49df59904f4d6c0ce8027585b",
+      "manifest_hash": "sha256:59337f2bd8b5c56faecded78af0c5e076be0f7f26abaab05f89ed87286860a1b",
       "enabled": true,
       "priority": 10,
       "registered_commands": {
@@ -37,7 +37,7 @@
           "speckit-converge"
         ]
       },
-      "installed_at": "2026-11-02T10:56:05.111657+00:00"
+      "installed_at": "2026-11-02T16:30:04.111041+00:00"
     }
   }
 }

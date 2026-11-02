@@ -2,3 +2,5 @@ id: EVS-VERIFICATION
 datasets: [evals/datasets/golden]
 checks:
   - delay_fact_verification_accuracy
+  - connection_time_check_accuracy      # 0.4.0 missed connection (REQ-F-035)
+  - inbound_leg_attribution_accuracy    # 0.4.0 (REQ-F-033, REQ-B-013)

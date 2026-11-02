@@ -1,0 +1,18 @@
+Dear {{ claimant_name }},
+
+{{ opening }}
+
+Your claim is for a missed connection (policy clause 3.7): your flight {{ inbound_leg }} arrived late at {{ connection_airport }} and you missed your booked onward flight {{ onward_leg }}.
+
+Claim {{ claim_id }}: approved in part.
+Amount claimed: USD {{ "%.2f"|format(claimed_usd) }}
+Amount approved: USD {{ "%.2f"|format(approved_usd) }}
+
+How we calculated this amount:
+{% for d in deductions %}
+- USD {{ "%.2f"|format(d.amount_usd) }} deducted under clause {{ d.clause }} ({{ d.clause_title }}): {{ d.explanation }}
+{% endfor %}
+
+{{ payment_note }}
+{% include "_appeal.j2" %}
+{% include "_footer.j2" %}

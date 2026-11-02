@@ -1,8 +1,8 @@
 # RAI card: Travel Claims Assistant
 
 ## Intended use
-Assist claims operations for trip delay and baggage claims: prepare decisions and,
-for simple low-value cases with no deductions, decide and pay automatically.
+Assist claims operations for trip delay, missed connection (from release 0.4.0) and baggage claims:
+prepare decisions and, for simple low-value cases with no deductions, decide and pay automatically.
 
 ## Not intended for
 Medical claims, cancellation claims, appeals, complaints, fraud decisions,
@@ -19,6 +19,11 @@ any claim outside the routing matrix.
 
 ## Known limitations
 - Accuracy lower on handwritten and low-quality images.
+- Missed connection (0.4.0): eligibility depends on a minimum connection time reference with one value per
+  airport (no terminal-specific or domestic/international values, ADR-006); the inbound delay must be
+  verified by the flight-status source, otherwise the claim goes to a person (row 6).
+- A detected document injection is ignored and logged, but the claim is routed normally; "always send to a
+  person" is planned as CARD-102 (decision D-16).
 - Confidence threshold 0.7 is provisional pending calibration.
 - Languages beyond [list] not tested.
 

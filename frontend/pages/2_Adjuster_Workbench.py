@@ -54,6 +54,20 @@ with left:
                      hide_index=True, width="stretch")
     for r in pkg.get("rejection_reasons", []):
         st.error(f"Clause {r['clause']} ({r['clause_title']}): {r['reason']}")
+    if pkg.get("connection"):   # 0.4.0 missed connection (REQ-F-021, T024)
+        c = pkg["connection"]
+        st.markdown(
+            f"**Connection at {c.get('airport')}**: inbound {c.get('inbound_leg')} → onward {c.get('onward_leg')} · "
+            f"booked {c.get('booked_connection_min')} min vs minimum {c.get('mct_min')} min "
+            f"({c.get('mct_source')}, as of {c.get('mct_as_of')}) · "
+            f"{'single ticket' if c.get('single_ticket') else 'separate tickets'} · inbound "
+            f"{c.get('inbound_arrival_delay_min')} min late ({c.get('inbound_cause')})")
+    if pkg.get("lines") and any(l.get("benefit") for l in pkg["lines"]):
+        st.dataframe(pd.DataFrame(pkg["lines"])[["line_id", "description", "benefit", "claimed_usd", "payable_usd"]],
+                     hide_index=True, width="stretch")
+    if pkg.get("journey"):
+        st.caption(f"Journey: USD {pkg['journey']['already_paid_usd']:,.2f} already paid on other claims; "
+                   f"shared limit remaining USD {pkg['journey']['shared_limit_remaining_usd']:,.2f}")
     for m in (pkg.get("documents") or {}).get("mismatches", []):
         st.warning(m)
 with right:

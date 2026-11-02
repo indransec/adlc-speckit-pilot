@@ -16,7 +16,7 @@ CLAIM_COLS = {"claim_id", "policy_no", "trip_id", "claimant_name", "claimant_ema
               "claimant_address", "passport_no", "bank_account_holder", "bank_account_no", "bank_code",
               "nationality_group", "destination_region", "age_band", "channel", "flight_no", "flight_date",
               "booking_date", "claim_type_declared", "claimed_usd", "compensation_received_usd", "description",
-              "submitted_at"}
+              "submitted_at", "journey_direction", "refund_declared_usd"}
 
 
 def seed_users() -> None:
@@ -28,7 +28,8 @@ def materialize(case: dict) -> str:
     p = dict(case["policy"])
     p["insured_persons"] = db.jdump(p["insured_persons"])
     db.upsert("policies", p)
-    db.upsert("flights", case["flight"])
+    for fl in case.get("flights") or [case["flight"]]:   # 0.4.0: every leg of a missed connection
+        db.upsert("flights", fl)
     for h in case.get("history", []):
         db.upsert("claims", {
             "claim_id": h["claim_id"], "policy_no": h["policy_no"], "trip_id": h["trip_id"],
@@ -37,9 +38,9 @@ def materialize(case: dict) -> str:
             "claim_type": h["claim_type"], "claimed_usd": h["claimed_usd"], "approved_usd": h["approved_usd"],
             "lines_json": db.jdump(h["lines"]), "status": h["status"], "submitted_at": h["submitted_at"],
             "closed_at": h["submitted_at"], "historical": 1, "description": "historical claim (synthetic)",
-            "scenario": "history", "updated_at": db.now()})
+            "scenario": "history", "updated_at": db.now(), "journey_direction": h.get("journey_direction")})
     c = case["claim"]
-    row = {k: c[k] for k in CLAIM_COLS}
+    row = {k: c.get(k) for k in CLAIM_COLS}
     row.update({"lines_json": db.jdump(c["lines"]), "scenario": case["scenario"],
                 "ground_truth": db.jdump({**case["expected"], "title": case["title"],
                                           "requirements": case["requirements"]}),

@@ -22,6 +22,9 @@ def _heuristic(doc: dict) -> AnomalyReview:
     flags = []
     if any("receipt amount" in m for m in doc.get("mismatches", [])):
         flags.append(AnomalyFlag(code="altered_document_suspected", description="Receipt amount differs from the claim form."))
+    if any("itinerary" in m for m in doc.get("mismatches", [])):   # 0.4.0 missed connection (T13, FR-013)
+        flags.append(AnomalyFlag(code="altered_document_suspected",
+                                 description="Boarding pass or claimed flight does not match the itinerary."))
     return AnomalyReview(flags=flags)
 
 

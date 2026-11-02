@@ -7,6 +7,7 @@ Changes to the claim data used by the agents and the mock systems. No new data c
 | Field | Change | Notes |
 |---|---|---|
 | `claim_type_declared`, `claim_type` | new value `missed_connection` | category `delay` |
+| `flight_no`, `flight_date` | rule for `missed_connection`: the **onward** flight the customer missed | all legs are in `itinerary_json`; keeps the duplicate-claim check (REQ-F-013) comparing like with like |
 | `journey_direction` | new: `outward` \| `return` | with `trip_id` identifies the journey (R5) |
 | `itinerary_json` | new: list of legs (below) | extracted, not customer-typed |
 | `refund_declared_usd` | new, default null | refund or credit for the unused onward ticket; null = not declared → requested |

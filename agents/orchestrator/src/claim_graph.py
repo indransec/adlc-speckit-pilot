@@ -173,8 +173,14 @@ def fraud(s: ClaimState) -> dict:
 
 
 def assessment(s: ClaimState) -> dict:
-    out = _delegate(s, "assessment", claim_type=s["intake"]["claim_type"], document=s["document"],
-                    coverage=s["coverage"], verification=s["verification"])
+    ctype = s["intake"]["claim_type"]
+    journey = None
+    if ctype in ("delay", "missed_connection"):   # 0.4.0 journey shared limit + duplicates (ADR-007), code only
+        journey = _claims("journey_benefits", s["claim_id"], trip_id=s["submission"]["trip_id"],
+                          direction=s["document"]["facts"].get("journey_direction") or s["submission"].get("journey_direction"),
+                          exclude_claim_id=s["claim_id"])
+    out = _delegate(s, "assessment", claim_type=ctype, document=s["document"],
+                    coverage=s["coverage"], verification=s["verification"], journey=journey)
     out = faults.apply("assessment_result", out, claim_id=s["claim_id"])  # simulation fault F3
     return {"assessment": out, "steps": 1, "cost_usd": _cost(out)}
 
@@ -388,7 +394,8 @@ def communicate(s: ClaimState) -> dict:
                     "reason": "a claims specialist found the documents provided do not support the amounts claimed"}]
     out = _delegate(s, "communication", "decision_letter", claimant_name=s["submission"]["claimant_name"],
                     outcome=f["outcome"], claimed_usd=a["claimed_usd"], approved_usd=f["amount_usd"],
-                    deductions=deds, reasons=reasons, payment=s.get("payment"))
+                    deductions=deds, reasons=reasons, payment=s.get("payment"),
+                    claim_type=s["intake"]["claim_type"], connection=(a.get("package") or {}).get("connection"))
     return {"letter": {k: out[k] for k in ("template", "sent", "violations", "subject")}, "steps": 1,
             "cost_usd": _cost(out)}
 

@@ -2,6 +2,8 @@
 deduction labels A/B with clause + evidence, and the decision package.
 
 REQ-F-012, REQ-F-020, REQ-F-021, REQ-B-003, REQ-B-004. Recommend-only: routing is code.
+Release 0.4.0: missed connection eligibility (clause 3.7: connection time, single ticket, inbound
+check-in; 3.3 exclusions), journey shared limit and duplicates (REQ-F-036..038, REQ-B-012).
 """
 from __future__ import annotations
 
@@ -17,6 +19,7 @@ from .calculator import TYPE_B_CLAUSES, Judgement, calculate
 NON_ESSENTIAL = ("spa", "massage", "wellness", "alcohol", "bar ", "wine", "beer", "cinema", "entertainment",
                  "shopping", "souvenir", "upgrade", "casino")
 EXCLUDED_ITEMS = ("cash", "passport", "ticket", "perishable")
+ABOVE_REASONABLE_CLASS = ("business class", "first class", "premium economy", "upgrade")   # 3.7 ticket lines
 
 
 class LineJudgement(BaseModel):
@@ -40,7 +43,19 @@ def heuristic_judgements(claim_type: str, lines: list[dict], loss_date: str | No
     for ln in lines:
         desc, cat, lid = ln["description"].lower() + " ", ln["category"], ln["line_id"]
         refs = [r for r in [form_doc] if r]
-        if claim_type == "delay" and (cat == "non_essential" or any(w in desc for w in NON_ESSENTIAL)):
+        if claim_type == "missed_connection" and cat == "ticket":
+            # 6.3 "travel tickets" does not apply to rebooked or new tickets under 3.7 (FR-007)
+            if any(w in desc for w in ABOVE_REASONABLE_CLASS):
+                out.append(LineJudgement(line_id=lid, decision="ineligible", clause="3.7", evidence_refs=refs,
+                                         reason=f"'{ln['description']}' is above economy or the originally booked class; "
+                                                "the adjuster assesses the reasonable fare"))
+            elif ln["claimed_usd"] > 150 and not ln.get("receipt_doc_id"):
+                out.append(LineJudgement(line_id=lid, decision="ineligible", clause="6.1",
+                                         evidence_refs=refs + [f"check:no-receipt:{lid}"],
+                                         reason=f"no receipt for '{ln['description']}' (USD {ln['claimed_usd']:.2f} > 150)"))
+            else:
+                out.append(LineJudgement(line_id=lid, decision="eligible"))
+        elif claim_type in ("delay", "missed_connection") and (cat == "non_essential" or any(w in desc for w in NON_ESSENTIAL)):
             out.append(LineJudgement(line_id=lid, decision="ineligible", clause="3.5", evidence_refs=refs,
                                      reason=f"'{ln['description']}' is a non-essential expense, not a necessary cost of the delay"))
         elif cat in ("cash", "documents") or any(w in desc for w in EXCLUDED_ITEMS):
@@ -79,6 +94,20 @@ def rejection_reasons(claim_type: str, coverage: dict, verification: dict, refs:
         if verification.get("strike_announced_before_booking"):
             r.append(("3.3", "the strike causing the delay was publicly announced before the trip was booked",
                       ["tool:flight-status"]))
+    if claim_type == "missed_connection":
+        c = verification.get("connection") or {}
+        if c and c.get("single_ticket") is False:
+            r.append(("3.7", "the inbound and onward flights were booked on separate tickets (self-transfer)",
+                      ["check:single-ticket", *refs.get("itinerary", [])]))
+        if c and c.get("connection_time_ok") is False:
+            r.append(("3.7", f"the booked connection of {c.get('booked_connection_min')} minutes at {c.get('airport')} is "
+                             f"shorter than the minimum connection time of {c.get('mct_min')} minutes ({c.get('mct_source')})",
+                      ["check:connection-time", *refs.get("itinerary", [])]))
+        if verification.get("strike_announced_before_booking"):
+            r.append(("3.3", "the strike delaying the inbound flight was publicly announced before the trip was booked",
+                      ["tool:flight-status"]))
+        if verification.get("late_check_in"):
+            r.append(("3.3", "the customer did not check in on time for the inbound flight", ["check:check-in"]))
     if claim_type == "baggage_delay" and verification.get("meets_threshold") is False and verification.get("bag_delay_hours") is not None:
         r.append(("4.1", f"baggage was returned after {verification['bag_delay_hours']:g} hours, not more than 12 hours", refs.get("pir", [])))
     for e in coverage.get("exclusions", []):
@@ -92,7 +121,7 @@ def rejection_reasons(claim_type: str, coverage: dict, verification: dict, refs:
     return out
 
 
-def run(ctx, *, claim_type: str, document: dict, coverage: dict, verification: dict) -> dict:
+def run(ctx, *, claim_type: str, document: dict, coverage: dict, verification: dict, journey: dict | None = None) -> dict:
     lines, facts = document["lines"], document["facts"]
     form_doc = document.get("claim_form_doc_id")
     doc_ids = {d["doc_id"] for d in document["documents"]}
@@ -100,6 +129,7 @@ def run(ctx, *, claim_type: str, document: dict, coverage: dict, verification: d
     for d in document["documents"]:
         by_type.setdefault(d["doc_type"], []).append(d["doc_id"])
     refs = {"delay_letter": by_type.get("airline_delay_letter", []), "pir": by_type.get("pir", []),
+            "itinerary": by_type.get("itinerary", []),
             "compensation": by_type.get("airline_delay_letter", []) + ([form_doc] if form_doc else [])}
     limits = coverage.get("limits") or {}
     reasons = rejection_reasons(claim_type, coverage, verification, refs)
@@ -146,7 +176,8 @@ def run(ctx, *, claim_type: str, document: dict, coverage: dict, verification: d
         judgements[j.line_id] = Judgement(j.line_id, j.decision, j.clause, j.reason, refs_ok, pct)
 
     calc = calculate(claim_type, lines, limits, coverage.get("fx_rates") or {}, judgements,
-                     float(facts.get("compensation_usd") or 0.0), refs) if limits else \
+                     float(facts.get("compensation_usd") or 0.0), refs, journey=journey,
+                     refund_usd=float(facts.get("refund_declared_usd") or 0.0)) if limits else \
         {"claimed_usd": sum(l["claimed_usd"] for l in lines), "payable_usd": 0.0, "deductions": [], "reduction_pct": 100.0}
 
     if reasons or calc["payable_usd"] <= 0:
@@ -168,8 +199,20 @@ def run(ctx, *, claim_type: str, document: dict, coverage: dict, verification: d
         "line_judgements": [j.model_dump() for j in judged.line_judgements],
         "clauses_cited": {c: (rag.clause(c) or {}).get("text", "") for c in cited},
         "evidence_documents": sorted(doc_ids), "rationale": judged.rationale,
-        "calculation_order": "FX(6.2) > judgements(B) > single item(5.2) > valuables(5.3) > offset(3.4) > excess(5.6) > section limit",
+        "calculation_order": "duplicates(7.2) > FX(6.2) > judgements(B) > single item(5.2) > valuables(5.3) > offset(3.4) > excess(5.6) > section limit",
     }
+    if claim_type == "missed_connection":   # 0.4.0 workbench view (T024)
+        package["connection"] = {**(verification.get("connection") or {}), "inbound_leg": verification.get("inbound_leg"),
+                                 "onward_leg": verification.get("onward_leg"),
+                                 "inbound_arrival_delay_min": verification.get("inbound_arrival_delay_min"),
+                                 "inbound_cause": verification.get("inbound_cause")}
+        package["lines"] = [{"line_id": l["line_id"], "description": l["description"], "benefit": l.get("benefit"),
+                             "claimed_usd": l["claimed_usd"], "payable_usd": calc.get("line_payable", {}).get(l["line_id"])}
+                            for l in lines]
+    if journey and claim_type in ("delay", "missed_connection"):
+        prior = float(journey.get("paid_delay_usd") or 0) + float(journey.get("paid_missed_connection_usd") or 0)
+        package["journey"] = {"already_paid_usd": round(prior, 2),
+                              "shared_limit_remaining_usd": round(max(float(limits.get("delay_limit", 0)) - prior, 0.0), 2)}
     return {"recommendation": recommendation, "recommended_usd": payable, "claimed_usd": calc["claimed_usd"],
             "deductions": deductions, "rejection_reasons": reasons, "llm_recommendation": llm_rec,
             "agent_agreement": agreement, "relabelled_to_type_b": relabelled, "package": package}
