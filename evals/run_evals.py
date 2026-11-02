@@ -77,7 +77,9 @@ def routing_suite():
 def system_suite(golden, service, db, materialize):
     rows, checks = [], {k: [] for k in (
         "claim_type", "extraction", "completeness", "mismatch", "coverage", "verification", "amount", "route",
-        "stp_should_be_human", "high_conf", "package", "fraud_flag_only", "audit", "budget", "type_b_as_a", "b_evidence")}
+        "stp_should_be_human", "high_conf", "package", "fraud_flag_only", "audit", "budget", "type_b_as_a", "b_evidence",
+        # 0.4.0 missed connection (thresholds agreed at G1)
+        "mc_eligibility", "mc_connection_time", "mc_inbound_leg", "duplicate_paid")}
     from shared.runtime import get_runtime
     rt = get_runtime()
     for case in golden:
@@ -115,13 +117,23 @@ def system_suite(golden, service, db, materialize):
             checks["coverage"].append(exp["rejection_clause"] in reasons)
         else:
             checks["coverage"].append(not reasons and cov.get("benefit_section") == {"delay": "3.1", "baggage_delay": "4.1",
-                                                                                   "baggage_loss": "5.1"}[claim["claim_type_declared"]])
+                                                                                   "baggage_loss": "5.1", "missed_connection": "3.7"}[claim["claim_type_declared"]])
         if claim["claim_type_declared"] == "delay":
             checks["verification"].append(outs.get(VER, {}).get("delay_hours_verified") == round(case["flight"]["delay_minutes"] / 60, 2))
         amount_ok = exp.get("amount_check") is False or exp.get("amount") is None or \
             abs((c["recommended_usd"] or 0) - exp["amount"]) <= 1.0
         if exp.get("amount_check") is not False and exp.get("amount") is not None:
             checks["amount"].append(amount_ok)
+        if exp.get("mc"):   # 0.4.0 missed connection metrics
+            ver, mc = outs.get(VER, {}), exp["mc"]
+            eligible_got = c["recommendation"] != "reject" and not (c["route"] or "").startswith("row6")
+            checks["mc_eligibility"].append(eligible_got == mc["eligible"])
+            if ver.get("connection"):
+                checks["mc_connection_time"].append(ver["connection"]["connection_time_ok"] == mc["connection_time_ok"])
+            checks["mc_inbound_leg"].append(ver.get("inbound_leg") == mc["inbound_leg"])
+        if any(d["clause"] == "7.2" and d["type"] == "A" for d in exp["deductions"]):
+            got_72 = [d for d in pkg.get("deductions", []) if d["clause"] == "7.2"]
+            checks["duplicate_paid"].append(0 if got_72 else 1)   # an expected duplicate that was paid anyway
         route_ok = c["route"] == exp["route"]
         checks["route"].append(route_ok)
         checks["stp_should_be_human"].append(c["route_row"] == 1 and exp["row"] != 1)
@@ -399,15 +411,22 @@ def main(release=None, quick=False):
         "counterfactual_fairness_parity": cf["counterfactual_fairness_parity"],
         "audit_record_complete": rate(chk["audit"]),
         "step_and_cost_budget_respected": rate(chk["budget"]),
+        # 0.4.0: None (not measured) only when the golden set has no missed connection case
+        "missed_connection_eligibility_accuracy": rate(chk["mc_eligibility"]) if chk["mc_eligibility"] else None,
+        "connection_time_check_accuracy": rate(chk["mc_connection_time"]) if chk["mc_connection_time"] else None,
+        "inbound_leg_attribution_accuracy": rate(chk["mc_inbound_leg"]) if chk["mc_inbound_leg"] else None,
+        "duplicate_expense_paid_count": sum(chk["duplicate_paid"]) if chk["mc_eligibility"] else None,
     }
     thresholds = yaml.safe_load(open(os.path.join(EVALS, "thresholds.yaml")))["thresholds"]
     results, ok = compare(m, thresholds)
     suites = {s: [k for k in ks if k in results] for s, ks in {
         "EVS-ORCHESTRATOR": ["routing_correctness"], "EVS-INTAKE": ["claim_type_classification_accuracy"],
         "EVS-DOCUMENT": ["extraction_key_fields_accuracy", "completeness_check_accuracy", "cross_document_mismatch_detection"],
-        "EVS-COVERAGE": ["coverage_agreement_with_adjuster"], "EVS-VERIFICATION": ["delay_fact_verification_accuracy"],
+        "EVS-COVERAGE": ["coverage_agreement_with_adjuster", "missed_connection_eligibility_accuracy"], "EVS-VERIFICATION": ["delay_fact_verification_accuracy", "connection_time_check_accuracy",
+                                                                  "inbound_leg_attribution_accuracy"],
         "EVS-FRAUD-SCREENING": [], "EVS-ASSESSMENT": ["amount_accuracy_within_1usd", "type_b_labelled_as_a",
-                                                      "type_b_evidence_link_present", "decision_package_completeness"],
+                                                      "type_b_evidence_link_present", "decision_package_completeness",
+                                                      "duplicate_expense_paid_count"],
         "EVS-SETTLEMENT": ["payment_without_token", "red_team_attacks_blocked"],
         "EVS-COMMUNICATION": ["letter_compliance_rate", "letter_rubric_pass_rate"],
         "EVS-SYSTEM": ["routing_correctness", "stp_that_should_be_human", "step_and_cost_budget_respected",

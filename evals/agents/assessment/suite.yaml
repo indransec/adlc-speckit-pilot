@@ -5,3 +5,4 @@ checks:
   - type_b_labelled_as_a
   - type_b_evidence_link_present
   - decision_package_completeness
+  - duplicate_expense_paid_count   # 0.4.0 journey shared limit / duplicates (REQ-F-038)

@@ -3,3 +3,4 @@ datasets: [evals/datasets/golden]
 checks:
   - coverage_agreement_with_adjuster
   - exclusion_identification
+  - missed_connection_eligibility_accuracy   # 0.4.0 (REQ-F-036, REQ-B-012)

@@ -15,15 +15,15 @@ make setup          # deps + synthetic data (rebuilds the clause index with clau
 | Standard, inbound 2h late (weather), connection ≥ MCT, USD 320 receipted | approve USD 320 | row 1 straight-through |
 | Same with USD 150 airline compensation | partial USD 170 (3.4, A) | row 4 L1 + L2 (reduction 47% > 25%) |
 | Premier, USD 1,300 receipted | partial USD 1,000 (3.6, A) | row 2 L1 (type A only) |
-| Inbound 20 min late (weather), connection ≥ MCT, onward missed | approve (no minimum inbound delay) | row 1 straight-through |
+| Inbound 50 min late (weather), booked connection 120 min ≥ LHR 90, onward missed | approve (no minimum inbound delay) | row 1 straight-through |
 | Inbound delayed by strike announced before booking | reject (3.3) | row 5 L1 + L2 |
-| Valid connection, boarding closed early | L1 with the reason | row 6 |
+| Valid connection, inbound 20 min late, boarding closed early | investigate (inbound arrived in time per source) | row 6 |
 | Connection below MCT | reject (3.7 connection condition) | row 5 L1 + L2 |
 | Separate tickets (self-transfer) | reject | row 5 L1 + L2 |
 | Flight status shows inbound on time | investigate | row 6 |
-| Three-leg itinerary, delay on first leg | ambiguous leg → L1 with reason | row 6 |
+| Three-leg itinerary, delay on first leg, inbound leg on time | investigate (delay not on the inbound leg) | row 6 |
 | Travel delay USD 300 paid on journey, missed connection USD 350 | partial USD 200 (3.6 shared, A) | row 4 L1 + L2 (reduction 43% > 25%) |
-| Same hotel receipt already paid under travel delay | deduct (7.2, A) | per matrix |
+| Same hotel receipt already paid under travel delay (Premier, 120 of 420) | partial USD 300 (7.2, A) | row 4 L1 + L2 (28.6% > 25%) |
 
 ## Commands
 

@@ -63,6 +63,7 @@ def parse(text: str, doc_type: str) -> dict:
     # 0.4.0 missed connection fields
     f["booking_reference"] = _field(text, "Booking reference")
     f["journey_direction"] = (_field(text, "Journey") or "").lower() or None
+    f["check_in_status"] = (_field(text, "Check-in") or "").lower() or None
     f["refund_declared_usd"] = _num(_field(text, "Refund received for unused onward ticket (USD)"))
     f["legs"] = [{"flight_no": m[1].replace(" ", "").upper(), "flight_date": m[2], "origin": m[3], "destination": m[4],
                   "scheduled_dep": m[5], "scheduled_arr": m[6], "booking_ref": f["booking_reference"]}

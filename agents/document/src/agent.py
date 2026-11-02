@@ -77,6 +77,7 @@ class DocExtraction(BaseModel):
     receipt_currency: Optional[str] = None
     receipt_date: Optional[str] = None
     receipt_merchant: Optional[str] = None
+    check_in_status: Optional[str] = Field(None, description="Boarding pass check-in remark, e.g. 'late'")
     booking_reference: Optional[str] = None
     journey_direction: Optional[Literal["outward", "return"]] = None
     refund_declared_usd: Optional[float] = Field(None, description="Refund or credit received for the unused onward ticket")
@@ -215,6 +216,7 @@ def run(ctx, *, claim_type: str, submission: dict) -> dict:
             # 0.4.0 missed connection: flight_no / flight_date above are the onward flight (data-model.md)
             "legs": legs, "journey_direction": form.get("journey_direction"),
             "refund_declared_usd": form.get("refund_declared_usd"),
+            "late_check_in": any((e["fields"].get("check_in_status") or "") == "late" for e in by_type.get("boarding_pass", [])),
         },
         "mismatches": mismatches,
         "unreadable_documents": unreadable,

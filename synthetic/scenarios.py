@@ -42,7 +42,8 @@ CAUSE_TEXT = {"weather": "adverse weather", "mechanical": "technical fault with 
 MERCHANTS = {"accommodation": "Airport Grand Hotel", "meals": "Terminal Brasserie", "transport": "City Taxi Co.",
              "non_essential": "SkySpa Wellness", "essentials": "Airport Pharmacy & Outfitters",
              "clothing": "Northline Apparel", "luggage": "Voyager Luggage", "valuables": "Meridian Jewellers",
-             "electronics": "TechHub Electronics", "personal": "City Department Store"}
+             "electronics": "TechHub Electronics", "personal": "City Department Store",
+             "ticket": "Airline Ticket Office"}
 STREETS = ["Baker Street", "Elm Road", "Harbour Lane", "Station Avenue", "Kings Way", "Market Place"]
 
 RT = {1: "row1_straight_through", 2: "row2_l1_policy_norm", 3: "row3_l1_authority", 4: "row4_l1_l2_significant",
@@ -51,10 +52,10 @@ STATUS_AFTER = {1: "closed_paid", 2: "awaiting_l1", 3: "awaiting_l1", 4: "awaiti
                 6: "awaiting_investigation", 7: "awaiting_siu"}
 
 
-def L(desc, cat, amt, *, cur="USD", claimed=None, purchased=None, receipt=True, extra=None, scan=None):
+def L(desc, cat, amt, *, cur="USD", claimed=None, purchased=None, receipt=True, extra=None, scan=None, benefit=None):
     return {"description": desc, "category": cat, "amount_orig": float(amt), "currency": cur,
             "claimed_usd": float(claimed if claimed is not None else amt), "purchase_date": purchased,
-            "receipt": receipt, "receipt_extra": extra, "scan": scan}
+            "receipt": receipt, "receipt_extra": extra, "scan": scan, **({"benefit": benefit} if benefit else {})}
 
 
 def X(row, amount, rec, deductions=(), final_outcome=None, final_amount=None, fraud="low", **kw):
@@ -300,6 +301,141 @@ def s_bagloss_fx_jpy(d, rng):
                 requirements=["REQ-F-012"])
 
 
+# --- missed connection scenarios (0.4.0). Expected outcomes are PROPOSED by Claude; a case counts as
+# ground truth only after a named person labels it (T047, constitution V). Kept out of SCENARIOS until then.
+MC_REQ = ["REQ-F-001", "REQ-F-032", "REQ-F-033", "REQ-F-034", "REQ-F-035", "REQ-F-036", "REQ-F-037", "REQ-F-025"]
+MC_NARR = "My first flight landed late and I missed my connection, so I had to buy a new ticket and stay overnight."
+
+
+def s_mc_stp(d, rng):
+    return dict(title="Missed connection, inbound 2.5h late (weather), within authority", plan="STANDARD",
+                type="missed_connection", inbound_delay_min=150, cause="weather",
+                lines=[L("Rebooked flight (economy)", "ticket", 180), L("Airport hotel (1 night)", "accommodation", 100),
+                       L("Dinner and breakfast", "meals", 40)],
+                narrative=MC_NARR, expected=X(1, 320.0, "approve"), requirements=MC_REQ + ["REQ-B-012"])
+
+
+def s_mc_offset(d, rng):
+    return dict(title="Missed connection, USD 150 airline compensation (47% reduction)", plan="STANDARD",
+                type="missed_connection", inbound_delay_min=150, cause="mechanical", compensation=150.0,
+                lines=[L("Rebooked flight (economy)", "ticket", 180), L("Airport hotel (1 night)", "accommodation", 100),
+                       L("Dinner and breakfast", "meals", 40)],
+                narrative=MC_NARR + " The airline paid me USD 150.",
+                expected=X(4, 170.0, "partial", [("A", "3.4", 150.0)]), requirements=MC_REQ + ["REQ-F-012"])
+
+
+def s_mc_over_limit(d, rng):
+    return dict(title="Missed connection, Premier, USD 1,300 claimed, limit USD 1,000", plan="PREMIER",
+                type="missed_connection", inbound_delay_min=180, cause="air_traffic_control",
+                lines=[L("New ticket (economy)", "ticket", 900), L("Airport hotel (2 nights)", "accommodation", 400)],
+                narrative=MC_NARR, expected=X(2, 1000.0, "partial", [("A", "3.6", 300.0)]), requirements=MC_REQ)
+
+
+def s_mc_short_delay(d, rng):
+    return dict(title="Missed connection, inbound only 50 min late, connection 120 min (no minimum delay)",
+                plan="STANDARD", type="missed_connection", inbound_delay_min=50, connection_min=120, cause="weather",
+                lines=[L("Rebooked flight (economy)", "ticket", 160), L("Airport hotel (1 night)", "accommodation", 100)],
+                narrative=MC_NARR, expected=X(1, 260.0, "approve"), requirements=MC_REQ)
+
+
+def s_mc_strike(d, rng):
+    return dict(title="Missed connection, inbound delayed by a strike announced before booking", plan="STANDARD",
+                type="missed_connection", inbound_delay_min=200, cause="industrial_action", strike_before_booking=True,
+                lines=[L("Rebooked flight (economy)", "ticket", 200), L("Airport hotel (1 night)", "accommodation", 110)],
+                narrative=MC_NARR, expected=X(5, 0.0, "reject"), requirements=MC_REQ + ["REQ-B-002"])
+
+
+def s_mc_short_connection(d, rng):
+    return dict(title="Missed connection, booked connection 60 min below LHR minimum 90 min", plan="STANDARD",
+                type="missed_connection", inbound_delay_min=90, connection_min=60, cause="weather",
+                lines=[L("Rebooked flight (economy)", "ticket", 190), L("Airport hotel (1 night)", "accommodation", 100)],
+                narrative=MC_NARR, expected=X(5, 0.0, "reject"), requirements=MC_REQ + ["REQ-B-002", "REQ-B-012"])
+
+
+def s_mc_self_transfer(d, rng):
+    return dict(title="Missed connection, flights on separate tickets (self-transfer)", plan="PREMIER",
+                type="missed_connection", inbound_delay_min=150, cause="weather", self_transfer=True,
+                lines=[L("New ticket (economy)", "ticket", 420), L("Airport hotel (1 night)", "accommodation", 140)],
+                narrative=MC_NARR, expected=X(5, 0.0, "reject"), requirements=MC_REQ + ["REQ-B-002", "REQ-B-012"])
+
+
+def s_mc_inbound_on_time(d, rng):
+    return dict(title="Missed connection claimed but flight-status shows the inbound on time", plan="STANDARD",
+                type="missed_connection", inbound_delay_min=0,
+                lines=[L("Rebooked flight (economy)", "ticket", 200), L("Airport hotel (1 night)", "accommodation", 100)],
+                narrative=MC_NARR, expected=X(6, 300.0, "approve", final_outcome="reject", final_amount=0.0),
+                requirements=MC_REQ + ["REQ-B-012"])
+
+
+def s_mc_three_legs(d, rng):
+    return dict(title="Three-leg itinerary, delay on the first leg, inbound leg on time", plan="STANDARD",
+                type="missed_connection", inbound_delay_min=0, three_legs=True,
+                lines=[L("Rebooked flight (economy)", "ticket", 210), L("Airport hotel (1 night)", "accommodation", 90)],
+                narrative="My first flight from San Francisco was late and I missed my connection in London.",
+                expected=X(6, 300.0, "approve", final_outcome="reject", final_amount=0.0), requirements=MC_REQ + ["REQ-B-013"])
+
+
+def s_mc_boarding_closed_early(d, rng):
+    return dict(title="Valid connection, inbound only 20 min late, boarding closed early", plan="STANDARD",
+                type="missed_connection", inbound_delay_min=20, cause="weather",
+                lines=[L("Rebooked flight (economy)", "ticket", 190), L("Airport hotel (1 night)", "accommodation", 100)],
+                narrative="My flight was a little late and the gate for my connection had already closed.",
+                expected=X(6, 290.0, "approve", final_outcome="reject", final_amount=0.0), requirements=MC_REQ + ["REQ-B-012"])
+
+
+def s_mc_late_check_in(d, rng):
+    return dict(title="Missed connection, customer checked in late for the inbound flight", plan="STANDARD",
+                type="missed_connection", inbound_delay_min=150, cause="weather", late_check_in=True,
+                lines=[L("Rebooked flight (economy)", "ticket", 180), L("Airport hotel (1 night)", "accommodation", 100)],
+                narrative=MC_NARR, expected=X(5, 0.0, "reject"), requirements=MC_REQ + ["REQ-B-002"])
+
+
+def s_mc_after_delay_shared_limit(d, rng):
+    prior = [L("Hotel (1 night)", "accommodation", 180), L("Meals", "meals", 120)]
+    return dict(title="Missed connection after USD 300 travel delay paid on the same journey (shared USD 500)",
+                plan="STANDARD", type="missed_connection", inbound_delay_min=150, cause="weather",
+                journey_prior=("delay", 300.0, [{**p, "purchase_date": None} for p in prior]),
+                lines=[L("Rebooked flight (economy)", "ticket", 250), L("Airport hotel (1 night)", "accommodation", 100)],
+                narrative=MC_NARR, expected=X(4, 200.0, "partial", [("A", "3.6", 150.0)]), requirements=MC_REQ + ["REQ-F-038"])
+
+
+def s_mc_duplicate_receipt(d, rng):   # 120 of 420 = 28.6% reduction -> row 4
+    hotel = L("Airport hotel (1 night)", "accommodation", 120)
+    return dict(title="Missed connection with a hotel receipt already paid under travel delay", plan="PREMIER",
+                type="missed_connection", inbound_delay_min=150, cause="weather",
+                journey_prior=("delay", 120.0, [{**hotel, "purchase_date": None}]),
+                lines=[L("Rebooked flight (economy)", "ticket", 300), hotel],
+                narrative=MC_NARR, expected=X(4, 300.0, "partial", [("A", "7.2", 120.0)]), requirements=MC_REQ + ["REQ-F-038"])
+
+
+def s_mc_combined(d, rng):
+    return dict(title="Combined claim: travel delay meals + missed connection ticket and hotel, shared limit",
+                plan="STANDARD", type="missed_connection", inbound_delay_min=400, cause="mechanical",
+                lines=[L("Meals while waiting", "meals", 80, benefit="delay"),
+                       L("Rebooked flight (economy)", "ticket", 300), L("Airport hotel (1 night)", "accommodation", 160)],
+                narrative=MC_NARR + " I also bought meals while waiting at the first airport.",
+                expected=X(2, 500.0, "partial", [("A", "3.6", 40.0)]), requirements=MC_REQ + ["REQ-F-038"])
+
+
+def s_delay_after_mc(d, rng):
+    prior = [L("Rebooked flight (economy)", "ticket", 250), L("Airport hotel (1 night)", "accommodation", 150)]
+    return dict(title="Travel delay claimed after USD 400 missed connection paid on the same journey (shared USD 500)",
+                plan="STANDARD", type="delay", delay_min=480, cause="weather",
+                journey_prior=("missed_connection", 400.0, [{**p, "purchase_date": None} for p in prior]),
+                lines=[L("Hotel (1 night)", "accommodation", 200)],
+                narrative="My onward flight was delayed overnight because of fog.",
+                expected=X(4, 100.0, "partial", [("A", "3.6", 100.0)]), requirements=["REQ-F-038", "REQ-F-012"])
+
+
+MC_SCENARIOS = {"mc_stp": s_mc_stp, "mc_offset": s_mc_offset, "mc_over_limit": s_mc_over_limit,
+                "mc_short_delay": s_mc_short_delay, "mc_strike": s_mc_strike, "mc_short_connection": s_mc_short_connection,
+                "mc_self_transfer": s_mc_self_transfer, "mc_inbound_on_time": s_mc_inbound_on_time,
+                "mc_three_legs": s_mc_three_legs, "mc_boarding_closed_early": s_mc_boarding_closed_early,
+                "mc_late_check_in": s_mc_late_check_in, "mc_after_delay_shared_limit": s_mc_after_delay_shared_limit,
+                "mc_duplicate_receipt": s_mc_duplicate_receipt, "mc_combined": s_mc_combined,
+                "delay_after_mc": s_delay_after_mc}
+
+
 # Scenarios used only by simulation traffic (kept out of SCENARIOS so dataset generation is unchanged)
 EXTRA_SCENARIOS = {"bagloss_fx_jpy": s_bagloss_fx_jpy}
 # Production-like traffic mix (mostly simple claims)
@@ -338,6 +474,67 @@ def _transpose(fn: str) -> str:
     return "".join(s) if "".join(s) != fn else fn[:-1] + str((int(fn[-1]) + 1) % 10)
 
 
+# --- missed connection (0.4.0) --------------------------------------------------------------------------
+MC_INBOUND = [("LH903", "Lufthansa", "FRA-LHR"), ("AF1080", "Air France", "CDG-LHR"),
+              ("EK007", "Emirates", "DXB-LHR"), ("QR015", "Qatar Airways", "DOH-LHR")]
+MC_DEP = 6 * 60   # inbound scheduled departure 06:00, so every inbound arrives the same day
+
+
+def _mc_parts(spec, d, rng, person, used):
+    """Flights, itinerary documents and claim fields for a missed connection spec.
+
+    spec keys: inbound_delay_min, cause, connection_min (booked), self_transfer, three_legs,
+    strike_before_booking (handled by caller), late_check_in, refund (None = not declared), direction.
+    """
+    for attempt in range(1000):
+        in_no, in_airline, in_route = rng.choice(MC_INBOUND)
+        if attempt >= 8:   # all named inbound flights used on this date: same airline and route, new number
+            in_no = f"{in_no[:2]}{rng.randint(1000, 9999)}"
+        on_no = f"BA0{rng.randint(100, 999)}"
+        if (in_no, d.isoformat()) not in used and (on_no, d.isoformat()) not in used:
+            break
+    else:
+        raise RuntimeError(f"no free synthetic flight numbers on {d}")
+    used.update({(in_no, d.isoformat()), (on_no, d.isoformat())})
+    block = ROUTE_MIN[in_route]
+    in_arr = MC_DEP + block
+    on_dep = in_arr + spec.get("connection_min", 150)
+    delay = spec.get("inbound_delay_min", 150)
+    leg_in = {"flight_no": in_no, "flight_date": d.isoformat(), "origin": in_route[:3], "destination": "LHR",
+              "scheduled_dep": _at(d, MC_DEP), "scheduled_arr": _at(d, in_arr)}
+    leg_on = {"flight_no": on_no, "flight_date": d.isoformat(), "origin": "LHR", "destination": "JFK",
+              "scheduled_dep": _at(d, on_dep), "scheduled_arr": _at(d, on_dep + 480)}
+    legs = [leg_in, leg_on]
+    flights = [{**leg_in, "actual_dep": _at(d, MC_DEP + delay), "actual_arr": _at(d, in_arr + delay),
+                "delay_minutes": delay, "status": "landed", "cause": spec.get("cause", "weather") if delay > 0 else None,
+                "cause_announced_at": None},
+               {**leg_on, "actual_dep": leg_on["scheduled_dep"], "actual_arr": leg_on["scheduled_arr"],
+                "delay_minutes": 0, "status": "departed", "cause": None, "cause_announced_at": None}]
+    if spec.get("three_legs"):   # first leg into the inbound origin, delayed; the inbound itself on time (T11)
+        first_no = f"UA{rng.randint(100, 999)}"
+        used.add((first_no, d.isoformat()))
+        leg0 = {"flight_no": first_no, "flight_date": d.isoformat(), "origin": "SFO", "destination": in_route[:3],
+                "scheduled_dep": _at(d, 0), "scheduled_arr": _at(d, MC_DEP - 120)}
+        legs.insert(0, leg0)
+        flights.append({**leg0, "actual_dep": _at(d, 180), "actual_arr": _at(d, MC_DEP + 60), "delay_minutes": 180,
+                        "status": "landed", "cause": "mechanical", "cause_announced_at": None})
+    ref1 = _rand_id(rng, 6)
+    ref2 = _rand_id(rng, 6) if spec.get("self_transfer") else ref1
+    itin = lambda ref, ls, airline: {"doc_type": "itinerary", "filename": f"itinerary_{ref}.pdf", "fields": {
+        "airline": airline, "passenger_name": person["claimant_name"], "booking_ref": ref,
+        "ticket_no": f"{rng.randint(100, 999)}-{rng.randint(1000000000, 9999999999)}", "legs": ls}}
+    if spec.get("self_transfer"):
+        docs = [itin(ref1, legs[:-1], in_airline), itin(ref2, [leg_on], "British Airways")]
+    else:
+        docs = [itin(ref1, legs, in_airline)]
+    docs.append({"doc_type": "boarding_pass", "filename": "boarding_pass.pdf", "fields": {
+        "passenger_name": person["claimant_name"], "flight_no": in_no, "flight_date": d.isoformat(),
+        "route": in_route, "booking_ref": ref1, "seat": f"{rng.randint(5, 45)}{rng.choice('ABCDEF')}",
+        "check_in": "late" if spec.get("late_check_in") else None}})
+    return {"flights": flights, "docs": docs, "onward": (on_no, "British Airways", "LHR-JFK"),
+            "inbound": (in_no, in_airline, in_route)}
+
+
 def build_case(scenario: str, rng: random.Random, claim_id: str, *, flight_date: date | None = None,
                shared: dict | None = None, part: int = 0, submitted_offset_days: int | None = None,
                used_flights: set | None = None) -> dict:
@@ -351,7 +548,8 @@ def build_case(scenario: str, rng: random.Random, claim_id: str, *, flight_date:
         if shared.get("flight") or flight_date or (flight_no, d.isoformat()) not in used:
             break
     used.add((flight_no, d.isoformat()))
-    spec = s_split(d, rng, part) if scenario == "claim_split" else {**SCENARIOS, **EXTRA_SCENARIOS}[scenario](d, rng)
+    spec = s_split(d, rng, part) if scenario == "claim_split" else \
+        {**SCENARIOS, **EXTRA_SCENARIOS, **MC_SCENARIOS}[scenario](d, rng)
     person = shared.get("person") or _claimant(rng)
     plan = spec["plan"]
     policy_no = shared.get("policy_no") or f"TRV-{'STD' if plan == 'STANDARD' else 'PRM'}-{rng.randint(100000, 999999)}"
@@ -398,12 +596,34 @@ def build_case(scenario: str, rng: random.Random, claim_id: str, *, flight_date:
               "scheduled_arr": _at(d, 8 * 60 + block), "actual_arr": _at(d, dep_minutes + block),
               "status": "departed", "cause": spec.get("cause") if delay_min >= 60 else None,
               "cause_announced_at": announced}
-    docs = [{"doc_type": "claim_form", "filename": "claim_form.pdf"}]
+    flights = [flight]
+    if spec["type"] == "missed_connection":   # 0.4.0: claim names the missed onward flight (data-model.md)
+        mc = _mc_parts(spec, d, rng, person, used)
+        flights = mc["flights"]
+        if announced:
+            flights[0 if not spec.get("three_legs") else 0]["cause"] = "industrial_action"
+            flights[0]["cause_announced_at"] = announced
+        flight_no, airline, route = mc["onward"]
+        flight = next(f for f in flights if f["flight_no"] == flight_no)
+        claim.update(flight_no=flight_no, flight_date=d.isoformat(), route=route,
+                     journey_direction=spec.get("direction", "outward"),
+                     refund_declared_usd=spec.get("refund", 0.0))
+        docs = [{"doc_type": "claim_form", "filename": "claim_form.pdf"}, *mc["docs"]]
+        # ground truth for the 0.4.0 metrics (labelled with the rest of the expected outcome, T047)
+        spec["expected"] = {**spec["expected"], "mc": {
+            "inbound_leg": mc["inbound"][0], "connection_time_ok": spec.get("connection_min", 150) >= 90,
+            "single_ticket": not spec.get("self_transfer"),
+            "eligible": spec["expected"]["recommendation"] != "reject" and spec["expected"]["row"] != 6}}
+    else:
+        docs = [{"doc_type": "claim_form", "filename": "claim_form.pdf"}]
     bp_flight = _transpose(flight_no) if spec.get("bp_flight_mismatch") else flight_no
-    docs.append({"doc_type": "boarding_pass", "filename": "boarding_pass.pdf", "fields": {
-        "passenger_name": person["claimant_name"], "flight_no": bp_flight, "flight_date": d.isoformat(),
-        "route": route, "booking_ref": _rand_id(rng, 6), "seat": f"{rng.randint(5, 45)}{rng.choice('ABCDEF')}"}})
-    if spec["type"] == "delay":
+    if spec["type"] != "missed_connection":
+        docs.append({"doc_type": "boarding_pass", "filename": "boarding_pass.pdf", "fields": {
+            "passenger_name": person["claimant_name"], "flight_no": bp_flight, "flight_date": d.isoformat(),
+            "route": route, "booking_ref": _rand_id(rng, 6), "seat": f"{rng.randint(5, 45)}{rng.choice('ABCDEF')}"}})
+    if spec["type"] == "missed_connection":
+        pass
+    elif spec["type"] == "delay":
         docs.append({"doc_type": "airline_delay_letter", "filename": "airline_delay_letter.pdf", "fields": {
             "airline": airline, "passenger_name": person["claimant_name"], "flight_no": flight_no,
             "flight_date": d.isoformat(), "scheduled_dep": sched, "actual_dep": actual,
@@ -438,8 +658,24 @@ def build_case(scenario: str, rng: random.Random, claim_id: str, *, flight_date:
         for k in range(3):
             history.append(_hist(claim, policy, rng, rng.choice(["delay", "baggage_delay"]), rng.choice([180, 240, 300]),
                                  same_trip=False, days_before=40 + 70 * k, items=["Meals", "Hotel (1 night)"]))
+    if spec.get("journey_prior"):   # 0.4.0: an approved claim on the same journey (shared limit / duplicates)
+        kind, amount, prior_lines = spec["journey_prior"]
+        h = _hist(claim, policy, rng, kind, amount, same_trip=True, days_before=10, items=[l["description"] for l in prior_lines])
+        h["journey_direction"] = spec.get("direction", "outward")
+        h["lines"] = [{**pl, "receipt_fingerprint": receipt_fingerprint(MERCHANTS.get(pl["category"], "Retail Store"),
+                                                                        pl["purchase_date"] or d.isoformat(), pl["currency"],
+                                                                        pl["amount_orig"])} for pl in prior_lines]
+        history.append(h)
     return {"scenario": scenario, "title": spec["title"], "requirements": spec["requirements"], "claim": claim,
-            "policy": policy, "flight": flight, "documents": docs, "history": history, "expected": spec["expected"]}
+            "policy": policy, "flight": flight, "flights": flights, "documents": docs, "history": history,
+            "expected": spec["expected"]}
+
+
+def receipt_fingerprint(merchant, date_, currency, amount) -> str:
+    """Same key as the document agent's exact-match fingerprint (ADR-007)."""
+    import hashlib
+    key = "|".join([" ".join((merchant or "").lower().split()), date_ or "", currency or "", f"{float(amount):.2f}"])
+    return hashlib.sha256(key.encode()).hexdigest()[:16]
 
 
 def _hist(claim, policy, rng, ctype, amount, *, same_trip, days_before, items):

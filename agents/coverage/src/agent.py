@@ -13,9 +13,10 @@ from shared import rag
 from shared.guardrails.pii import redact_for_model
 
 TOOL = "TOOL-POLICY-ADMIN"
-BENEFIT = {"delay": "3.1", "baggage_delay": "4.1", "baggage_loss": "5.1"}
+BENEFIT = {"delay": "3.1", "baggage_delay": "4.1", "baggage_loss": "5.1", "missed_connection": "3.7"}
 SECTION_CLAUSES = {"delay": ["3.1", "3.2", "3.3", "3.4", "3.5", "3.6"], "baggage_delay": ["4.1", "4.2", "4.3"],
-                   "baggage_loss": ["5.1", "5.2", "5.3", "5.4", "5.5", "5.6", "5.7"]}
+                   "baggage_loss": ["5.1", "5.2", "5.3", "5.4", "5.5", "5.6", "5.7"],
+                   "missed_connection": ["3.7", "3.2", "3.3", "3.4", "3.5", "3.6"]}   # 0.4.0
 ALWAYS = ["2.1", "2.2", "6.1", "6.2", "6.3", "7.2"]
 CLAIM_LEVEL_EXCLUSIONS = {"3.3", "6.3", "7.1"}
 
@@ -27,7 +28,7 @@ class Exclusion(BaseModel):
 
 
 class CoverageMapping(BaseModel):
-    benefit_section: str = Field(description="Clause id of the main benefit, e.g. 3.1, 4.1 or 5.1")
+    benefit_section: str = Field(description="Clause id of the main benefit, e.g. 3.1, 3.7, 4.1 or 5.1")
     applicable_clauses: list[str] = Field(description="Clause ids relevant to assessing this claim")
     exclusions: list[Exclusion] = Field(default_factory=list,
                                         description="Claim-level exclusions considered, citing clause ids from the provided wording only")

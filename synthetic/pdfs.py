@@ -91,7 +91,8 @@ def boarding_pass(f: dict) -> bytes:
     return render_lines("BOARDING PASS", [
         f"Passenger name: {f['passenger_name']}", f"Flight number: {f['flight_no']}",
         f"Flight date: {f['flight_date']}", f"Route: {f['route']}",
-        f"Booking reference: {f['booking_ref']}", f"Seat: {f['seat']}"])
+        f"Booking reference: {f['booking_ref']}", f"Seat: {f['seat']}",
+        *([f"Check-in: {f['check_in']}"] if f.get("check_in") else [])])
 
 
 def airline_delay_letter(f: dict) -> bytes:

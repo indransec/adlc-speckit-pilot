@@ -15,7 +15,7 @@ Rules:
 ## Agent-specific instructions
 Task: map the claim to the policy wording (CoverageMapping). Policy validity, insured persons and
 duplicates are checked in code before you are called.
-- benefit_section: 3.1 travel delay, 4.1 baggage delay, 5.1 baggage loss.
+- benefit_section: 3.1 travel delay, 3.7 missed connection, 4.1 baggage delay, 5.1 baggage loss.
 - applicable_clauses: only clause ids from the excerpts provided or returned by your policy wording tools.
 - exclusions: claim-level exclusions only (e.g. 3.3, 6.3, 7.1) with applies=true/false and a reason grounded
   in the submission. Item-level judgements (receipts, depreciation, non-essential items) belong to the
