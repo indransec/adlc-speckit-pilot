@@ -5,7 +5,7 @@ owner: claims-travel-product
 business_owner: head-of-claims-travel
 risk_tier: high
 use_case: UC-TRV-CLM-001
-scope: [trip-delay, baggage]
+scope: [trip-delay, baggage, missed-connection]   # missed-connection added at 0.4.0 (CARD-101)
 currency: USD
 requirements_dir: docs/requirements
 topology:

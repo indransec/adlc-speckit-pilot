@@ -145,16 +145,16 @@ Existing repository layout (plan.md "Source Code"): `agents/<agent>/src/`, `tool
 - [X] T047 [HUMAN: l2-grace] Senior adjuster labels the proposed golden cases (at least the 12 planned at G1; T018, T028, T035 propose 14) (expected outcome, amount, deductions, route); `hoc` reviews; only labelled cases are added to `SCENARIOS` [Constitution V]
 - [X] T048 [HUMAN: ailead] AI lead labels the 6 adversarial cases with `l2-grace`
 - [X] T049 Regenerate datasets with `make datasets` (golden + adversarial, versioned) after T047-T048 [AUTHORITY: `evals/datasets/**` edits need approval]
-- [ ] T050 Add missed connection scenarios to `TRAFFIC_WEIGHTS` in `synthetic/scenarios.py` so `make perf` covers them [REQ-N-001, REQ-N-004]
+- [X] T050 Add missed connection scenarios to `TRAFFIC_WEIGHTS` in `synthetic/scenarios.py` so `make perf` covers them [REQ-N-001, REQ-N-004]
 - [ ] T051 Traceability: map `REQ-F-032..039`, `REQ-B-012/013` verification methods in `scripts/build_traceability.py` if new methods need mapping; `make traceability` shows no unverified requirement
 
 ---
 
 ## Phase N: Polish & Cross-Cutting
 
-- [ ] T052 [P] Add `missed-connection` to `system.yaml` `scope` (not a routing key; approval prompt applies to `system.yaml`)
-- [ ] T053 [P] Update `docs/rai/rai-card.md` and `docs/rai/transparency-notice.md` for the new claim type
-- [ ] T054 [P] Update `README.md` claim types and quickstart pointer
+- [X] T052 [P] Add `missed-connection` to `system.yaml` `scope` (not a routing key; approval prompt applies to `system.yaml`)
+- [X] T053 [P] Update `docs/rai/rai-card.md` and `docs/rai/transparency-notice.md` for the new claim type
+- [X] T054 [P] Update `README.md` claim types and quickstart pointer
 - [ ] T055 Run quickstart.md end to end; fix any mismatch
 
 ---

@@ -1,6 +1,7 @@
 # Travel Claims Assistant (ADLC pilot)
 
-Agentic backend for **travel insurance claims** (MVP scope: **trip delay** and **baggage**),
+Agentic backend for **travel insurance claims** (scope: **trip delay**, **baggage** and, from release 0.4.0, **missed connection**
+— see `specs/0.4.0-missed-connection/quickstart.md`),
 built on the enterprise ADLC scaffold. This repo is both a working system and the reference
 example of every ADLC artifact, filled in for the pilot and **simulated end to end on synthetic data**.
 

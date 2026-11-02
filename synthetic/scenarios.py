@@ -499,7 +499,10 @@ EXTRA_SCENARIOS = {"bagloss_fx_jpy": s_bagloss_fx_jpy}
 TRAFFIC_WEIGHTS = {"delay_stp": 14, "bagdelay_stp": 12, "delay_offset": 6, "bagloss_excess": 8, "bagloss_fx": 3,
                    "over_authority": 4, "linked_trip": 2, "missing_receipt": 5, "valuables": 3, "depreciation": 4,
                    "nonessential": 4, "delay_short": 4, "policy_inactive": 2, "strike": 2, "duplicate": 2,
-                   "mismatch": 3, "poor_scan": 2, "fraud": 2, "injection": 1, "incomplete": 3}
+                   "mismatch": 3, "poor_scan": 2, "fraud": 2, "injection": 1, "incomplete": 3,
+                   # 0.4.0 missed connection (T050; perf and simulation traffic)
+                   "mc_stp": 3, "mc_offset": 1, "mc_over_limit": 1, "mc_short_connection": 1,
+                   "mc_inbound_on_time": 1, "mc_combined": 1}
 
 
 # --- case assembly ------------------------------------------------------------------------------------
