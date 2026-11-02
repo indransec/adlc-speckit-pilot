@@ -342,21 +342,21 @@ def s_mc_strike(d, rng):
     return dict(title="Missed connection, inbound delayed by a strike announced before booking", plan="STANDARD",
                 type="missed_connection", inbound_delay_min=200, cause="industrial_action", strike_before_booking=True,
                 lines=[L("Rebooked flight (economy)", "ticket", 200), L("Airport hotel (1 night)", "accommodation", 110)],
-                narrative=MC_NARR, expected=X(5, 0.0, "reject"), requirements=MC_REQ + ["REQ-B-002"])
+                narrative=MC_NARR, expected=X(5, 0.0, "reject", rejection_clause="3.3"), requirements=MC_REQ + ["REQ-B-002"])
 
 
 def s_mc_short_connection(d, rng):
     return dict(title="Missed connection, booked connection 60 min below LHR minimum 90 min", plan="STANDARD",
                 type="missed_connection", inbound_delay_min=90, connection_min=60, cause="weather",
                 lines=[L("Rebooked flight (economy)", "ticket", 190), L("Airport hotel (1 night)", "accommodation", 100)],
-                narrative=MC_NARR, expected=X(5, 0.0, "reject"), requirements=MC_REQ + ["REQ-B-002", "REQ-B-012"])
+                narrative=MC_NARR, expected=X(5, 0.0, "reject", rejection_clause="3.7"), requirements=MC_REQ + ["REQ-B-002", "REQ-B-012"])
 
 
 def s_mc_self_transfer(d, rng):
     return dict(title="Missed connection, flights on separate tickets (self-transfer)", plan="PREMIER",
                 type="missed_connection", inbound_delay_min=150, cause="weather", self_transfer=True,
                 lines=[L("New ticket (economy)", "ticket", 420), L("Airport hotel (1 night)", "accommodation", 140)],
-                narrative=MC_NARR, expected=X(5, 0.0, "reject"), requirements=MC_REQ + ["REQ-B-002", "REQ-B-012"])
+                narrative=MC_NARR, expected=X(5, 0.0, "reject", rejection_clause="3.7"), requirements=MC_REQ + ["REQ-B-002", "REQ-B-012"])
 
 
 def s_mc_inbound_on_time(d, rng):
@@ -387,7 +387,7 @@ def s_mc_late_check_in(d, rng):
     return dict(title="Missed connection, customer checked in late for the inbound flight", plan="STANDARD",
                 type="missed_connection", inbound_delay_min=150, cause="weather", late_check_in=True,
                 lines=[L("Rebooked flight (economy)", "ticket", 180), L("Airport hotel (1 night)", "accommodation", 100)],
-                narrative=MC_NARR, expected=X(5, 0.0, "reject"), requirements=MC_REQ + ["REQ-B-002"])
+                narrative=MC_NARR, expected=X(5, 0.0, "reject", rejection_clause="3.3"), requirements=MC_REQ + ["REQ-B-002"])
 
 
 def s_mc_after_delay_shared_limit(d, rng):

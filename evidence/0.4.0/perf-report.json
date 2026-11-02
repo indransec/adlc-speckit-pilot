@@ -1,0 +1,16 @@
+{
+  "release": "0.4.0",
+  "generated_at": "2026-11-02T17:23:35+00:00",
+  "llm_mode": "mock",
+  "claims": 30,
+  "concurrency": 10,
+  "load_factor_vs_peak": 3.0,
+  "simulated_model_latency_ms": 400,
+  "p95_package_latency_s": 12.51,
+  "max_package_latency_s": 12.98,
+  "errors": 0,
+  "throughput_claims_per_min": 48.9,
+  "wall_s": 36.8,
+  "slo_seconds": 600,
+  "passed": true
+}

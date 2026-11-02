@@ -146,7 +146,7 @@ Existing repository layout (plan.md "Source Code"): `agents/<agent>/src/`, `tool
 - [X] T048 [HUMAN: ailead] AI lead labels the 6 adversarial cases with `l2-grace`
 - [X] T049 Regenerate datasets with `make datasets` (golden + adversarial, versioned) after T047-T048 [AUTHORITY: `evals/datasets/**` edits need approval]
 - [X] T050 Add missed connection scenarios to `TRAFFIC_WEIGHTS` in `synthetic/scenarios.py` so `make perf` covers them [REQ-N-001, REQ-N-004]
-- [ ] T051 Traceability: map `REQ-F-032..039`, `REQ-B-012/013` verification methods in `scripts/build_traceability.py` if new methods need mapping; `make traceability` shows no unverified requirement
+- [X] T051 Traceability: map `REQ-F-032..039`, `REQ-B-012/013` verification methods in `scripts/build_traceability.py` if new methods need mapping; `make traceability` shows no unverified requirement
 
 ---
 
@@ -155,7 +155,7 @@ Existing repository layout (plan.md "Source Code"): `agents/<agent>/src/`, `tool
 - [X] T052 [P] Add `missed-connection` to `system.yaml` `scope` (not a routing key; approval prompt applies to `system.yaml`)
 - [X] T053 [P] Update `docs/rai/rai-card.md` and `docs/rai/transparency-notice.md` for the new claim type
 - [X] T054 [P] Update `README.md` claim types and quickstart pointer
-- [ ] T055 Run quickstart.md end to end; fix any mismatch
+- [X] T055 Run quickstart.md end to end; fix any mismatch
 
 ---
 
@@ -171,13 +171,13 @@ Existing repository layout (plan.md "Source Code"): `agents/<agent>/src/`, `tool
 
 ## Phase ADLC: Evidence and Gate Readiness (G3, G4)
 
-- [ ] TA01 `make test` green (unit + routing tests)
-- [ ] TA02 `make evals` meets every threshold in `evals/thresholds.yaml`, with all 4 missed connection metrics measured
-- [ ] TA03 `make perf` (3x peak, missed connection in the mix)
-- [ ] TA04 `make traceability`: no unverified requirement
+- [X] TA01 `make test` green (unit + routing tests)
+- [X] TA02 `make evals` meets every threshold in `evals/thresholds.yaml`, with all 4 missed connection metrics measured
+- [X] TA03 `make perf` (3x peak, missed connection in the mix)
+- [X] TA04 `make traceability`: no unverified requirement
 - [ ] TA05 Open the pull request `release/0.4.0` → `main` with CODEOWNERS reviewers
 - [ ] TA06 `uv run python -m scripts.adlc check G3`; `/speckit-adlc-gate G3` writes `briefs/G3.md`
-- [ ] TA07 RAI: fairness, PII, injection and red-team suites pass (in `make evals`); RAI card and transparency notice updated (T053)
+- [X] TA07 RAI: fairness, PII, injection and red-team suites pass (in `make evals`); RAI card and transparency notice updated (T053)
 - [ ] TA08 [HUMAN: compliance] Letter templates approved (T043)
 - [ ] TA09 `uv run python -m scripts.adlc check G4`; `/speckit-adlc-gate G4` writes `briefs/G4.md`
 
