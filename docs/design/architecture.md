@@ -41,3 +41,18 @@ See `routing-matrix.md` (source of truth for `agents/orchestrator/src/routing.py
 | Approval token (ADR-003) | Signed JWT, single use | `shared/hitl/approval_token.py` |
 | Workbench (ADR-004 stand-in) | Streamlit + FastAPI | `frontend/`, `backend/` |
 | Telemetry | OpenTelemetry/OpenInference -> Arize Phoenix (cost tracking with catalog prices); local span sink -> `llm_calls`, `tool_calls` | `shared/telemetry.py` |
+
+## Release 0.4.0: missed connection benefit (CARD-101, ADR-006, ADR-007)
+
+Same topology and routing; the new claim type flows through the existing agents.
+
+| Step | Change | Where decided |
+|---|---|---|
+| Intake | Claim type `missed_connection` (category delay); combined delay + missed connection stays one claim, lines tagged by benefit | code |
+| Document | Extracts every itinerary leg, journey direction and declared refund; completeness checklist for both legs | model extracts, code validates |
+| Verification | Inbound leg matched in code; booked connection vs minimum connection time from `reference/minimum-connection-times.yaml`; single-ticket check; inbound arrival delay and cause from TOOL-FLIGHT-STATUS (arrival fields) | code |
+| Coverage | Clause 3.7 eligibility, covered causes 3.2, exclusions 3.3 | model with clause retrieval, checked against code facts |
+| Assessment | Calculator section `missed_connection`: shared journey limit (3.6), offsets incl. unused-ticket refund (3.4), duplicates (7.2), all type A; reasonable class, non-essential, receipts as type B | code |
+| Orchestrator | Reads `journey_benefits` from the claims system and passes it to assessment; `routing.py` unchanged | code |
+| Routing | Unverified inbound delay → verification signal 0 → confidence ≤ 0.35 → row 6; short connection, self-transfer, excluded cause → rejection → row 5 | existing rules |
+| Communication | `missed_connection_*` letter templates (Compliance, G4) | templates |

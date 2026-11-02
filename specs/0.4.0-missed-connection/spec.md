@@ -46,7 +46,8 @@ the receipted amount and the claim routes straight through.
    missed connection clause and the claim routes straight through (row 1).
 2. **Given** the same claim with USD 150 already paid by the airline for the delay, **When** it is
    assessed, **Then** USD 150 is deducted as a type A compensation offset with the clause cited, and
-   the claim routes to L1 (row 2).
+   the claim routes to L1 then L2 (row 4: reduction 47% of claimed is above 25%). *(Corrected at G2
+   planning, 2026-11-02: was "L1 (row 2)"; see plan.md "Rework of Earlier Gates".)*
 3. **Given** a Premier-plan claim of USD 1,300 with receipts, **When** it is assessed, **Then** the
    payable amount is capped at the Premier limit of USD 1,000 per journey as a type A deduction
    (USD 300) and routing follows the matrix: type A only, so L1 (row 2).

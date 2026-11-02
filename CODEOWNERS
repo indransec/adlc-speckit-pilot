@@ -4,6 +4,8 @@
 # Routing rules and authority limits are a business control
 /agents/orchestrator/src/routing.py   @claims-business-owner @ai-lead
 /evals/thresholds.yaml                @claims-business-owner @ai-lead
+# Minimum connection times decide missed connection eligibility (ADR-006)
+/reference/                           @claims-business-owner @ai-lead
 # Tool contracts and permissions need security
 /tools/                    @security-architect
 /docs/design/tool-permission-matrix.yaml  @security-architect

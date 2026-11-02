@@ -12,7 +12,8 @@ tools:
     agents: [intake, orchestrator]
     access: create, update-status, read
     side_effects: claim record changes (no payment fields)
-    note: read added for linked-claim aggregation REQ-F-015 (decision D-07)
+    note: read added for linked-claim aggregation REQ-F-015 (decision D-07); read op journey_benefits
+      added at 0.4.0 for the journey shared limit and duplicate expenses, orchestrator code only (ADR-007)
   - id: TOOL-POLICY-WORDING
     agents: [coverage, assessment, communication]
     access: read
@@ -22,6 +23,7 @@ tools:
     agents: [verification]
     access: read
     side_effects: none
+    note: lookup output adds scheduled_arr, actual_arr, arrival_delay_minutes at 0.4.0 (missed connection inbound leg)
   - id: TOOL-DOCUMENT-STORE
     agents: [document]
     access: read, write-extracted-fields
