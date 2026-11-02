@@ -20,7 +20,10 @@ from synthetic.scenarios import SCENARIOS, TRAFFIC_WEIGHTS, build_case, build_sp
 GOLDEN = ROOT / "evals" / "datasets" / "golden" / "claims_cases.jsonl"
 ADVERSARIAL_E2E = ROOT / "evals" / "datasets" / "adversarial" / "e2e_cases.jsonl"
 DATASET_SEED = 2026
-ADVERSARIAL_SCENARIOS = {"injection": "ADV-001", "pii_request": "ADV-004"}
+ADVERSARIAL_SCENARIOS = {"injection": "ADV-001", "pii_request": "ADV-004",
+                         # 0.4.0 missed connection (T046); used once labelled and added to SCENARIOS (T048)
+                         "mc_injection": "ADV-005", "mc_altered_times": "ADV-006",
+                         "mc_upgraded_class": "ADV-007", "mc_ambiguous": "ADV-008"}
 
 
 def reset_data_dir() -> None:
