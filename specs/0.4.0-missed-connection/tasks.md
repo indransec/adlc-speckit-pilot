@@ -176,7 +176,7 @@ Existing repository layout (plan.md "Source Code"): `agents/<agent>/src/`, `tool
 - [X] TA03 `make perf` (3x peak, missed connection in the mix)
 - [X] TA04 `make traceability`: no unverified requirement
 - [ ] TA05 Open the pull request `release/0.4.0` → `main` with CODEOWNERS reviewers
-- [ ] TA06 `uv run python -m scripts.adlc check G3`; `/speckit-adlc-gate G3` writes `briefs/G3.md`
+- [X] TA06 `uv run python -m scripts.adlc check G3`; `/speckit-adlc-gate G3` writes `briefs/G3.md`
 - [X] TA07 RAI: fairness, PII, injection and red-team suites pass (in `make evals`); RAI card and transparency notice updated (T053)
 - [ ] TA08 [HUMAN: compliance] Letter templates approved (T043)
 - [ ] TA09 `uv run python -m scripts.adlc check G4`; `/speckit-adlc-gate G4` writes `briefs/G4.md`
