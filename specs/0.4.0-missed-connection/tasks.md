@@ -179,7 +179,7 @@ Existing repository layout (plan.md "Source Code"): `agents/<agent>/src/`, `tool
 - [X] TA06 `uv run python -m scripts.adlc check G3`; `/speckit-adlc-gate G3` writes `briefs/G3.md`
 - [X] TA07 RAI: fairness, PII, injection and red-team suites pass (in `make evals`); RAI card and transparency notice updated (T053)
 - [X] TA08 [HUMAN: compliance] Letter templates approved (T043)
-- [ ] TA09 `uv run python -m scripts.adlc check G4`; `/speckit-adlc-gate G4` writes `briefs/G4.md`
+- [X] TA09 `uv run python -m scripts.adlc check G4`; `/speckit-adlc-gate G4` writes `briefs/G4.md`
 
 **Checkpoint**: G3 is signed by AI lead + Product owner; G4 by RAI/Risk + Compliance.
 
