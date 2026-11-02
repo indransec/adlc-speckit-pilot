@@ -1,7 +1,7 @@
 # Functional requirements - what the system must do
 requirements:
   - id: REQ-F-001
-    text: Register each submitted claim, assign a claim ID and classify it as delay, baggage or both within 5 minutes.
+    text: Register each submitted claim, assign a claim ID and classify it as delay, baggage, missed connection or a combination within 5 minutes.
     verification: [eval:intake-classification, test:intake]
   - id: REQ-F-002
     text: Send an acknowledgement with claim ID and next steps to the customer.
@@ -50,4 +50,29 @@ requirements:
     verification: [test:settlement]
   - id: REQ-F-031
     text: Send the decision letter with breakdown, clause citations for any deduction, and appeal rights.
+    verification: [eval:letters, rai:letter-review]
+  # Release 0.4.0: missed connection benefit (CARD-101, specs/0.4.0-missed-connection/spec.md)
+  - id: REQ-F-032
+    text: For a missed connection claim, check completeness - bookings or boarding passes for the inbound and onward legs, and receipts for rebooking, accommodation and meals - and request what is missing.
+    verification: [eval:document-completeness, test:document-chasing]
+  - id: REQ-F-033
+    text: Extract every itinerary leg and identify the inbound leg that arrives at the onward leg's departure airport.
+    verification: [eval:document-extraction, eval:edge-cases]
+  - id: REQ-F-034
+    text: Verify the inbound leg's actual arrival and delay cause with the flight status source; route to investigation when source and documents disagree.
+    verification: [eval:verification]
+  - id: REQ-F-035
+    text: Check the booked connection time against the connection airport's published minimum connection time (60 minutes when none is published) and record the value used and its source.
+    verification: [eval:coverage, test:calculation]
+  - id: REQ-F-036
+    text: Assess missed connection eligibility against the missed connection clause, covered causes (3.2), delay exclusions (3.3), late check-in, and single-ticket booking (self-transfer on separate tickets is not covered).
+    verification: [eval:coverage]
+  - id: REQ-F-037
+    text: Calculate the missed connection payable amount - reasonable ticket, accommodation and meal costs, the plan's travel delay limit per journey (USD 500 Standard, USD 1,000 Premier), compensation offset (3.4), receipt rule (6.1) and currency conversion (6.2).
+    verification: [test:calculation, eval:amount-accuracy]
+  - id: REQ-F-038
+    text: Across travel delay and missed connection claims for the same journey, deduct any expense already paid and cap both benefits together at one travel delay limit per journey.
+    verification: [test:calculation, eval:edge-cases]
+  - id: REQ-F-039
+    text: Send the missed connection decision letter from the approved template with breakdown, clause citations and appeal rights.
     verification: [eval:letters, rai:letter-review]

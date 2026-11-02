@@ -30,3 +30,19 @@ kpis:
     baseline: "[current]"
     target: "<= baseline"
     source: complaints log
+  # Release 0.4.0: missed connection benefit (CARD-101); figures from the card, Business owner confirms at G1
+  - id: KPI-07
+    name: Missed-connection complaints per month
+    baseline: "[40]"
+    target: "[10]"
+    source: complaints log
+  - id: KPI-08
+    name: Goodwill payments outside the claims system (missed connection)
+    baseline: "[USD 12,000 / month]"
+    target: "[0]"
+    source: finance ledger
+  - id: KPI-09
+    name: Decision time for a missed-connection claim
+    baseline: "[9 days, manual]"
+    target: "[2 days]"
+    source: claims system timestamps

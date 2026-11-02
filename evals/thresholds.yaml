@@ -24,3 +24,8 @@ thresholds:
   counterfactual_fairness_parity: {min: 0.95}
   audit_record_complete: {min: 1.0}
   step_and_cost_budget_respected: {min: 1.0}
+  # Added at release 0.4.0 for the missed connection benefit (CARD-101, REQ-F-033..038, REQ-B-012/013)
+  missed_connection_eligibility_accuracy: {min: 0.95}
+  connection_time_check_accuracy: {min: 1.0}
+  inbound_leg_attribution_accuracy: {min: 1.0}
+  duplicate_expense_paid_count: {max_count: 0}

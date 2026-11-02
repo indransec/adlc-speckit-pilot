@@ -22,8 +22,9 @@ from pathlib import Path
 from shared.config import ROOT
 
 RUNS = ROOT / "sim" / "runs"
+# usecase/: a governed repo's own intake record must not leak into a run, which starts from a blank intake
 SKIP = {".git", ".venv", "data", ".cache", "evidence", "__pycache__", ".pytest_cache", "node_modules", ".DS_Store",
-        ".env", ".idea", ".vscode"}
+        ".env", ".idea", ".vscode", "usecase"}
 GIT = ["git", "-c", "user.name=ADLC Simulator", "-c", "user.email=simulator@claims.sim", "-c", "commit.gpgsign=false"]
 START_DAY = -60  # G0 intake, relative to day 0 (shadow start)
 

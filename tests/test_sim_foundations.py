@@ -72,9 +72,12 @@ def test_risk_tier_rules():
 def test_run_is_isolated_from_the_repo(sim_run):
     ws = sim_run["env"]["PROJECT_ROOT"]
     assert os.path.isdir(os.path.join(ws, ".git")) and not os.path.exists(os.path.join(ws, "sim", "runs"))
+    repo_record = os.path.join(os.path.dirname(os.path.dirname(__file__)), "usecase", f"{UC}.yaml")
+    before = open(repo_record, "rb").read() if os.path.exists(repo_record) else None  # governed repo has its own
     usecase.save(usecase.template(), by="po")
     assert os.path.exists(os.path.join(ws, "usecase", f"{UC}.yaml"))
-    assert not os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "usecase", f"{UC}.yaml"))
+    after = open(repo_record, "rb").read() if os.path.exists(repo_record) else None
+    assert before == after                                            # the run never writes into the repo
 
 
 def test_g0_sign_off_freezes_evidence_and_moves_the_board(sim_run):

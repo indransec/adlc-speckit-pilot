@@ -33,3 +33,10 @@ requirements:
   - id: REQ-B-011
     text: When the agent cannot reach a judgement (confidence < 0.7, conflicting documents, ambiguous wording) it routes to L1 with the reason.
     verification: [eval:routing]
+  # Release 0.4.0: missed connection benefit (CARD-101)
+  - id: REQ-B-012
+    text: The agent never pays a missed connection claim unless the inbound delay is verified by the flight status source and the booked connection met the minimum connection time; otherwise it routes to a person.
+    verification: [test:routing, eval:routing]
+  - id: REQ-B-013
+    text: The agent never attributes a delay to a leg other than the inbound leg of the missed connection; when legs are ambiguous it routes to L1 with the reason.
+    verification: [eval:edge-cases]
