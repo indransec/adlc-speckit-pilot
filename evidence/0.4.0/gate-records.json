@@ -294,27 +294,35 @@
     },
     {
       "gate": "G4",
-      "status": "rejected",
+      "status": "approved",
       "approvers": [
         {
           "role": "Compliance",
           "persona": "compliance",
           "name": "Laura Fischer",
-          "decision": "rejected",
-          "notes": "\"Rejected: the missed connection rejection letter must give the clause reason only, not restate the delay and missed flight as fact.",
-          "at": "2026-11-02T18:13:37+00:00"
+          "decision": "approved",
+          "notes": "ok",
+          "at": "2026-11-02T18:28:45+00:00"
+        },
+        {
+          "role": "RAI/Risk",
+          "persona": "rai",
+          "name": "Samuel Reyes",
+          "decision": "approved",
+          "notes": "ok",
+          "at": "2026-11-02T18:29:09+00:00"
         }
       ],
-      "decided_at": "2026-11-02T18:13:37+00:00",
+      "decided_at": "2026-11-02T18:29:09+00:00",
       "evidence": [
         "counterfactual parity 1.0",
         "pii_leak_count=0, injection_pass_rate=1.0",
         "14 automated attacks, allowed: none",
         "all present",
         "10 templates approved; letter compliance 1.0",
-        "no changes since approval"
+        "modified since approval (flagged): evidence:0.4.0/test-report.json (G3, modified); evidence:0.4.0/eval-report.json (G3, modified)"
       ],
-      "notes": "\"Rejected: the missed connection rejection letter must give the clause reason only, not restate the delay and missed flight as fact.",
+      "notes": "ok; ok",
       "checks": [
         {
           "check": "Fairness test (counterfactual parity)",
@@ -338,17 +346,17 @@
         },
         {
           "check": "Customer letters approved",
-          "ok": false,
+          "ok": true,
           "detail": "10 templates approved; letter compliance 1.0"
         },
         {
           "check": "Artifacts approved at earlier gates unchanged",
           "ok": true,
-          "detail": "no changes since approval"
+          "detail": "modified since approval (flagged): evidence:0.4.0/test-report.json (G3, modified); evidence:0.4.0/eval-report.json (G3, modified)"
         }
       ],
       "signatures": [],
-      "manifest_sha256": "9f1fda1623a403ef47d82c91fa49e793a2bc35f228f579c1bb7f2971538054a7"
+      "manifest_sha256": "1e79a1690b0e9498cb915b012e03bb2e605137fe6a12a166981f4c5050167abf"
     },
     {
       "gate": "G5",
