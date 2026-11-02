@@ -11,14 +11,18 @@ import sys
 
 # Shell commands that change gate state or record a person's decision.
 BLOCKED_COMMANDS = [
-    (r"adlc\.py\b.*\b(sign|approve|reset-gates|simulate)\b", "scripts/adlc.py sign/approve/reset-gates/simulate"),
+    (r"(adlc\.py|scripts\.adlc)\b.*\b(sign|approve|reset-gates|simulate)\b", "scripts/adlc.py sign/approve/reset-gates/simulate"),
     (r"\bmake\b.*\bsimulate\b", "make simulate (approves every gate with simulated approvers)"),
     (r"/lifecycle/gates/[^\s'\"]*/(sign|approve)\b", "POST /lifecycle/gates/*/sign|approve"),
     (r"/lifecycle/gates/reset\b", "POST /lifecycle/gates/reset"),
-    (r"/usecases/[^\s'\"]+/(submit|classification/confirm)\b", "use-case submit / classification confirm (persona decisions)"),
+    (r"/usecases/[^\s'\"]+/(submit|classification/confirm|g1)\b(?!/)","use-case submit / classification confirm / G1 confirmation (persona decisions)"),
+    (r"usecase\.save_g1\s*\(", "G1 confirmation (Business owner decision)"),
+    (r"usecase\.save\s*\(.*\bby\s*=\s*['\"](?!claude['\"])", "saving the use-case record as a person (Claude saves drafts as by='claude')"),
     (r"/changes/[^\s'\"]+/decide\b", "change request decision (CAB)"),
     (r"lifecycle\.(sign|approve|reset_gates|simulate|sim_approvals)\s*\(", "direct lifecycle sign/approve/reset call"),
     (r"usecase\.(submit|confirm_classification)\s*\(", "direct use-case persona decision"),
+    (r"(?s)^(?=.*/usecases\b(?!/))(?=.*[\"']by[\"']\s*:\s*[\"'](?!claude[\"']))",
+     "saving the use-case record as a person via the API (Claude saves drafts as by='claude')"),
 ]
 
 EVIDENCE = re.compile(r"(^|/)evidence/")

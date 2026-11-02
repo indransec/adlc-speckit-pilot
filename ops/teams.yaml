@@ -43,6 +43,8 @@ personas:
   - {id: po, name: Arjun Rao, title: Product Owner, team: product-ai, roles: ["Product owner"]}
   - {id: ailead, name: Kenji Sato, title: AI Lead, team: product-ai, roles: ["AI lead"]}
   - {id: relmgr, name: Chris Novak, title: Release Manager, team: product-ai, roles: []}
+  # AI assistant: drafts records so the ledger shows who wrote them; holds no ADLC role, so it cannot sign
+  - {id: claude, name: Claude, title: AI assistant (drafts only), team: product-ai, roles: []}
   # on-call engineering
   - {id: ana, name: Ana Lima, title: AI Engineer, team: ai-oncall, roles: []}
   - {id: dev, name: Dev Patel, title: AI Engineer, team: ai-oncall, roles: []}

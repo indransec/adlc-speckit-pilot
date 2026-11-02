@@ -3,8 +3,8 @@ schema_version: "1.0"
 preset:
   id: "adlc"
   name: "ADLC governed delivery"
-  version: "0.1.0"
-  description: "Appends ADLC gate sections (G1 requirements, G2 design record, G3/G4 evidence tasks) to the core spec, plan and tasks templates, and adds a gate-brief template for human signers"
+  version: "0.2.0"
+  description: "ADLC gate sections in the spec, plan and tasks templates, a gate-brief template, /speckit-adlc-* commands, and a previous-gate check in front of the Spec Kit stage commands"
   author: "adlc-speckit-pilot"
   license: "MIT"
 
@@ -35,6 +35,33 @@ provides:
       name: "gate-brief-template"
       file: "templates/gate-brief-template.md"
       description: "Brief for the people who sign a gate: what to review, engine check results, decisions asked"
+
+    # ADLC commands (installed as Claude skills /speckit-adlc-*)
+    - type: "command"
+      name: "adlc.intake"
+      file: "commands/adlc.intake.md"
+      description: "Draft the G0 intake record and release feature folder from a use-case card"
+    - type: "command"
+      name: "adlc.gate"
+      file: "commands/adlc.gate.md"
+      description: "Run a gate's checks and write the brief for its signers; never signs"
+    - type: "command"
+      name: "adlc.status"
+      file: "commands/adlc.status.md"
+      description: "Where the release is in G0-G7, what blocks the open gate, next step"
+    - type: "command"
+      name: "adlc.rework"
+      file: "commands/adlc.rework.md"
+      description: "Change to an approved artifact: find its gate, show drift, write a rework note"
+
+    # Previous-gate check in front of the Spec Kit stage commands
+    - {type: "command", name: "speckit.specify", file: "commands/require-g0.md", strategy: "prepend", description: "Requires G0 approved"}
+    - {type: "command", name: "speckit.clarify", file: "commands/require-g0.md", strategy: "prepend", description: "Requires G0 approved"}
+    - {type: "command", name: "speckit.checklist", file: "commands/require-g0.md", strategy: "prepend", description: "Requires G0 approved"}
+    - {type: "command", name: "speckit.plan", file: "commands/require-g1.md", strategy: "prepend", description: "Requires G1 approved"}
+    - {type: "command", name: "speckit.tasks", file: "commands/require-g2.md", strategy: "prepend", description: "Requires G2 approved"}
+    - {type: "command", name: "speckit.implement", file: "commands/require-g2.md", strategy: "prepend", description: "Requires G2 approved"}
+    - {type: "command", name: "speckit.converge", file: "commands/require-g2.md", strategy: "prepend", description: "Requires G2 approved"}
 
 tags:
   - "adlc"
