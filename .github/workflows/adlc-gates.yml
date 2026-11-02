@@ -1,0 +1,17 @@
+name: adlc-gates
+# Pull requests into main must carry an approved G3 (Test & evals) for the release in system.yaml.
+# Added 2026-11-02 after PR #1 (release 0.4.0) was merged before G3 was signed. G4 / G5 are reported
+# only: G4 reviews letters that live in the same PR, and G5 is enforced by the release workflow.
+# Make this a required status check in the branch protection rules for main.
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: G3 approved by people (from the engine's gate records)
+        run: python scripts/gate_status.py --require G3 --show G4 --show G5
