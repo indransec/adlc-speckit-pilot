@@ -83,10 +83,69 @@
     },
     {
       "gate": "G1",
-      "status": "pending",
-      "approvers": [],
-      "decided_at": null,
-      "evidence": []
+      "status": "approved",
+      "approvers": [
+        {
+          "role": "Business owner (Head of Claims)",
+          "persona": "hoc",
+          "name": "Helen Ortiz",
+          "decision": "approved",
+          "notes": "ok",
+          "at": "2026-11-02T13:04:14+00:00"
+        },
+        {
+          "role": "AI lead",
+          "persona": "ailead",
+          "name": "Kenji Sato",
+          "decision": "approved",
+          "notes": "ok",
+          "at": "2026-11-02T13:04:30+00:00"
+        }
+      ],
+      "decided_at": "2026-11-02T13:04:30+00:00",
+      "evidence": [
+        "45 requirements, all with verification methods",
+        "routing.py constants match system.yaml; HITL points defined",
+        "9 KPIs with targets (baselines '[...]' are placeholders to confirm)",
+        "27 thresholds incl. zero-tolerance controls",
+        "STP \u2264 USD 1,000, significance 25%, confidence 0.7; 9 KPI targets; confirmed by Helen Ortiz",
+        "no changes since approval"
+      ],
+      "signatures": [],
+      "notes": "ok; ok",
+      "checks": [
+        {
+          "check": "Requirements with IDs and verification methods",
+          "ok": true,
+          "detail": "45 requirements, all with verification methods"
+        },
+        {
+          "check": "Autonomy level and HITL points (routing matrix)",
+          "ok": true,
+          "detail": "routing.py constants match system.yaml; HITL points defined"
+        },
+        {
+          "check": "KPI baseline and targets",
+          "ok": true,
+          "detail": "9 KPIs with targets (baselines '[...]' are placeholders to confirm)"
+        },
+        {
+          "check": "Eval thresholds agreed",
+          "ok": true,
+          "detail": "27 thresholds incl. zero-tolerance controls"
+        },
+        {
+          "check": "Authority limits, KPI targets and thresholds confirmed by the Business owner",
+          "ok": true,
+          "detail": "STP \u2264 USD 1,000, significance 25%, confidence 0.7; 9 KPI targets; confirmed by Helen Ortiz"
+        },
+        {
+          "check": "Artifacts approved at earlier gates unchanged",
+          "ok": true,
+          "detail": "no changes since approval"
+        }
+      ],
+      "manifest_sha256": "b9e351e30054c97c128ef06e901802db3d96c9606d7151856ab7b0165ddec848"
     },
     {
       "gate": "G2",
