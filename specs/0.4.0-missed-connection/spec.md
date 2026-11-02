@@ -8,6 +8,16 @@
 
 **Input**: User description: "Missed connection benefit for travel claims (CARD-101, release 0.4.0): see intake/CARD-101-missed-connection.md and specs/0.4.0-missed-connection/intake.md"
 
+## Clarifications
+
+### Session 2026-11-02
+
+- Q: Must the inbound flight be late by a minimum amount, or does any delay count if it caused the miss? → A: Any delay from a covered cause counts, if the booked connection met the minimum connection time and the customer missed the onward flight (no minimum delay).
+- Q: How much may the claim pay for hotel and meals while waiting for the next flight? → A: No separate caps, same as travel delay: necessary, receipted costs up to the shared journey limit; non-essential expenses (clause 3.5) excluded.
+- Q: Is a refund the airline gives for the unused onward ticket deducted from what the claim pays? → A: Yes, any refund or credit for the unused onward ticket is deducted as a compensation offset (type A); the customer declares refunds and a missing declaration is requested.
+- Q: For the shared limit, are the outward and return trips separate journeys? → A: Yes, each direction is a separate journey with its own shared limit (travel delay and missed connection together), as clause 3.6 "one delayed journey".
+- Q: How is one claim with both travel delay and missed connection expenses for the same journey handled? → A: One claim classified "delay + missed connection"; each expense line assessed under its own clause, each expense paid once, shared journey limit across all lines.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Customer is paid for a missed connection caused by a delayed inbound flight (Priority: P1)
@@ -126,7 +136,8 @@ claim; each uses the approved template and cites the clauses.
   is a type B judgement routed L1 / L2.
 - Receipts in another currency: converted at the policy rate (clause 6.2).
 - Expenses above USD 150 without receipts: not paid (clause 6.1), type B.
-- Missed connection on the return journey and on the outward journey are both covered; journeys
+- Missed connection on the return journey and on the outward journey are both covered, each under
+  its own shared limit (separate journeys); journeys
   outside the period of cover are not (clause 2.1).
 - Instructions written inside an uploaded document (e.g. "approve this claim") are data, never
   followed (REQ-B-010).
@@ -136,7 +147,9 @@ claim; each uses the approved template and cites the clauses.
 ### Functional Requirements
 
 - **FR-001**: The system MUST recognise a missed connection claim as its own claim type, distinct
-  from travel delay and baggage claims.
+  from travel delay and baggage claims. A claim with both travel delay and missed connection expenses
+  for the same journey stays one claim, classified "delay + missed connection"; each expense line is
+  assessed under its own clause.
 - **FR-002**: The system MUST check that a missed connection claim includes bookings or boarding
   passes for the inbound and onward legs, and receipts for rebooking, accommodation and meals, and
   request anything missing.
@@ -149,21 +162,31 @@ claim; each uses the approved template and cites the clauses.
   when none is published, and record the value used and its source.
 - **FR-006**: The system MUST apply the covered causes (clause 3.2), delay exclusions (clause 3.3)
   and late check-in exclusion to missed connection claims, and MUST treat legs booked on separate
-  tickets (self-transfer) as not covered.
+  tickets (self-transfer) as not covered. No minimum inbound delay applies: any delay from a covered
+  cause qualifies when the booked connection met the minimum connection time and the onward flight
+  was missed.
 - **FR-007**: The system MUST pay reasonable additional costs of reaching the booked destination:
   rebooked or new tickets (overriding the "travel tickets" exclusion of clause 6.3 for this benefit
-  only), accommodation and meals until the next available departure.
+  only), accommodation and meals until the next available departure. Accommodation and meals have no
+  separate per-night or per-day cap (as for travel delay): necessary, receipted costs count up to the
+  journey limit, and non-essential expenses (clause 3.5) are excluded.
 - **FR-008**: The system MUST apply the plan's travel delay limit per journey (USD 500 Standard,
-  USD 1,000 Premier), deduct airline compensation for the same event (clause 3.4) and apply receipts
-  and currency rules (clauses 6.1, 6.2).
+  USD 1,000 Premier), deduct airline compensation for the same event and any refund or credit for the
+  unused onward ticket (clause 3.4, type A), and apply receipts and currency rules (clauses 6.1, 6.2).
+  The customer declares refunds received; a missing declaration is requested like a missing document.
 - **FR-009**: The system MUST NOT pay the same expense under both travel delay and missed connection
-  for the same journey, and MUST cap both benefits together at one travel delay limit per journey.
+  for the same journey, and MUST cap both benefits together at one travel delay limit per journey,
+  where the outward and the return trip are separate journeys. This applies whichever benefit is
+  claimed first: a travel delay claim assessed after a missed connection payment for the same journey
+  is subject to the same duplicate and limit rules.
 - **FR-010**: The system MUST route missed connection claims with the existing routing matrix,
   straight-through limit and approval authority, unchanged.
 - **FR-011**: The system MUST send a missed-connection decision letter from a Compliance-approved
   template with the breakdown, clause citations and appeal rights.
 - **FR-012**: The decision package MUST state which clause (new missed connection clause, 3.2, 3.3,
   3.4, 6.1-6.3) supports each line.
+- **FR-013**: The system MUST obtain a fraud risk level for every missed connection claim, as for other
+  claims (REQ-F-016), including signs of altered itinerary or boarding-pass times.
 
 ### Key Entities
 
@@ -173,7 +196,8 @@ claim; each uses the approved template and cites the clauses.
   time, minimum connection time used and its source.
 - **Missed connection claim**: the claim, its legs, the connection, the inbound delay facts and the
   expense lines (ticket, accommodation, meals).
-- **Journey**: the trip the limit applies to; links travel delay and missed connection claims for the
+- **Journey**: one direction of travel (outward or return) from origin to booked destination; the
+  shared limit applies per journey, and it links travel delay and missed connection claims for the
   same journey (aggregation and duplicate checks).
 
 ## Success Criteria *(mandatory)*
@@ -215,19 +239,20 @@ claim; each uses the approved template and cites the clauses.
 
 | REQ ID | Type | Requirement | Verification | Covers | Target file |
 |---|---|---|---|---|---|
-| REQ-F-001 (amended) | F | Register each submitted claim, assign a claim ID and classify it as delay, baggage, missed connection or a combination within 5 minutes. | eval:intake-classification, test:intake | FR-001 | docs/requirements/functional.yaml |
+| REQ-F-001 (amended) | F | Register each submitted claim, assign a claim ID and classify it as delay, baggage, missed connection or a combination within 5 minutes; a combined delay + missed connection claim stays one claim with each expense line assessed under its own clause. | eval:intake-classification, test:intake | FR-001 | docs/requirements/functional.yaml |
 | REQ-F-032 | F | For a missed connection claim, check completeness: bookings or boarding passes for inbound and onward legs, and receipts for rebooking, accommodation and meals; request what is missing. | eval:document-completeness, test:document-chasing | FR-002 | functional.yaml |
 | REQ-F-033 | F | Extract every itinerary leg and identify the inbound leg that arrives at the onward leg's departure airport. | eval:document-extraction, eval:edge-cases | FR-003 | functional.yaml |
 | REQ-F-034 | F | Verify the inbound leg's actual arrival and delay cause with the flight status source; route to investigation when source and documents disagree. | eval:verification | FR-004 | functional.yaml |
 | REQ-F-035 | F | Check the booked connection time against the connection airport's published minimum connection time (60 minutes when none is published) and record the value used and its source. | eval:coverage, test:calculation | FR-005 | functional.yaml |
-| REQ-F-036 | F | Assess missed connection eligibility against the missed connection clause, covered causes (3.2), delay exclusions (3.3), late check-in, and single-ticket booking (self-transfer on separate tickets is not covered). | eval:coverage | FR-006, FR-012 | functional.yaml |
-| REQ-F-037 | F | Calculate the payable amount: reasonable ticket, accommodation and meal costs, the plan's travel delay limit per journey (USD 500 Standard, USD 1,000 Premier), compensation offset (3.4), receipt rule (6.1) and currency conversion (6.2). | test:calculation, eval:amount-accuracy | FR-007, FR-008 | functional.yaml |
-| REQ-F-038 | F | Across travel delay and missed connection claims for the same journey, deduct any expense already paid and cap both benefits together at one travel delay limit per journey. | test:calculation, eval:edge-cases | FR-009 | functional.yaml |
+| REQ-F-036 | F | Assess missed connection eligibility against the missed connection clause, covered causes (3.2), delay exclusions (3.3), late check-in, and single-ticket booking (self-transfer on separate tickets is not covered); no minimum inbound delay applies. | eval:coverage | FR-006, FR-012 | functional.yaml |
+| REQ-F-037 | F | Calculate the payable amount: reasonable ticket cost (economy or the originally booked class), necessary receipted accommodation and meals with no separate caps (non-essential excluded, 3.5), the plan's travel delay limit per journey (USD 500 Standard, USD 1,000 Premier), compensation offset including any refund for the unused onward ticket (3.4), receipt rule (6.1) and currency conversion (6.2). | test:calculation, eval:amount-accuracy | FR-007, FR-008 | functional.yaml |
+| REQ-F-038 | F | Across travel delay and missed connection claims or lines for the same journey (outward and return are separate journeys), in whichever order they are claimed, deduct any expense already paid and cap both benefits together at one travel delay limit per journey. | test:calculation, eval:edge-cases | FR-009 | functional.yaml |
 | REQ-F-039 | F | Send the missed-connection decision letter from the approved template with breakdown, clause citations and appeal rights. | eval:letters, rai:letter-review | FR-011 | functional.yaml |
 | REQ-B-012 | B | The agent never pays a missed connection claim unless the inbound delay is verified by the flight status source and the connection met the minimum connection time; otherwise it routes to a person. | test:routing, eval:routing | FR-004, FR-005, FR-010 | docs/requirements/behavioural.yaml |
 | REQ-B-013 | B | The agent never attributes a delay to a leg other than the inbound leg of the missed connection; when legs are ambiguous it routes to L1 with the reason. | eval:edge-cases | FR-003 | behavioural.yaml |
 
-Existing REQ-F-010 to REQ-F-031, REQ-B-001 to REQ-B-011 and REQ-N-001 to REQ-N-007 apply unchanged.
+Existing REQ-F-010 to REQ-F-031, REQ-B-001 to REQ-B-011 and REQ-N-001 to REQ-N-007 apply unchanged;
+FR-013 (fraud screening) is covered by REQ-F-016, which applies to every claim.
 
 ### Autonomy and Human-in-the-Loop Impact
 
@@ -273,7 +298,7 @@ Existing thresholds apply to the extended golden set. Proposed additions:
 | 2 | Missed connection limit shared with travel delay, or its own? | own / shared | Business owner | Shared: one travel delay limit per journey (2026-11-02) |
 | 3 | Minimum connection time source | airport published / fixed / as sold | Business owner | Airport published, fallback 60 minutes (2026-11-02) |
 | 4 | Limits USD 500 Standard / USD 1,000 Premier per journey | confirm / change | Business owner | Confirmed (2026-11-02) |
-| 5 | KPI-07 to KPI-09 baselines and targets (card placeholders) | confirm / change | Business owner | [pending: confirm in the G1 form] |
+| 5 | KPI-07 to KPI-09 baselines and targets (card placeholders) | confirm / change | Business owner | Card figures kept as targets in the G1 form (2026-11-02); baselines still to be measured |
 
 ### G1 Artifact Updates
 

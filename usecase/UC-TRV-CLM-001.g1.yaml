@@ -1,0 +1,21 @@
+stp_limit_usd: 1000.0
+significance_net_pct: 25.0
+confidence_cutoff: 0.7
+hitl_points:
+- L1-approval
+- L1-L2-approval
+- investigation
+- siu-referral
+kpi_targets:
+  KPI-01: -40%
+  KPI-02: 15-25% (conservative MVP routing)
+  KPI-03: -30%
+  KPI-04: '>= baseline'
+  KPI-05: < 15%
+  KPI-06: <= baseline
+  KPI-07: '[10]'
+  KPI-08: '[0]'
+  KPI-09: '[2 days]'
+thresholds_acknowledged: true
+slos_acknowledged: true
+confirmed_by: hoc
