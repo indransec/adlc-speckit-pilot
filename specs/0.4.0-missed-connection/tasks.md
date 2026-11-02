@@ -42,13 +42,13 @@ Existing repository layout (plan.md "Source Code"): `agents/<agent>/src/`, `tool
 
 ### Implementation
 
-- [ ] T008 Add `scheduled_arr`, `actual_arr` to the `flights` table and `journey_direction`, `itinerary_json`, `refund_declared_usd` to the `claims` table in `shared/db.py` (data-model.md: `journey_direction` "`outward` | `return`"; `refund_declared_usd` "default null")
+- [ ] T008 Add `scheduled_arr`, `actual_arr` to the `flights` table and `journey_direction`, `itinerary_json`, `refund_declared_usd` to the `claims` table in `shared/db.py` (data-model.md: `journey_direction` "`outward` | `return`"; `refund_declared_usd` "default null"; for `missed_connection`, `flight_no` / `flight_date` = "the **onward** flight the customer missed")
 - [ ] T009 Generate arrival times for synthetic flights (actual arrival = scheduled + delay) in `synthetic/generate.py` / `synthetic/materialize.py`
-- [ ] T010 [P] Extend `tools/flight_status/impl.py` `lookup` output and `tools/flight_status/tool.yaml` output schema with `scheduled_arr`, `actual_arr`, `arrival_delay_minutes` (contracts/tool-contracts.md) [REQ-F-034]
-- [ ] T011 [P] Add read operation `journey_benefits` to `tools/claims_system/impl.py` (`OPERATIONS[...] = "read"`) and `tools/claims_system/tool.yaml` (contracts/tool-contracts.md) [REQ-F-038, ADR-007]
+- [ ] T010 [P] Extend `tools/flight_status/impl.py` `lookup` output and `tools/flight_status/tool.yaml` output schema with `scheduled_arr`, `actual_arr`, `arrival_delay_minutes` (contracts/tool-contracts.md) (Security reviews the PR: CODEOWNERS `/tools/`) [REQ-F-034]
+- [ ] T011 [P] Add read operation `journey_benefits` to `tools/claims_system/impl.py` (`OPERATIONS[...] = "read"`) and `tools/claims_system/tool.yaml` (contracts/tool-contracts.md) (Security reviews the PR: CODEOWNERS `/tools/`) [REQ-F-038, ADR-007]
 - [ ] T012 [P] New module `agents/verification/src/connection.py`: `load_mct()` from `reference/minimum-connection-times.yaml`, `match_inbound(legs, onward)` and `check_connection(...)` returning the Connection object of data-model.md (code only, no model) [REQ-F-033, REQ-F-035, REQ-B-013]
 - [ ] T013 Add claim type `missed_connection` (category `delay`) to `agents/intake/src/agent.py` (`CATEGORY`, `claim_type` Literal and description, heuristic) [REQ-F-001]
-- [ ] T014 Document agent: `CHECKLIST["missed_connection"]` (booking or boarding pass for each leg, receipts, refund declaration) and extraction of `legs[]`, `journey_direction`, `refund_declared_usd` in `agents/document/src/agent.py` and `parsing.py`; booking references redacted in logs [REQ-F-032, REQ-F-033]
+- [ ] T014 Document agent: `CHECKLIST["missed_connection"]` (booking or boarding pass for each leg, receipts, refund declaration) and extraction of `legs[]`, `journey_direction`, `refund_declared_usd` in `agents/document/src/agent.py` and `parsing.py`; facts `flight_no` / `flight_date` set to the onward flight; booking references redacted in logs [REQ-F-032, REQ-F-033]
 - [ ] T015 Run `make test` and `make validate`; T005-T007 pass
 
 **Checkpoint**: tools, data and claim type ready.
@@ -63,9 +63,9 @@ Existing repository layout (plan.md "Source Code"): `agents/<agent>/src/`, `tool
 
 ### Tests first
 
-- [ ] T016 [P] [US1] Calculator tests for section `missed_connection`: receipted ticket/hotel/meals; plan limit (USD 500 / USD 1,000) clause 3.6 type A; compensation and unused-ticket refund offset 3.4 type A; ticket above economy or booked class type B; non-essential 3.5 type B; no 6.3 deduction on ticket lines, in `agents/assessment/tests/test_calculator_missed_connection.py` [REQ-F-037]
-- [ ] T017 [P] [US1] Verification tests: inbound arrival delay and cause verified → `inbound_delay_verified`, `connection_time_ok`, `single_ticket` set, in `agents/verification/tests/test_missed_connection.py` (create `tests/` dir) [REQ-F-034, REQ-F-035]
-- [ ] T018 [P] [US1] Scenarios `mc_stp`, `mc_offset`, `mc_over_limit` in `synthetic/scenarios.py` with proposed `expected` (rows 1, 4, 2 per quickstart.md) and `requirements` lists; not yet in `SCENARIOS` until labelled (T047) [REQ-F-032..037]
+- [ ] T016 [P] [US1] Calculator tests for section `missed_connection`: receipted ticket/hotel/meals; plan limit (USD 500 / USD 1,000) clause 3.6 type A; compensation and unused-ticket refund offset 3.4 type A; ticket above economy or booked class type B; non-essential 3.5 type B; no 6.3 deduction on ticket lines; expense over USD 150 without receipt → 6.1 type B; EUR receipt converted at the policy rate → 6.2 type A; rebooked ticket costing no more than the original → nothing payable for the ticket, in `agents/assessment/tests/test_calculator_missed_connection.py` [REQ-F-037]
+- [ ] T017 [P] [US1] Verification tests: inbound arrival delay and cause verified → `inbound_delay_verified`, `connection_time_ok`, `single_ticket` set; a short covered delay (inbound 20 minutes late, weather, connection ≥ MCT) qualifies (no minimum inbound delay), in `agents/verification/tests/test_missed_connection.py` (create `tests/` dir) [REQ-F-034, REQ-F-035, REQ-F-036]
+- [ ] T018 [P] [US1] Scenarios `mc_stp`, `mc_offset`, `mc_over_limit`, `mc_short_delay` (inbound 20 min late, weather) in `synthetic/scenarios.py` with proposed `expected` (rows 1, 4, 2, 1 per quickstart.md) and `requirements` lists; not yet in `SCENARIOS` until labelled (T047) [REQ-F-032..037]
 
 ### Implementation
 
@@ -90,15 +90,16 @@ Existing repository layout (plan.md "Source Code"): `agents/<agent>/src/`, `tool
 ### Tests first
 
 - [ ] T026 [P] [US2] Routing guard test: for every missed connection test case, routes 1-3 occur only when `inbound_delay_verified` and `connection_time_ok` and `single_ticket`; uses `agents/orchestrator/src/routing.py` unchanged, in `agents/orchestrator/tests/test_missed_connection_guard.py` [REQ-B-012]
-- [ ] T027 [P] [US2] Assessment tests: `rejection_reasons` returns a reason with clause for short connection (3.7), self-transfer (3.7), excluded cause / announced strike (3.3), late check-in (3.3) in `agents/assessment/tests/test_missed_connection_rejections.py` [REQ-F-036]
-- [ ] T028 [P] [US2] Scenarios `mc_strike`, `mc_short_connection`, `mc_self_transfer`, `mc_inbound_on_time`, `mc_three_legs` in `synthetic/scenarios.py` with proposed `expected` (rows 5, 5, 5, 6, 6) [REQ-F-034, REQ-F-036, REQ-B-012, REQ-B-013]
+- [ ] T027 [P] [US2] Assessment tests: `rejection_reasons` returns a reason with clause for short connection (3.7), self-transfer (3.7), excluded cause / announced strike (3.3), late check-in for the inbound leg (3.3) in `agents/assessment/tests/test_missed_connection_rejections.py` [REQ-F-036]
+- [ ] T028 [P] [US2] Scenarios `mc_strike`, `mc_short_connection`, `mc_self_transfer`, `mc_inbound_on_time`, `mc_three_legs`, `mc_boarding_closed_early` (valid connection, boarding closed early → L1 with the reason) in `synthetic/scenarios.py` with proposed `expected` (rows 5, 5, 5, 6, 6, 6) [REQ-F-034, REQ-F-036, REQ-B-012, REQ-B-013]
+- [ ] T056 [P] [US2] Test: the duplicate-claim check (REQ-F-013) does not treat a travel delay claim and a missed connection claim on the same journey as duplicates; overlapping receipts are handled by 7.2 (T037) instead, in `tests/test_missed_connection_journey.py` [REQ-F-013, REQ-F-038]
 
 ### Implementation
 
 - [ ] T029 [US2] `rejection_reasons` for `missed_connection` in `agents/assessment/src/agent.py` (short connection, self-transfer, excluded cause, late check-in) → recommendation reject → row 5 [REQ-F-036, REQ-B-002]
 - [ ] T030 [US2] Verification: source not found, no cause, on-time inbound, document/source mismatch or ambiguous leg → `verification_success = 0` with discrepancy text → confidence ≤ 0.35 → row 6, in `agents/verification/src/agent.py` [REQ-F-034, REQ-B-012, REQ-B-013]
 - [ ] T031 [US2] Fraud screening receives itinerary time mismatches as anomaly flags (flag only) in `agents/fraud-screening/src/agent.py` [FR-013, REQ-F-016, T13]
-- [ ] T032 [US2] `make test` green incl. T026-T027
+- [ ] T032 [US2] `make test` green incl. T026-T027, T056
 
 ---
 
@@ -141,7 +142,7 @@ Existing repository layout (plan.md "Source Code"): `agents/<agent>/src/`, `tool
 - [ ] T044 [P] Metrics in `evals/run_evals.py` for the 4 G1 thresholds: `missed_connection_eligibility_accuracy`, `connection_time_check_accuracy`, `inbound_leg_attribution_accuracy`, `duplicate_expense_paid_count`; each must be measured (not "not measured in this run") whenever missed connection cases exist [REQ-F-033..038]
 - [ ] T045 [P] Agent suites: missed connection cases in `evals/agents/verification/suite.yaml`, `evals/agents/assessment/suite.yaml`, `evals/agents/intake/suite.yaml`, `evals/agents/document/suite.yaml`
 - [ ] T046 [P] Adversarial cases: injected instruction in a receipt, altered boarding-pass time, self-transfer, upgraded class, three legs, ambiguous connection in `evals/datasets/adversarial/` source (via `synthetic/generate.py`)
-- [ ] T047 [HUMAN: l2-grace] Senior adjuster labels the 12 proposed golden cases (expected outcome, amount, deductions, route); `hoc` reviews; only labelled cases are added to `SCENARIOS` [Constitution V]
+- [ ] T047 [HUMAN: l2-grace] Senior adjuster labels the proposed golden cases (at least the 12 planned at G1; T018, T028, T035 propose 14) (expected outcome, amount, deductions, route); `hoc` reviews; only labelled cases are added to `SCENARIOS` [Constitution V]
 - [ ] T048 [HUMAN: ailead] AI lead labels the 6 adversarial cases with `l2-grace`
 - [ ] T049 Regenerate datasets with `make datasets` (golden + adversarial, versioned) after T047-T048 [AUTHORITY: `evals/datasets/**` edits need approval]
 - [ ] T050 Add missed connection scenarios to `TRAFFIC_WEIGHTS` in `synthetic/scenarios.py` so `make perf` covers them [REQ-N-001, REQ-N-004]

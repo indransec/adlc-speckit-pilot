@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-02
 
-**Status**: Draft (G1)
+**Status**: Approved (G1, 2026-11-02)
 
 **Input**: User description: "Missed connection benefit for travel claims (CARD-101, release 0.4.0): see intake/CARD-101-missed-connection.md and specs/0.4.0-missed-connection/intake.md"
 
@@ -17,6 +17,7 @@
 - Q: Is a refund the airline gives for the unused onward ticket deducted from what the claim pays? → A: Yes, any refund or credit for the unused onward ticket is deducted as a compensation offset (type A); the customer declares refunds and a missing declaration is requested.
 - Q: For the shared limit, are the outward and return trips separate journeys? → A: Yes, each direction is a separate journey with its own shared limit (travel delay and missed connection together), as clause 3.6 "one delayed journey".
 - Q: How is one claim with both travel delay and missed connection expenses for the same journey handled? → A: One claim classified "delay + missed connection"; each expense line assessed under its own clause, each expense paid once, shared journey limit across all lines.
+- Q: Which leg does the late check-in exclusion refer to? → A: The inbound leg (answered by the Business owner after `/speckit-analyze`, 2026-11-02; narrows REQ-F-036 without changing its text).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -162,7 +163,7 @@ claim; each uses the approved template and cites the clauses.
   minimum connection time: the connection airport's published minimum connection time, or 60 minutes
   when none is published, and record the value used and its source.
 - **FR-006**: The system MUST apply the covered causes (clause 3.2), delay exclusions (clause 3.3)
-  and late check-in exclusion to missed connection claims, and MUST treat legs booked on separate
+  and late check-in exclusion (check-in for the inbound leg) to missed connection claims, and MUST treat legs booked on separate
   tickets (self-transfer) as not covered. No minimum inbound delay applies: any delay from a covered
   cause qualifies when the booked connection met the minimum connection time and the onward flight
   was missed.

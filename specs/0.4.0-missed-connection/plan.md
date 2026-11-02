@@ -90,6 +90,7 @@ shared/db.py                            # flights arrival columns; claims journe
 synthetic/{policy_wording.md,scenarios.py}  # clause 3.7, missed connection scenarios
 evals/                                  # metrics for the 4 new thresholds; datasets (labelled by people)
 tests/                                  # unit tests incl. REQ-B-012 routing guard
+frontend/pages/2_Adjuster_Workbench.py  # decision package view: connection, line benefit, shared limit
 ```
 
 **Structure Decision**: extend the existing agents and tools in place; no new agent (constitution
@@ -130,6 +131,9 @@ No violations.
   L1 then L2 (row 4). Corrected in the spec with a note. `spec.md` is the source of the G1
   requirements, not a frozen G1 artifact; the requirements, thresholds and routing are unaffected.
   For the G1 signers' information; no re-approval of G1 proposed.
+- After `/speckit-analyze` (G3), the Business owner clarified that the late check-in exclusion refers
+  to the inbound leg (spec Clarifications, FR-006). This narrows REQ-F-036 without changing its text
+  in the frozen `docs/requirements/functional.yaml`; no re-approval of G1 proposed.
 
 ### Decisions for G2 Signers
 

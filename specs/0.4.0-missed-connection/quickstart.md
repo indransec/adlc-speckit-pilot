@@ -15,7 +15,9 @@ make setup          # deps + synthetic data (rebuilds the clause index with clau
 | Standard, inbound 2h late (weather), connection ≥ MCT, USD 320 receipted | approve USD 320 | row 1 straight-through |
 | Same with USD 150 airline compensation | partial USD 170 (3.4, A) | row 4 L1 + L2 (reduction 47% > 25%) |
 | Premier, USD 1,300 receipted | partial USD 1,000 (3.6, A) | row 2 L1 (type A only) |
+| Inbound 20 min late (weather), connection ≥ MCT, onward missed | approve (no minimum inbound delay) | row 1 straight-through |
 | Inbound delayed by strike announced before booking | reject (3.3) | row 5 L1 + L2 |
+| Valid connection, boarding closed early | L1 with the reason | row 6 |
 | Connection below MCT | reject (3.7 connection condition) | row 5 L1 + L2 |
 | Separate tickets (self-transfer) | reject | row 5 L1 + L2 |
 | Flight status shows inbound on time | investigate | row 6 |
