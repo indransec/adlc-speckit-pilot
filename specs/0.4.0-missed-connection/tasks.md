@@ -26,7 +26,7 @@ Existing repository layout (plan.md "Source Code"): `agents/<agent>/src/`, `tool
 - [X] T001 Confirm branch `release/0.4.0`, `uv run python -m scripts.adlc status` shows G2 approved, and `make test` is green before changes
 - [X] T002 [P] Add clause 3.7 "Missed connection" (benefit, minimum connection time condition, single ticket, 6.3 ticket exclusion not applied, shared limit with 3.6 per journey) to `synthetic/policy_wording.md` [REQ-F-036, REQ-F-037]
 - [X] T003 [P] Draft `reference/minimum-connection-times.yaml` per data-model.md (`as_of`, `source`, `owner: product-owner`, `fallback_minutes: 60`, one value per airport for every airport in `synthetic/scenarios.py` FLIGHTS) [REQ-F-035, ADR-006]
-- [ ] T004 [HUMAN: po] Product owner confirms the minimum connection time values and source in `reference/minimum-connection-times.yaml` (CODEOWNERS: Business owner + AI lead review the PR)
+- [X] T004 [HUMAN: po] Product owner confirms the minimum connection time values and source in `reference/minimum-connection-times.yaml` (CODEOWNERS: Business owner + AI lead review the PR)
 
 ---
 

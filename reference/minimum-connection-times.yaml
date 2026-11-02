@@ -3,14 +3,12 @@
 # Owner: Product owner (Claims operations). Reviewed quarterly. Changes by pull request approved by
 # CODEOWNERS (Business owner + AI lead), because the value decides eligibility.
 #
-# STATUS: DRAFT proposed by Claude for the synthetic pilot airports. Values are indicative
-# international-to-international MCTs, NOT taken from a published source. The Product owner confirms
-# or corrects each value and sets `source` and `confirmed_by` (task T004) before any golden case is
-# labelled.
+# STATUS: values proposed by Claude for the synthetic pilot airports and confirmed unchanged by the
+# Product owner (po, Arjun Rao) on 2026-11-02 (task T004), source: general published information.
 as_of: 2026-11-02
-source: "DRAFT - to be confirmed by the Product owner (T004)"
+source: "General published information (pilot reference values), confirmed by the Product owner"
 owner: product-owner
-confirmed_by: null
+confirmed_by: po
 fallback_minutes: 60
 airports:
   BOM: 90   # Mumbai
