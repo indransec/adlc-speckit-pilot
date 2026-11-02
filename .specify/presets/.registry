@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "presets": {
+    "adlc": {
+      "version": "0.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:65ebb45b1828f821b0fc1a94e44f14d1d8e3eb43f2918d232df87e4364bac9fd",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {},
+      "registered_skills": {},
+      "installed_at": "2026-11-02T07:45:19.692310+00:00"
+    }
+  }
+}

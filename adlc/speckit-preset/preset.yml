@@ -1,0 +1,41 @@
+schema_version: "1.0"
+
+preset:
+  id: "adlc"
+  name: "ADLC governed delivery"
+  version: "0.1.0"
+  description: "Appends ADLC gate sections (G1 requirements, G2 design record, G3/G4 evidence tasks) to the core spec, plan and tasks templates, and adds a gate-brief template for human signers"
+  author: "adlc-speckit-pilot"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=1.2.5"
+
+provides:
+  templates:
+    - type: "template"
+      name: "spec-template"
+      file: "templates/spec-adlc.md"
+      strategy: "append"
+      description: "G1: requirement register, autonomy/HITL impact, KPIs, eval thresholds, ground truth, open decisions"
+
+    - type: "template"
+      name: "plan-template"
+      file: "templates/plan-adlc.md"
+      strategy: "append"
+      description: "G2: constitution check by principle, design record mapped to the engine's G2 artifacts"
+
+    - type: "template"
+      name: "tasks-template"
+      file: "templates/tasks-adlc.md"
+      strategy: "append"
+      description: "Task rules (REQ IDs, authority markers, human-only steps) and the ADLC evidence phase for G3/G4"
+
+    - type: "template"
+      name: "gate-brief-template"
+      file: "templates/gate-brief-template.md"
+      description: "Brief for the people who sign a gate: what to review, engine check results, decisions asked"
+
+tags:
+  - "adlc"
+  - "governance"

@@ -35,8 +35,8 @@ companions = G2, `tasks.md` = build plan, `briefs/G*.md` = gate briefs for signe
 | 2 | Spec Kit v1.2.5 installed unmodified (`specify init --here --integration claude`) | done 2026-11-02 (`1d18f7c`) |
 | 3 | Guardrails in `.claude/settings.json` + `.claude/hooks/adlc_guard.py` (below); tested that Claude cannot sign | done 2026-11-02 |
 | 4 | Constitution via `/speckit-constitution` with the ADLC rules | done 2026-11-02 (v1.0.0, decision D-15) |
-| 5 | ADLC sections in spec / plan / tasks templates, gate-brief template | next |
-| 6 | `/adlc.intake`, `/adlc.gate <G>`, `/adlc.status`, `/adlc.rework`; gate precondition in speckit-specify / -plan / -implement | |
+| 5 | ADLC sections in spec / plan / tasks templates, gate-brief template, as the local `adlc` preset (below) | done 2026-11-02 |
+| 6 | `/adlc.intake`, `/adlc.gate <G>`, `/adlc.status`, `/adlc.rework`; gate precondition in speckit-specify / -plan / -implement | next |
 | 7 | Run G0 → G2 for 0.4.0 (user signs as personas) | |
 | 8 | Run G3 → G5 (release branch + PR, golden cases labelled by the user, one deliberate G4 rejection) | |
 | 9 | Retro in `docs/pilot-retro.md` | |
@@ -64,13 +64,31 @@ G6 / G7 are out of the first pass (they need traffic over time).
 - Not covered: writing the gate store or ledger directly (e.g. SQL). Ledger tampering is caught by
   `adlc.py verify-ledger`. `make test` and engine actions still write `evidence/` as intended.
 
-### Step 5 option to evaluate
+### Step 5: `adlc` preset (chosen over editing `.specify/templates/`)
 
 Spec Kit v1.2.5 supports **presets** (`specify preset add`, template resolution by priority). Packaging
 the ADLC template changes as a local `adlc` preset instead of editing `.specify/templates/` directly
 keeps Spec Kit upgradable and makes the customisation reusable for other apps. Its built-in
 **workflow gates** (`.specify/workflows/speckit/workflow.yml`) are plain approve/reject for whoever runs
 the CLI, with no roles, so they do not replace ADLC sign-off.
+
+- Source `adlc/speckit-preset/` (see its README), installed with `specify preset add --dev` into
+  `.specify/presets/adlc/`. Core templates in `.specify/templates/` are unchanged.
+- `append` strategy: spec gets "ADLC: G1 Requirements", plan gets "Constitution Check by Principle" and
+  "G2 Design Record", tasks get "ADLC Task Rules" and "Phase ADLC: Evidence and Gate Readiness (G3, G4)".
+  New `gate-brief-template` for `specs/<release>-<slug>/briefs/G*.md`.
+- Key point: the gate checks read the engine's files (`docs/requirements/*.yaml`, `docs/kpis.yaml`,
+  `evals/thresholds.yaml`, `docs/design/*`, `evidence/`), not `spec.md` / `plan.md`. The ADLC sections
+  are therefore registers that name the target engine file for every item, plus a checklist to write
+  them before `adlc.py check`.
+- Preset composition needs PyYAML in the resolver's Python; system `python3` has none, so
+  `.claude/settings.json` sets `SPECKIT_PYTHON_EXECUTABLE=.venv/bin/python` (relative: run Spec Kit
+  scripts from the repo root; outside Claude, export it in your shell). Without it the resolver fails
+  loudly rather than silently dropping the ADLC sections.
+- Verified 2026-11-02: all four templates resolve with the ADLC sections (bash resolver, `--json`
+  mode, `specify preset resolve`); 105 tests green.
+- Step 6 option: presets can also ship `command` entries, so the `/adlc.*` commands could live in the
+  same preset.
 
 ### Gate walkthrough (steps 7-8)
 
