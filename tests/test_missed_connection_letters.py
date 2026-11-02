@@ -31,7 +31,10 @@ def test_rendered_once_approved(monkeypatch, template, needle):
     real = notify.approved()
     monkeypatch.setattr(notify, "approved", lambda: {**real, template: {**real[template], "status": "approved"}})
     subject, body = notify.render(template, CTX)
-    assert "missed connection (policy clause 3.7)" in body and "LH903" in body and "BA0175" in body and "LHR" in body
+    if template == "missed_connection_rejected":   # G4 rework (Compliance): clause reason only, no restated facts
+        assert "missed connection cover (policy clause 3.7)" in body and "LH903" not in body and "arrived late" not in body
+    else:
+        assert "missed connection (policy clause 3.7)" in body and "LH903" in body and "BA0175" in body and "LHR" in body
     assert needle in body
     if template != "missed_connection_paid":
         assert "appeal" in body.lower() or "review" in body.lower()
