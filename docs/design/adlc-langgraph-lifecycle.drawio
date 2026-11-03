@@ -1,0 +1,593 @@
+<mxfile host="drawio" agent="claude-code" version="24.0.0">
+  <diagram id="p1" name="1 · E2E lifecycle — people, LangGraph flow, Claude Code + Spec Kit, engine">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="p1-0" />
+        <mxCell id="p1-1" parent="p1-0" />
+        <mxCell id="p1-c1" value="&lt;b style='font-size:22px'&gt;ADLC G0 → G7 driven by LangGraph, authored by Claude Code + Spec Kit, signed by people&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:12px'&gt;Proposed design (from the 0.4.0 Spec Kit pilot). The ADLC engine is the only authority for gates, roles, signatures and the ledger; LangGraph sequences and waits; Claude Code + Spec Kit write documents and code; people decide.&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=12;" vertex="1" parent="p1-1">
+          <mxGeometry x="40" y="10" width="3200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c2" value="&lt;b style='font-size:13px'&gt;People &amp; signers&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;Streamlit ADLC UI (SSO, personas → roles)&lt;br&gt;GitHub PR review · Slack/Teams&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=11;" vertex="1" parent="p1-1">
+          <mxGeometry x="40" y="120" width="210" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c3" value="" style="rounded=0;html=1;fillColor=#fff2cc;strokeColor=#d6b656;opacity=25;" vertex="1" parent="p1-1">
+          <mxGeometry x="260" y="120" width="2890" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c4" value="&lt;b style='font-size:13px'&gt;LangGraph lifecycle flow&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;lifecycle_flow/ · thread = use_case:release&lt;br&gt;Postgres checkpointer · interrupt() / resume&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=11;" vertex="1" parent="p1-1">
+          <mxGeometry x="40" y="320" width="210" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c5" value="" style="rounded=0;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;opacity=25;" vertex="1" parent="p1-1">
+          <mxGeometry x="260" y="320" width="2890" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c6" value="&lt;b style='font-size:13px'&gt;Claude Code + Spec Kit worker&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;Claude Agent SDK · git worktree per thread&lt;br&gt;Spec Kit v1.2.5 + adlc preset · guard hook&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=11;" vertex="1" parent="p1-1">
+          <mxGeometry x="40" y="530" width="210" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c7" value="" style="rounded=0;html=1;fillColor=#d5e8d4;strokeColor=#82b366;opacity=25;" vertex="1" parent="p1-1">
+          <mxGeometry x="260" y="530" width="2890" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c8" value="&lt;b style='font-size:13px'&gt;ADLC engine (authority)&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;FastAPI · lifecycle.py checks · gate profiles&lt;br&gt;Postgres gate store · hash-chained ledger&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=11;" vertex="1" parent="p1-1">
+          <mxGeometry x="40" y="740" width="210" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c9" value="" style="rounded=0;html=1;fillColor=#f8cecc;strokeColor=#b85450;opacity=25;" vertex="1" parent="p1-1">
+          <mxGeometry x="260" y="740" width="2890" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c10" value="&lt;b style='font-size:13px'&gt;Delivery &amp; runtime&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;GitHub + Actions · eval harness · release&lt;br&gt;product agents (LangGraph) · observability&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=11;" vertex="1" parent="p1-1">
+          <mxGeometry x="40" y="950" width="210" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c11" value="" style="rounded=0;html=1;fillColor=#f5f5f5;strokeColor=#666666;opacity=25;" vertex="1" parent="p1-1">
+          <mxGeometry x="260" y="950" width="2890" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c12" value="&lt;b&gt;G0&lt;/b&gt; · Intake &amp; triage" style="shape=step;perimeter=stepPerimeter;size=14;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="p1-1">
+          <mxGeometry x="270" y="78" width="350" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c13" value="PO submits record · Data owner confirms classification&lt;br&gt;&lt;b&gt;Sign:&lt;/b&gt; Sponsor, Risk, Data owner" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="270" y="128" width="344" height="174" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c14" value="&lt;b&gt;G0 subgraph&lt;/b&gt;&lt;br&gt;start on intake card → author → ⏸ submit/confirm → check → brief → ⏸ signatures" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="270" y="328" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c15" value="/speckit-adlc-intake CARD-n (drafts as &lt;i&gt;claude&lt;/i&gt;, no roles)&lt;br&gt;/speckit-adlc-gate G0 → briefs/G0.md" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="270" y="538" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c16" value="Checks: record, risk tier, data classification, feasibility&lt;br&gt;Freeze: use-case record, risk questionnaire" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="270" y="748" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c17" value="specs/&amp;lt;release&amp;gt;-&amp;lt;slug&amp;gt;/ feature folder&lt;br&gt;intake card from Jira/ADO" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="270" y="958" width="344" height="164" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c18" value="&lt;b&gt;G1&lt;/b&gt; · Requirements" style="shape=step;perimeter=stepPerimeter;size=14;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="p1-1">
+          <mxGeometry x="630" y="78" width="350" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c19" value="Business owner answers clarifications, confirms limits/KPIs&lt;br&gt;&lt;b&gt;Sign:&lt;/b&gt; Business owner, AI lead" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="630" y="128" width="344" height="174" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c20" value="&lt;b&gt;G1 subgraph&lt;/b&gt;&lt;br&gt;author → ⏸ clarification answers → ⏸ G1 confirm → check → fix-loop → brief → ⏸ signatures" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="630" y="328" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c21" value="/speckit-specify · /speckit-checklist&lt;br&gt;/speckit-clarify (questions → interrupt)&lt;br&gt;/speckit-adlc-gate G1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="630" y="538" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c22" value="Checks: requirement IDs + verification, routing/HITL, KPIs, eval thresholds&lt;br&gt;Freeze (block on drift): thresholds, routing, system authority" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="630" y="748" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c23" value="PR: requirements/*.yaml, kpis.yaml, thresholds.yaml (G1 owners)" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="630" y="958" width="344" height="164" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c24" value="&lt;b&gt;G2&lt;/b&gt; · Design" style="shape=step;perimeter=stepPerimeter;size=14;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="p1-1">
+          <mxGeometry x="990" y="78" width="350" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c25" value="&lt;b&gt;Sign:&lt;/b&gt; Architecture, Security" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="990" y="128" width="344" height="174" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c26" value="&lt;b&gt;G2 subgraph&lt;/b&gt;&lt;br&gt;author → check → fix-loop → brief → ⏸ signatures" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="990" y="328" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c27" value="/speckit-plan (plan, research, data model, contracts)&lt;br&gt;/speckit-adlc-gate G2" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="990" y="538" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c28" value="Checks: manifests, ADRs, tool permission matrix, threat model, data flows, CODEOWNERS&lt;br&gt;Freeze: tool matrix (block), topology" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="990" y="748" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c29" value="PR: ADRs, architecture, threat model, permission matrix" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="990" y="958" width="344" height="164" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c30" value="&lt;b&gt;G3&lt;/b&gt; · Test &amp; evals" style="shape=step;perimeter=stepPerimeter;size=14;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="p1-1">
+          <mxGeometry x="1350" y="78" width="350" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c31" value="Label golden / adversarial cases · code-owner PR review&lt;br&gt;&lt;b&gt;Sign:&lt;/b&gt; AI lead, Product owner" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="1350" y="128" width="344" height="174" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c32" value="&lt;b&gt;G3 subgraph&lt;/b&gt;&lt;br&gt;tasks → analyze → implement → ⏸ golden labels → CI → check → brief → ⏸ PR review + signatures" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="1350" y="328" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c33" value="/speckit-tasks · /speckit-analyze&lt;br&gt;/speckit-implement on release/x → PR&lt;br&gt;/speckit-adlc-gate G3" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="1350" y="538" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c34" value="Checks: CI tests, datasets versioned, evals ≥ thresholds, zero B→A, traceability, perf 3× peak" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="1350" y="748" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c35" value="GitHub Actions: test, evals, gate-check&lt;br&gt;adlc-gates required check (G3 approved)" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="1350" y="958" width="344" height="164" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c36" value="&lt;b&gt;G4&lt;/b&gt; · RAI assurance" style="shape=step;perimeter=stepPerimeter;size=14;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="p1-1">
+          <mxGeometry x="1710" y="78" width="350" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c37" value="&lt;b&gt;Sign:&lt;/b&gt; RAI/Risk, Compliance&lt;br&gt;(pilot: deliberate reject → rework → approve)" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="1710" y="128" width="344" height="174" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c38" value="&lt;b&gt;G4 subgraph&lt;/b&gt;&lt;br&gt;RAI actions → check → brief → ⏸ signatures → reject? → rework" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="1710" y="328" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c39" value="Run RAI suites, letter templates&lt;br&gt;/speckit-adlc-rework on reject&lt;br&gt;/speckit-adlc-gate G4" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="1710" y="538" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c40" value="Checks: counterfactual fairness, PII + injection, red team, RAI card, letters approved" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="1710" y="748" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c41" value="rai-report.json, eval-report.json (generated, never hand-edited)" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="1710" y="958" width="344" height="164" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c42" value="&lt;b&gt;G5&lt;/b&gt; · Deploy" style="shape=step;perimeter=stepPerimeter;size=14;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="p1-1">
+          <mxGeometry x="2070" y="78" width="350" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c43" value="CAB decides change request&lt;br&gt;&lt;b&gt;Sign:&lt;/b&gt; CAB, Head of business" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="2070" y="128" width="344" height="174" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c44" value="&lt;b&gt;G5 subgraph&lt;/b&gt;&lt;br&gt;raise CR → ⏸ CAB → shadow run → check → brief → ⏸ signatures" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="2070" y="328" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c45" value="Prepare release record, runbook, rollback plan&lt;br&gt;/speckit-adlc-gate G5" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="2070" y="538" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c46" value="Checks: bundle hash, G3+G4 evidence, shadow results, rollback + kill-switch drills" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="2070" y="748" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c47" value="Release workflow: shadow → canary → full&lt;br&gt;model gateway, tool gateway, guardrails" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="2070" y="958" width="344" height="164" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c48" value="&lt;b&gt;G6&lt;/b&gt; · Run &amp; observe" style="shape=step;perimeter=stepPerimeter;size=14;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="p1-1">
+          <mxGeometry x="2430" y="78" width="350" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c49" value="&lt;b&gt;Sign:&lt;/b&gt; Head of business" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="2430" y="128" width="344" height="174" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c50" value="&lt;b&gt;G6 subgraph&lt;/b&gt;&lt;br&gt;scheduled (cron) hypercare window → check → brief → ⏸ signatures" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="2430" y="328" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c51" value="Hypercare report from telemetry&lt;br&gt;/speckit-adlc-gate G6" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="2430" y="538" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c52" value="Checks: SLOs, control breaches, Sev1/2 alerts, QA error rate, value dashboard" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="2430" y="748" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c53" value="OpenTelemetry/OpenInference → Phoenix&lt;br&gt;Prometheus/Grafana · GoAlert on-call" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="2430" y="958" width="344" height="164" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c54" value="&lt;b&gt;G7&lt;/b&gt; · Improve / retire" style="shape=step;perimeter=stepPerimeter;size=14;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="p1-1">
+          <mxGeometry x="2790" y="78" width="350" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c55" value="&lt;b&gt;Sign:&lt;/b&gt; Head of business, AI lead" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="2790" y="128" width="344" height="174" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c56" value="&lt;b&gt;G7 subgraph&lt;/b&gt;&lt;br&gt;scheduled review → check → brief → ⏸ signatures → next intake or retire" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="2790" y="328" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c57" value="Override reasons, drift &amp;amp; calibration, value-realised report&lt;br&gt;/speckit-adlc-gate G7" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="2790" y="538" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c58" value="Checks: overrides reviewed, drift + calibration, value vs hypothesis" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="2790" y="748" width="344" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c59" value="Improvement → new intake card (next release) or retirement" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="2790" y="958" width="344" height="164" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c60" value="approved" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#9673a6;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p1-1" source="p1-c14" target="p1-c20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c61" value="approved" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#9673a6;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p1-1" source="p1-c20" target="p1-c26">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c62" value="approved" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#9673a6;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p1-1" source="p1-c26" target="p1-c32">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c63" value="approved" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#9673a6;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p1-1" source="p1-c32" target="p1-c38">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c64" value="approved" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#9673a6;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p1-1" source="p1-c38" target="p1-c44">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c65" value="approved" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#9673a6;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p1-1" source="p1-c44" target="p1-c50">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c66" value="approved" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#9673a6;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p1-1" source="p1-c50" target="p1-c56">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c67" value="① run /speckit-* task" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#82b366;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.25;exitY=1;entryX=0.25;entryY=0;" edge="1" parent="p1-1" source="p1-c20" target="p1-c21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c68" value="② draft as claude" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#82b366;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.25;exitY=1;entryX=0.25;entryY=0;" edge="1" parent="p1-1" source="p1-c21" target="p1-c22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c69" value="③ read status / checks (read-only client)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#b85450;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.75;exitY=1;entryX=0.75;entryY=0;" edge="1" parent="p1-1" source="p1-c20" target="p1-c22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c70" value="④ sign in UI" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#d6b656;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.95;exitY=1;entryX=0.95;entryY=0;" edge="1" parent="p1-1" source="p1-c19" target="p1-c22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c71" value="⑤ ledger event → relay → resume" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#b85450;fontSize=10;labelBackgroundColor=#ffffff;dashed=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" edge="1" parent="p1-1" source="p1-c22" target="p1-c20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c72" value="reject / drift → rework at the gate that froze the artifact" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#b85450;fontSize=10;labelBackgroundColor=#ffffff;dashed=1;exitX=0.5;exitY=0;entryX=0.5;entryY=0;" edge="1" parent="p1-1" source="p1-c38" target="p1-c26">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c73" value="improve → new intake (next release)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#666666;fontSize=10;labelBackgroundColor=#ffffff;dashed=1;exitX=0.5;exitY=1;entryX=0.5;entryY=1;" edge="1" parent="p1-1" source="p1-c59" target="p1-c17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c74" value="Intake card&lt;br&gt;(Jira/ADO)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=10;" vertex="1" parent="p1-1">
+          <mxGeometry x="100" y="78" width="90" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c75" value="start thread" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;entryX=0;entryY=0.2;" edge="1" parent="p1-1" source="p1-c74" target="p1-c14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c76" value="&lt;b style='font-size:13px'&gt;Legend&lt;/b&gt;&lt;br&gt;&lt;font color='#d6b656'&gt;■&lt;/font&gt; People decide (UI, PR review)&lt;br&gt;&lt;font color='#9673a6'&gt;■&lt;/font&gt; LangGraph flow: sequences, waits, retries, notifies; &lt;b&gt;no authority&lt;/b&gt;&lt;br&gt;&lt;font color='#82b366'&gt;■&lt;/font&gt; Claude Code + Spec Kit: writes specs, plans, code, briefs on a branch&lt;br&gt;&lt;font color='#b85450'&gt;■&lt;/font&gt; ADLC engine: checks, roles, signatures, ledger, drift blocking&lt;br&gt;&lt;font color='#666666'&gt;■&lt;/font&gt; Delivery and runtime (CI/CD, product agents, observability)&lt;br&gt;⏸ = LangGraph interrupt() waiting for people · dashed = event / loop&lt;br&gt;①–⑤ on G1 show the interaction pattern used at every gate" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#999999;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="40" y="1170" width="560" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c77" value="&lt;b style='font-size:13px'&gt;Authority boundary (non-negotiable controls)&lt;/b&gt;&lt;br&gt;1. Only people sign / approve / reset, in the UI under SSO; the engine refuses role-less approvals (adlc_governed).&lt;br&gt;2. The flow's engine client exposes read + draft routes only; sign/approve/submit/confirm routes are not in it.&lt;br&gt;3. Claude worker runs with project settings: deny rules + adlc_guard.py hook; drafts as persona &lt;i&gt;claude&lt;/i&gt; (no roles).&lt;br&gt;4. One person, one role per gate; previous gate must be approved (engine) and is re-checked by Spec Kit commands.&lt;br&gt;5. Approved artifacts are frozen in the hash-chained ledger; drift on authority files blocks later gates.&lt;br&gt;6. Evidence is generated by CI / engine actions, never hand-edited; verify-ledger runs before every signature wait.&lt;br&gt;7. Graph state is a cache: every resume re-reads the engine (sync node); events are hints, not decisions.&lt;br&gt;8. lifecycle_flow/, gate profiles and the preset are under CODEOWNERS and change through platform governance." style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="620" y="1170" width="900" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c78" value="&lt;b style='font-size:13px'&gt;Human inputs the flow waits for (interrupts)&lt;/b&gt;&lt;br&gt;G0: PO submit, Data owner classification confirm, G0 signatures&lt;br&gt;G1: clarification answers (Business owner), G1 limits/KPI confirmation, signatures&lt;br&gt;G2: Architecture + Security signatures&lt;br&gt;G3: golden / adversarial labels (ground truth is human), PR code-owner review, signatures&lt;br&gt;G4: RAI + Compliance signatures (reject → rework path)&lt;br&gt;G5: CAB change-request decision, signatures&lt;br&gt;G6 / G7: signatures after scheduled hypercare / review windows&lt;br&gt;Timeouts → reminder → escalation to gate owner (SLA per gate)" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="1540" y="1170" width="820" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-c79" value="&lt;b style='font-size:13px'&gt;Cross-cutting&lt;/b&gt;&lt;br&gt;• Risk-tier gate profiles (YAML): same G0–G7 order, checks/thresholds scale with tier&lt;br&gt;• Many use cases in parallel: engine keyed by use_case + release; one LangGraph thread each&lt;br&gt;• Cost: per-node and per-thread budget for Claude runs; live-model evals only when a gate condition asks&lt;br&gt;• Tracing: lifecycle flow + worker + product agents → OpenTelemetry/OpenInference → Phoenix&lt;br&gt;• Metrics: cycle time per gate, rework count, time waiting on people, cost per release&lt;br&gt;• Evidence pack per release/gate for audit (adlc.py evidence-pack)&lt;br&gt;• Regulatory mapping: gates/checks ↔ EU AI Act, ISO/IEC 42001, NIST AI RMF controls" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p1-1">
+          <mxGeometry x="2380" y="1170" width="880" height="230" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="p2" name="2 · Technology architecture and trust zones">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2600" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="p2-0" />
+        <mxCell id="p2-1" parent="p2-0" />
+        <mxCell id="p2-c1" value="&lt;b style='font-size:22px'&gt;Technology architecture — automation plane vs authority plane&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:12px'&gt;Arrows show calls and events. The automation plane has no route to any decision endpoint.&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=12;" vertex="1" parent="p2-1">
+          <mxGeometry x="40" y="10" width="2500" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c2" value="&lt;b style='font-size:14px'&gt;People &amp; channels&lt;/b&gt;" style="rounded=1;arcSize=2;html=1;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=10;spacingTop=6;opacity=60;" vertex="1" parent="p2-1">
+          <mxGeometry x="40" y="80" width="2520" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c3" value="&lt;b style='font-size:14px'&gt;Automation plane (no authority)&lt;/b&gt;" style="rounded=1;arcSize=2;html=1;whiteSpace=wrap;fillColor=#e1d5e7;strokeColor=#9673a6;dashed=1;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=10;spacingTop=6;opacity=60;" vertex="1" parent="p2-1">
+          <mxGeometry x="40" y="300" width="1240" height="560" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c4" value="&lt;b style='font-size:14px'&gt;Authority plane — ADLC engine&lt;/b&gt;" style="rounded=1;arcSize=2;html=1;whiteSpace=wrap;fillColor=#f8cecc;strokeColor=#b85450;dashed=1;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=10;spacingTop=6;opacity=60;" vertex="1" parent="p2-1">
+          <mxGeometry x="1320" y="300" width="1240" height="560" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c5" value="&lt;b style='font-size:14px'&gt;Delivery (GitHub)&lt;/b&gt;" style="rounded=1;arcSize=2;html=1;whiteSpace=wrap;fillColor=#f5f5f5;strokeColor=#666666;dashed=1;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=10;spacingTop=6;opacity=60;" vertex="1" parent="p2-1">
+          <mxGeometry x="40" y="890" width="1240" height="560" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c6" value="&lt;b style='font-size:14px'&gt;Product runtime — the agent being built&lt;/b&gt;" style="rounded=1;arcSize=2;html=1;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;dashed=1;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=10;spacingTop=6;opacity=60;" vertex="1" parent="p2-1">
+          <mxGeometry x="1320" y="890" width="760" height="560" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c7" value="&lt;b style='font-size:14px'&gt;Observability &amp; on-call&lt;/b&gt;" style="rounded=1;arcSize=2;html=1;whiteSpace=wrap;fillColor=#ffe6cc;strokeColor=#d79b00;dashed=1;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=10;spacingTop=6;opacity=60;" vertex="1" parent="p2-1">
+          <mxGeometry x="2110" y="890" width="450" height="560" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c8" value="&lt;b&gt;Intake source&lt;/b&gt;&lt;br&gt;Jira / Azure DevOps use-case card&lt;br&gt;(file in intake/ during pilot)" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="70" y="120" width="270" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c9" value="&lt;b&gt;ADLC UI (Streamlit)&lt;/b&gt;&lt;br&gt;Use Case Intake + ADLC Lifecycle pages&lt;br&gt;SSO; personas → IdP groups → ADLC roles&lt;br&gt;submit · confirm · sign · reject" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="370" y="120" width="380" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c10" value="&lt;b&gt;GitHub PR review&lt;/b&gt;&lt;br&gt;CODEOWNERS, branch protection&lt;br&gt;code-owner approval" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="780" y="120" width="300" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c11" value="&lt;b&gt;Notifications&lt;/b&gt;&lt;br&gt;Slack / Teams: brief ready, waiting on you, SLA reminders, escalation" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="1110" y="120" width="300" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c12" value="&lt;b&gt;Labelling&lt;/b&gt;&lt;br&gt;golden + adversarial cases labelled by people (ground truth is human)" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="1440" y="120" width="330" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c13" value="&lt;b&gt;Signers by gate&lt;/b&gt;&lt;br&gt;G0 Sponsor, Risk, Data owner · G1 Business owner, AI lead · G2 Architecture, Security&lt;br&gt;G3 AI lead, PO · G4 RAI/Risk, Compliance · G5 CAB, Head of business · G6 Head of business · G7 Head of business, AI lead" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="1800" y="120" width="730" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c14" value="&lt;b&gt;LangGraph lifecycle flow&lt;/b&gt; (lifecycle_flow/)&lt;br&gt;StateGraph: one subgraph per gate G0–G7&lt;br&gt;nodes: sync · precheck · author · check · fix-loop · brief · verify-ledger · await (interrupt) · route&lt;br&gt;thread_id = use_case:release · flow_version in state&lt;br&gt;schedules for G6/G7 windows" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="70" y="340" width="520" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c15" value="&lt;b&gt;Checkpointer&lt;/b&gt;&lt;br&gt;Postgres (LangGraph PostgresSaver)&lt;br&gt;cache only; rebuildable from engine" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="70" y="570" width="250" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c16" value="&lt;b&gt;Event relay&lt;/b&gt;&lt;br&gt;consumes engine outbox&lt;br&gt;→ Command(resume) on the thread" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="340" y="570" width="250" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c17" value="&lt;b&gt;Engine client (read + draft only)&lt;/b&gt;&lt;br&gt;GET gates, checks, board, ledger/verify · POST drafts as &lt;i&gt;claude&lt;/i&gt; · run actions&lt;br&gt;&lt;font color='#b85450'&gt;no sign / approve / reset / submit / confirm routes&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="70" y="710" width="520" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c18" value="&lt;b&gt;Claude Code worker&lt;/b&gt; (Claude Agent SDK, headless)&lt;br&gt;git worktree per thread · branch release/x&lt;br&gt;setting_sources = project → .claude/settings.json deny rules + adlc_guard.py hook&lt;br&gt;budget: max turns / cost per node · tools limited per node" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="630" y="340" width="620" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c19" value="&lt;b&gt;GitHub Spec Kit v1.2.5&lt;/b&gt;&lt;br&gt;/speckit-specify, -clarify, -checklist,&lt;br&gt;-plan, -tasks, -analyze, -implement&lt;br&gt;&lt;br&gt;&lt;b&gt;adlc preset&lt;/b&gt;&lt;br&gt;ADLC sections in templates, gate-brief template, previous-gate checks, /speckit-adlc-intake, -gate, -status, -rework (--json output)" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="630" y="570" width="300" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c20" value="&lt;b&gt;Constitution&lt;/b&gt;&lt;br&gt;.specify/memory/constitution.md&lt;br&gt;ADLC principles I–VII" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="950" y="570" width="300" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c21" value="&lt;b&gt;Claude models&lt;/b&gt;&lt;br&gt;Anthropic API for the worker&lt;br&gt;(product agents use their own model gateway)" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="950" y="710" width="300" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c22" value="&lt;b&gt;Engine API (FastAPI)&lt;/b&gt;&lt;br&gt;/lifecycle/gates, /usecases, /board, /ledger, /changes&lt;br&gt;decision routes: sign, approve, reset, submit, confirm, decide&lt;br&gt;→ only from UI with SSO identity" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="1350" y="340" width="400" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c23" value="&lt;b&gt;Lifecycle engine&lt;/b&gt; (shared/lifecycle.py, usecase.py, changes.py)&lt;br&gt;G0–G7 order fixed · checks per gate · role checks · one person one role per gate&lt;br&gt;adlc_governed: role-less approvals refused · keyed by use_case + release" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="1780" y="340" width="750" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c24" value="&lt;b&gt;Gate profiles (YAML, versioned)&lt;/b&gt;&lt;br&gt;checks + thresholds per risk tier&lt;br&gt;approver roles · frozen artifacts (gate_artifacts.yaml)" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="1350" y="570" width="400" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c25" value="&lt;b&gt;Gate store&lt;/b&gt;&lt;br&gt;Postgres (was SQLite)&lt;br&gt;gate records, signatures, CRs" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="1780" y="570" width="360" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c26" value="&lt;b&gt;Evidence ledger&lt;/b&gt;&lt;br&gt;hash-chained ledger.jsonl + content store&lt;br&gt;freeze · drift · verify · evidence pack" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="2170" y="570" width="360" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c27" value="&lt;b&gt;Outbox&lt;/b&gt;&lt;br&gt;gate_signed, gate_approved, gate_rejected, use_case_submitted, g1_confirmed, cr_decided" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="1350" y="710" width="400" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c28" value="&lt;b&gt;Identity &amp; roles&lt;/b&gt;&lt;br&gt;ops/teams.yaml personas → IdP groups · persona &lt;i&gt;claude&lt;/i&gt; has no roles · audit retention" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="1780" y="710" width="750" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c29" value="&lt;b&gt;Repository&lt;/b&gt;&lt;br&gt;specs/&amp;lt;release&amp;gt;-&amp;lt;slug&amp;gt;/ (spec, plan, tasks, briefs)&lt;br&gt;docs/requirements, kpis, thresholds, design, ADRs&lt;br&gt;agents/, evals/, CODEOWNERS" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="70" y="930" width="560" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c30" value="&lt;b&gt;GitHub Actions&lt;/b&gt;&lt;br&gt;test · evals · gate-check · validate-manifests&lt;br&gt;adlc-gates: required check, G3 approved by people&lt;br&gt;release: needs G5 approved" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="660" y="930" width="590" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c31" value="&lt;b&gt;Eval harness&lt;/b&gt;&lt;br&gt;evals/ datasets (versioned), judges, RAI suites, perf test&lt;br&gt;thresholds.yaml (G1 owners) → eval-report, rai-report" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="70" y="1120" width="560" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c32" value="&lt;b&gt;Release workflow&lt;/b&gt;&lt;br&gt;bundle hash · shadow → canary → full · rollback · kill switch" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="660" y="1120" width="590" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c33" value="&lt;b&gt;Product agents (LangGraph)&lt;/b&gt;&lt;br&gt;orchestrator + specialist agents (create_react_agent, @tool)&lt;br&gt;routing / HITL per G1 · autonomy level per risk tier" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="1350" y="930" width="700" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c34" value="&lt;b&gt;Tool gateway&lt;/b&gt;&lt;br&gt;tool permission matrix (G2)&lt;br&gt;guardrails: PII, injection" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="1350" y="1110" width="340" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c35" value="&lt;b&gt;Model gateway&lt;/b&gt;&lt;br&gt;deploy/models.yaml&lt;br&gt;(OpenRouter / provider)" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="1710" y="1110" width="340" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c36" value="&lt;b&gt;HITL workbench&lt;/b&gt;&lt;br&gt;reviewers handle routed cases; override reasons feed G7" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="1350" y="1290" width="700" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c37" value="&lt;b&gt;Tracing&lt;/b&gt;&lt;br&gt;OpenTelemetry / OpenInference&lt;br&gt;→ Arize Phoenix (product agents, lifecycle flow, worker)" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="2140" y="930" width="390" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c38" value="&lt;b&gt;Metrics &amp; SLOs&lt;/b&gt;&lt;br&gt;Prometheus / Grafana&lt;br&gt;slos.yaml, alerts.yaml&lt;br&gt;cycle time per gate, cost per release" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="2140" y="1110" width="390" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c39" value="&lt;b&gt;On-call&lt;/b&gt;&lt;br&gt;GoAlert escalation · incidents" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p2-1">
+          <mxGeometry x="2140" y="1290" width="390" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c40" value="card created → start thread" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;entryX=0.2;entryY=0;" edge="1" parent="p2-1" source="p2-c8" target="p2-c14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c41" value="run task" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p2-1" source="p2-c14" target="p2-c18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c42" value="slash commands" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p2-1" source="p2-c18" target="p2-c19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c43" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.9;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="p2-1" source="p2-c18" target="p2-c21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c44" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.2;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="p2-1" source="p2-c14" target="p2-c15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c45" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.9;exitY=1;entryX=0.9;entryY=0;" edge="1" parent="p2-1" source="p2-c14" target="p2-c17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c46" value="read + draft" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#b85450;fontSize=10;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;entryX=0;entryY=0.8;" edge="1" parent="p2-1" source="p2-c17" target="p2-c22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c47" value="decisions (SSO identity)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#d6b656;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.8;exitY=1;entryX=0.3;entryY=0;" edge="1" parent="p2-1" source="p2-c9" target="p2-c22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c48" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p2-1" source="p2-c22" target="p2-c23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c49" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p2-1" source="p2-c23" target="p2-c25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c50" value="freeze / verify" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.95;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="p2-1" source="p2-c23" target="p2-c26">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c51" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.05;exitY=1;entryX=0.8;entryY=0;" edge="1" parent="p2-1" source="p2-c23" target="p2-c24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c52" value="events" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#b85450;fontSize=10;labelBackgroundColor=#ffffff;dashed=1;exitX=0.5;exitY=1;entryX=1;entryY=0.5;" edge="1" parent="p2-1" source="p2-c26" target="p2-c27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c53" value="event → resume" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#b85450;fontSize=10;labelBackgroundColor=#ffffff;dashed=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" edge="1" parent="p2-1" source="p2-c27" target="p2-c16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c54" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#b85450;fontSize=10;labelBackgroundColor=#ffffff;dashed=1;exitX=0.5;exitY=0;entryX=0.7;entryY=1;" edge="1" parent="p2-1" source="p2-c16" target="p2-c14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c55" value="notify / escalate" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#9673a6;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.6;exitY=0;entryX=0.5;entryY=1;" edge="1" parent="p2-1" source="p2-c14" target="p2-c11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c56" value="commits, PR, briefs" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#82b366;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.1;exitY=1;entryX=0.8;entryY=0;" edge="1" parent="p2-1" source="p2-c18" target="p2-c29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c57" value="review" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#d6b656;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.3;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="p2-1" source="p2-c10" target="p2-c29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c58" value="push / PR" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p2-1" source="p2-c29" target="p2-c30">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c59" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.2;exitY=1;entryX=0.8;entryY=0;" edge="1" parent="p2-1" source="p2-c30" target="p2-c31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c60" value="evidence + G3 status" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#666666;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.9;exitY=0;entryX=0.2;entryY=1;" edge="1" parent="p2-1" source="p2-c30" target="p2-c22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c61" value="deploy after G5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#666666;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p2-1" source="p2-c32" target="p2-c33">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c62" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p2-1" source="p2-c33" target="p2-c34">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c63" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.8;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="p2-1" source="p2-c33" target="p2-c35">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c64" value="traces" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p2-1" source="p2-c33" target="p2-c37">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c65" value="alerts" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p2-1" source="p2-c38" target="p2-c39">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c66" value="hypercare metrics (G6)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#d79b00;fontSize=10;labelBackgroundColor=#ffffff;dashed=1;exitX=0.5;exitY=0;entryX=0.8;entryY=1;" edge="1" parent="p2-1" source="p2-c38" target="p2-c22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c67" value="labels" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#d6b656;fontSize=10;labelBackgroundColor=#ffffff;dashed=1;exitX=0.2;exitY=1;entryX=1;entryY=0.3;" edge="1" parent="p2-1" source="p2-c12" target="p2-c31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-c68" value="✗ no route from automation to decisions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;fontColor=#b85450;fontStyle=1;fontSize=11;" vertex="1" parent="p2-1">
+          <mxGeometry x="1150" y="838" width="340" height="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="p3" name="3 · Gate subgraph (same for every gate)">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="p3-0" />
+        <mxCell id="p3-1" parent="p3-0" />
+        <mxCell id="p3-c1" value="&lt;b style='font-size:22px'&gt;Gate subgraph — the pattern every gate G0–G7 uses&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:12px'&gt;Per-gate differences come from the gate profile: which Claude tasks run, which human inputs are awaited, which checks apply.&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=12;" vertex="1" parent="p3-1">
+          <mxGeometry x="40" y="10" width="2300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c2" value="enter Gn" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;" vertex="1" parent="p3-1">
+          <mxGeometry x="40" y="220" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c3" value="&lt;b&gt;sync&lt;/b&gt;&lt;br&gt;read gate status from engine" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="p3-1">
+          <mxGeometry x="200" y="210" width="210" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c4" value="&lt;b&gt;precheck&lt;/b&gt;&lt;br&gt;previous gate approved?" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fillColor=#f8cecc;strokeColor=#b85450;rhombus;" vertex="1" parent="p3-1">
+          <mxGeometry x="450" y="210" width="210" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c5" value="&lt;b&gt;author&lt;/b&gt;&lt;br&gt;Claude Code: /speckit-* tasks for Gn" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="p3-1">
+          <mxGeometry x="700" y="210" width="210" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c6" value="&lt;b&gt;⏸ human input&lt;/b&gt;&lt;br&gt;clarifications, confirmations, labels, CR (per profile)" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="p3-1">
+          <mxGeometry x="950" y="210" width="210" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c7" value="&lt;b&gt;check&lt;/b&gt;&lt;br&gt;engine: GET /lifecycle/gates/Gn" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="p3-1">
+          <mxGeometry x="1200" y="210" width="210" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c8" value="&lt;b&gt;checks pass?&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fillColor=#f8cecc;strokeColor=#b85450;rhombus;" vertex="1" parent="p3-1">
+          <mxGeometry x="1450" y="210" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c9" value="&lt;b&gt;fix-loop&lt;/b&gt;&lt;br&gt;Claude fixes failing checks (max N)" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="p3-1">
+          <mxGeometry x="1450" y="400" width="210" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c10" value="&lt;b&gt;escalate&lt;/b&gt;&lt;br&gt;notify gate owner / AI lead" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="p3-1">
+          <mxGeometry x="1450" y="560" width="210" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c11" value="&lt;b&gt;brief&lt;/b&gt;&lt;br&gt;/speckit-adlc-gate Gn --json → briefs/Gn.md" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="p3-1">
+          <mxGeometry x="1660" y="210" width="210" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c12" value="&lt;b&gt;verify-ledger&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="p3-1">
+          <mxGeometry x="1910" y="210" width="170" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c13" value="&lt;b&gt;⏸ await signatures&lt;/b&gt;&lt;br&gt;people sign in UI; relay resumes on ledger event" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="p3-1">
+          <mxGeometry x="1910" y="400" width="200" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c14" value="&lt;b&gt;sync&lt;/b&gt;&lt;br&gt;re-read engine decision" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="p3-1">
+          <mxGeometry x="1660" y="400" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c15" value="&lt;b&gt;decision?&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fillColor=#f8cecc;strokeColor=#b85450;rhombus;" vertex="1" parent="p3-1">
+          <mxGeometry x="1660" y="560" width="200" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c16" value="approved → G(n+1)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="p3-1">
+          <mxGeometry x="1950" y="580" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c17" value="&lt;b&gt;rework&lt;/b&gt;&lt;br&gt;/speckit-adlc-rework: drift, rework note for the signers of the freezing gate" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="p3-1">
+          <mxGeometry x="1200" y="560" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c18" value="&lt;b&gt;⏸ wait&lt;/b&gt;&lt;br&gt;previous gate pending; resume on its approval" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="p3-1">
+          <mxGeometry x="450" y="400" width="210" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c19" value="&lt;b&gt;SLA timer&lt;/b&gt;&lt;br&gt;reminder → escalation" style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="p3-1">
+          <mxGeometry x="1910" y="690" width="200" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c20" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p3-1" source="p3-c2" target="p3-c3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c21" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p3-1" source="p3-c3" target="p3-c4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c22" value="yes" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p3-1" source="p3-c4" target="p3-c5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c23" value="no" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p3-1" source="p3-c4" target="p3-c18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c24" value="resume" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;dashed=1;exitX=0;exitY=0.5;entryX=0.5;entryY=1;" edge="1" parent="p3-1" source="p3-c18" target="p3-c3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c25" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p3-1" source="p3-c5" target="p3-c6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c26" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p3-1" source="p3-c6" target="p3-c7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c27" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p3-1" source="p3-c7" target="p3-c8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c28" value="yes" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p3-1" source="p3-c8" target="p3-c11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c29" value="no" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p3-1" source="p3-c8" target="p3-c9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c30" value="retry" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;exitX=0;exitY=0.5;entryX=0.5;entryY=1;" edge="1" parent="p3-1" source="p3-c9" target="p3-c7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c31" value="N reached" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p3-1" source="p3-c9" target="p3-c10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c32" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p3-1" source="p3-c11" target="p3-c12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c33" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p3-1" source="p3-c12" target="p3-c13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c34" value="event" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;dashed=1;" edge="1" parent="p3-1" source="p3-c13" target="p3-c14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c35" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p3-1" source="p3-c14" target="p3-c15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c36" value="approved" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p3-1" source="p3-c15" target="p3-c16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c37" value="rejected / drift" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="p3-1" source="p3-c15" target="p3-c17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c38" value="re-enter the freezing gate" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;dashed=1;exitX=0;exitY=0.5;entryX=0.5;entryY=1;" edge="1" parent="p3-1" source="p3-c17" target="p3-c3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c39" value="no decision in SLA" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#9673a6;fontSize=10;labelBackgroundColor=#ffffff;dashed=1;" edge="1" parent="p3-1" source="p3-c13" target="p3-c19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c40" value="&lt;b style='font-size:13px'&gt;State (LifecycleState)&lt;/b&gt;&lt;br&gt;use_case, release, gate, gate_status (cache), rework_count, branch, pr, flow_version, budget_used&lt;br&gt;&lt;br&gt;&lt;b&gt;Rules&lt;/b&gt;&lt;br&gt;• Every resume starts with sync: the engine decides, the event only wakes the thread&lt;br&gt;• Nodes are idempotent; a thread can be restarted from engine state after a flow upgrade&lt;br&gt;• Worker output is commits + PR, not graph state&lt;br&gt;• No node calls a decision route (client does not expose them)" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p3-1">
+          <mxGeometry x="40" y="760" width="700" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c41" value="&lt;b style='font-size:13px'&gt;Per-gate profile drives the subgraph&lt;/b&gt;&lt;br&gt;author tasks: G0 intake · G1 specify/checklist/clarify · G2 plan · G3 tasks/analyze/implement · G4 RAI suites · G5 CR, release record · G6/G7 reports&lt;br&gt;human inputs: G0 submit + classification · G1 answers + limits/KPIs · G3 labels + PR review · G5 CAB&lt;br&gt;checks + thresholds: from gate profile for the use case's risk tier&lt;br&gt;triggers: G0 on intake event · G6/G7 on schedule after hypercare / review window" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p3-1">
+          <mxGeometry x="760" y="760" width="760" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-c42" value="&lt;b style='font-size:13px'&gt;Lessons from the 0.4.0 pilot built into the design&lt;/b&gt;&lt;br&gt;• Checklist at G1 found 7 gaps → keep checklist + clarify as author tasks with human answers&lt;br&gt;• Plan found a misrouted scenario → rework back to G1 signers, not a silent fix&lt;br&gt;• PR merged before G3 was signed → adlc-gates required check in CI&lt;br&gt;• Deliberate G4 rejection → rework path is a first-class edge&lt;br&gt;• /speckit-analyze needs tasks.md → runs at G3, not G2&lt;br&gt;• Guard hook has false positives / gaps → enforcement lives in the engine, hook is defence in depth" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#999999;fontSize=11;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;" vertex="1" parent="p3-1">
+          <mxGeometry x="1540" y="760" width="820" height="300" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

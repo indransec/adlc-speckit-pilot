@@ -133,7 +133,7 @@ Existing repository layout (plan.md "Source Code"): `agents/<agent>/src/`, `tool
 - [X] T040 [P] [US4] Draft templates `missed_connection_paid`, `missed_connection_partial`, `missed_connection_rejected` in `agents/communication/templates/approved.yaml` (breakdown, clause per deduction, appeal 8.1) [REQ-F-039, REQ-B-008]
 - [X] T041 [US4] Template selection for `missed_connection` in `agents/communication/src/agent.py` [REQ-F-039]
 - [X] T042 [US4] Letter eval cases for the three outcomes in `evals/agents/communication/suite.yaml` [REQ-F-039]
-- [ ] T043 [HUMAN: compliance] Compliance reviews and approves the three missed connection templates (G4 artifact `agents/communication/templates/approved.yaml`)
+- [X] T043 [HUMAN: compliance] Compliance reviews and approves the three missed connection templates (G4 artifact `agents/communication/templates/approved.yaml`)
 
 ---
 
@@ -178,8 +178,8 @@ Existing repository layout (plan.md "Source Code"): `agents/<agent>/src/`, `tool
 - [ ] TA05 Open the pull request `release/0.4.0` → `main` with CODEOWNERS reviewers
 - [X] TA06 `uv run python -m scripts.adlc check G3`; `/speckit-adlc-gate G3` writes `briefs/G3.md`
 - [X] TA07 RAI: fairness, PII, injection and red-team suites pass (in `make evals`); RAI card and transparency notice updated (T053)
-- [ ] TA08 [HUMAN: compliance] Letter templates approved (T043)
-- [ ] TA09 `uv run python -m scripts.adlc check G4`; `/speckit-adlc-gate G4` writes `briefs/G4.md`
+- [X] TA08 [HUMAN: compliance] Letter templates approved (T043)
+- [X] TA09 `uv run python -m scripts.adlc check G4`; `/speckit-adlc-gate G4` writes `briefs/G4.md`
 
 **Checkpoint**: G3 is signed by AI lead + Product owner; G4 by RAI/Risk + Compliance.
 

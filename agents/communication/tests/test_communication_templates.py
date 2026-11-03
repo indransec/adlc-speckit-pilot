@@ -8,7 +8,8 @@ from tools.notify.impl import TemplateNotApproved, approved, render
 CTX = {"claimant_name": "A B", "claim_id": "CLM-X", "claim_label": "baggage", "missing": ["PIR"], "day": 3,
        "outcome": "partial", "opening": "Thank you.", "claimed_usd": 100.0, "approved_usd": 50.0, "payment_note": "Paid.",
        "deductions": [{"clause": "6.1", "clause_title": "Receipts", "amount_usd": 50.0, "explanation": "No receipt."}],
-       "reasons": [{"clause": "3.3", "clause_title": "Delay exclusions", "explanation": "Under 6 hours."}]}
+       "reasons": [{"clause": "3.3", "clause_title": "Delay exclusions", "explanation": "Under 6 hours."}],
+       "inbound_leg": "LH903", "onward_leg": "BA0175", "connection_airport": "LHR"}   # 0.4.0 missed connection letters
 
 
 @pytest.mark.parametrize("tid", sorted(k for k, t in approved().items() if t.get("status") == "approved"))  # drafts pending Compliance excluded (0.4.0)
